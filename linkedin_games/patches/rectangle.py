@@ -37,7 +37,7 @@ class Rectangle():
 
 
     def __str__(self) -> str:
-        return f"Rectangle(x={self.x}, y={self.y},  width={self.width}, height={self.height}, squares={self.squares})"
+        return f"Rectangle(x={self.x}, y={self.y}, width={self.width}, height={self.height}, squares={self.squares})"
 
 
     def __eq__(self, other) -> bool:
@@ -93,7 +93,7 @@ class Rectangle():
 
 
     @property
-    def area(self):
+    def area(self) -> int:
         return self._width * self._height
 
 

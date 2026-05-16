@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-from .rectangle import Rectangle, RecType
+from rectangle import Rectangle, RecType
 
 
 class Patches(pyo.ConcreteModel):
@@ -73,7 +73,7 @@ class Patches(pyo.ConcreteModel):
             I, J, K,
             rule= lambda model, i, j, k: r[k] - i <= m*(1 - x[i,j,k])
         )
-
+        
         self.row_upper_bound_coverage_constraints = pyo.Constraint(
             I, J, K,
             rule= lambda model, i, j, k: i - (r[k] + h[k] - 1) <= m*(1 - x[i,j,k])
@@ -83,7 +83,7 @@ class Patches(pyo.ConcreteModel):
             I, J, K,
             rule= lambda model, i, j, k: c[k] - j <= n*(1 - x[i,j,k])
         )
-
+        
         self.column_upper_bound_coverage_constraints = pyo.Constraint(
             I, J, K,
             rule= lambda model, i, j, k: j - (c[k] + w[k] - 1) <= n*(1 - x[i,j,k])

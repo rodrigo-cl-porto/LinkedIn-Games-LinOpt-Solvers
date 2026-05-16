@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
+
 class Queens(pyo.ConcreteModel):
 
     def __init__(self, board_dims:tuple[int], regions:dict) -> None:
@@ -19,15 +20,15 @@ class Queens(pyo.ConcreteModel):
         K = self.Colors = pyo.Set(initialize=regions.keys())
 
         # Sets
-        S = self.S = pyo.Set(initialize=lambda model: [(i,j) for i in I for j in J])
+        S = self.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J])
         R = self.R = pyo.Set(K, initialize=regions, dimen=2)
         D = self.D = pyo.Set(initialize=lambda model: [
-            ((i, j), (i+1, j+1)) for (i,j) in S if (i+1,j+1) in S] + [
-            ((i, j), (i+1, j-1)) for (i,j) in S if (i+1,j-1) in S
+            ((i, j), (i+1, j+1)) for (i, j) in S if (i+1, j+1) in S] + [
+            ((i, j), (i+1, j-1)) for (i, j) in S if (i+1, j-1) in S
         ])
 
         # Objective function
-        self.obj = pyo.Objective(expr=0, sense=pyo.maximize)
+        self.obj = pyo.Objective(expr=0)
 
         # Decision Variables
         x = self.x = pyo.Var(S, within=pyo.Binary, initialize=0)
@@ -54,7 +55,7 @@ class Queens(pyo.ConcreteModel):
         )
 
 
-    def solve(self):
+    def solve(self) -> None:
 
         # Optmization result
         result = pyo.SolverFactory("gurobi").solve(self)
@@ -64,15 +65,14 @@ class Queens(pyo.ConcreteModel):
         else:
             print("No feasible solution was found!")
             print(result.Solver)
-        
 
 
-    def show(self):
+    def show(self) -> None:
 
         G = nx.grid_2d_graph(self.n, self.m)
         plt.figure(figsize=(3.4, 3.4))
         
-        squares = [(i-1, j-1) for (i,j) in sorted(list(self.S))]
+        squares = [(i-1, j-1) for (i, j) in sorted(list(self.S))]
 
         color_map = [{(i-1, j-1): region for (i,j) in squares} for region, squares in regions.items()]
         color_map = {square: region for d in color_map for square, region in d.items()}
@@ -93,7 +93,7 @@ class Queens(pyo.ConcreteModel):
 
         nx.draw(
             G,
-            pos= {(i,j): (j, -i) for i, j in G.nodes()},
+            pos= {(i, j): (j, -i) for i, j in G.nodes()},
             with_labels= True,
             labels= {(i-1, j-1): "O" for (i,j) in solution},
             node_size= 1000,
@@ -117,4 +117,5 @@ if __name__ == "__main__":
     }
 
     queens = Queens((7,7), regions)
-    queens.solve().show()
+    queens.solve()
+    queens.show()

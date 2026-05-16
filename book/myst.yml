@@ -44,7 +44,7 @@ project:
         file: ./notebooks/4-mini-sudoku.ipynb
       - title: Patches
         file: ./notebooks/5-patches.ipynb
-        hidden: true
+        #hidden: true
     - title: Some Useful Python Concepts
       children:
       - title: Chained and Multiple Assigments
