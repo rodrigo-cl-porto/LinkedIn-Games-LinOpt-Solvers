@@ -12,11 +12,13 @@ project:
     - LinkedIn Tango
     - LinkedIn Zip
     - LinkedIn Mini Sudoku
+    - LinkedIn Patches
     - Linear Optimization
     - Python
     - Pyomo
     - NetworkX
     - Gurobipy
+    - Highspy
   authors:
     - name: Rodrigo Celso de Lima Porto
       email: rodrigo.cl.porto@gmail.com
@@ -32,6 +34,8 @@ project:
   toc:
     - title: Introduction
       file: landing.md
+    - title: What is Linear Optimization?
+      file: ./notebooks/0-linear-optimization.ipynb
     - title: How to Solve
       children:
       - title: Queens
@@ -44,8 +48,7 @@ project:
         file: ./notebooks/4-mini-sudoku.ipynb
       - title: Patches
         file: ./notebooks/5-patches.ipynb
-        #hidden: true
-    - title: Some Useful Python Concepts
+    - title: Useful Pythonic Concepts
       children:
       - title: Chained and Multiple Assigments
         url: https://www.w3schools.com/python/python_variables_multiple.asp
@@ -55,16 +58,18 @@ project:
         url: https://www.geeksforgeeks.org/python/python-lambda-anonymous-functions-filter-map-reduce/
       - title: Classes and Objects
         url: https://www.geeksforgeeks.org/python/python-classes-and-objects/
-    - title: Python Libraries Used in This Book
+    - title: Python Libraries
       children:
-      - title: Pyomo
-        url: https://www.pyomo.org/
       - title: Gurobipy
         url: https://www.gurobi.com/faqs/gurobipy/
-      - title: NetworkX
-        url: https://networkx.org/
+      - title: Highspy
+        url: https://anaconda.org/channels/conda-forge/packages/highspy/overview
       - title: Matplotlib
         url: https://matplotlib.org/
+      - title: NetworkX
+        url: https://networkx.org/
+      - title: Pyomo
+        url: https://www.pyomo.org/
   abbreviations:
     BLO: Binary Linear Optimization
     BLOP: Binary Linear Optimization Problem
@@ -73,6 +78,7 @@ project:
     MTZ: Miller-Tucker-Zemlin
     NLO: Non-Linear Optimization
     NLOP: Non-Linear Optimization Problem
+    No.: Number
     S.t.: Subject to
   kernelspec:
     language: python

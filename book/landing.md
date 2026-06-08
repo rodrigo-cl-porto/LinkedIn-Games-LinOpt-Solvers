@@ -39,10 +39,6 @@ It'll be assumed that you have familiarity with the following topics:
 :::{tip} Learning Goals
 Along this book, you'll learn how to:
 - Apply Linear Optimization to solve the LinkedIn minigames:
-  - Queens
-  - Tango
-  - Zip
-  - Mini Sudoku
 - Create optimization models with the Pyomo library
 - Solve problems with network logic with the NetworkX library
 - Display the results with graphical manipulation via Matplotlib
