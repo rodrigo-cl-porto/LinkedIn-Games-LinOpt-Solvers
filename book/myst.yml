@@ -34,8 +34,8 @@ project:
   toc:
     - title: Introduction
       file: landing.md
-    - title: What is Linear Optimization?
-      file: ./notebooks/0-linear-optimization.ipynb
+    - title: What is Optimization?
+      file: ./notebooks/0-optimization.ipynb
     - title: How to Solve
       children:
       - title: Queens
@@ -73,6 +73,7 @@ project:
   abbreviations:
     BLO: Binary Linear Optimization
     BLOP: Binary Linear Optimization Problem
+    KKT: Karush-Kuhn-Tucker
     LO: Linear Optimization
     LOP: Linear Optimization Problem
     MTZ: Miller-Tucker-Zemlin
