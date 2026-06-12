@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-from rectangle import Rectangle, RecType
+from .rectangle import Rectangle, RecType
 
 
 class Patches(pyo.ConcreteModel):
@@ -132,6 +132,8 @@ class Patches(pyo.ConcreteModel):
             print("It was not possible to find a feasible solution for the game.")
             print(result.Solver)
 
+        return None
+
 
     def show(self) -> None:
 
@@ -148,10 +150,12 @@ class Patches(pyo.ConcreteModel):
         )
         plt.show()
 
+        return None
+
 
 if __name__ == "__main__":
 
-    # Example of Tango No. 15
+    # Example of Patches No. 16
     rectangles = {
         "yellow":  Rectangle((1, 2), RecType.ANY,      2, "#846A0B"),
         "teal":    Rectangle((1, 4), RecType.ANY,      6, "#096B78"),

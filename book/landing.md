@@ -12,7 +12,7 @@ site:
 
 A public Jupyter book to learn ludically how to apply Linear Optimization with Python to solve LinkedIn Games
 
-{button}`Let's get it started! <./notebooks/1-queens.ipynb>`
+{button}`Let's get it started! <./notebooks/0-optimization.ipynb>`
 
 :::{image} ./assets/logos/cover.png
 :alt: Solving LinkedIn Games by Linear Optimization
@@ -23,7 +23,7 @@ A public Jupyter book to learn ludically how to apply Linear Optimization with P
 
 ## About this book
 
-This book is a personal project created along 2025 in order to teach how to create and apply optimization models with Python libraries like Pyomo and NetworkX to solve some games available on LinkedIn.
+This book is a personal project based on Medium articles I wrote along 2025 in order to teach how to create and apply optimization models with Python libraries like Pyomo and NetworkX to solve some games available on LinkedIn.
 
 :::{important}
 It'll be assumed that you have familiarity with the following topics:
