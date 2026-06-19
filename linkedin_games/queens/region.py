@@ -60,6 +60,10 @@ class QueensBoard():
         self._regions = regions
 
 
+    def __len__(self):
+        return self._m * self._n
+
+
     @property
     def rows(self) -> int:
         return self._m
@@ -96,11 +100,6 @@ class QueensBoard():
             raise TypeError(msg)
         
         self._n = int(round(value, 0))
-
-
-    @property
-    def size(self) -> int:
-        return self._m * self._n
     
     
     @property
@@ -119,10 +118,8 @@ class QueensBoard():
         if len(value) != len({r.color for r in value}):
             msg = "There must not be two regions with the same color."
             raise ValueError(msg)
-        
-        board_size = self._m * self._n
 
-        if board_size != len({r.squares for r in value}):
+        if len({r.squares for r in value}) != len(self):
             msg = "The regions must be a partition of the board game"
             raise ValueError(msg)
         
