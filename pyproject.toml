@@ -1,7 +1,8 @@
 [project]
 name = "Solving-LinkedIn-Games-by-Linear-Optimization"
 version = "0.1.2"
-description = "Add your description here"
+description = "A Python package for solving LinkedIn games using linear optimization techniques."
+authors = [{ name = "Rodrigo Celso de Lima Porto", email = "rodrigo.cl.porto@gmail.com"}]
 readme = "README.md"
 license = { file = "LICENSE.md" }
 requires-python = ">=3.13"

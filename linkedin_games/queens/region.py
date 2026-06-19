@@ -5,6 +5,29 @@ class Region():
         self._color = color
 
 
+    def __repr__(self) -> str:
+        return f"Region(color={self._color}, squares={self._squares})"
+
+
+    def __str__(self) -> str:
+        return f"Region with color {self._color} and squares {self._squares}"
+    
+
+    def __len__(self) -> int:
+        return len(self._squares)
+
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Region):
+            return False
+        
+        return self._squares == other.squares and self._color == other.color
+
+
+    def __ne__(self, other) -> bool:
+        return not self.__eq__(other)
+
+
     @property
     def squares(self) -> set[tuple[int]]:
         return self._squares
@@ -12,6 +35,10 @@ class Region():
 
     @squares.setter
     def squares(self, value:set[tuple[int]]):
+
+        if value is list:
+            self._squares = {*value}
+
         self._squares = value
 
 
@@ -36,7 +63,7 @@ class QueensBoard():
     @property
     def rows(self) -> int:
         return self._m
-    
+
 
     @rows.setter
     def rows(self, value: int):
@@ -79,25 +106,27 @@ class QueensBoard():
     @property
     def squares(self) -> set[tuple[int]]:
         return {(i,j) for i in range(1, self._m+1) for j in range(1, self._n+1)}
-    
+
 
     @property
     def regions(self) -> dict|list[Region]:
         return self._regions
-    
+
 
     @regions.setter
-    def regions(self, value:tuple[Region]):
+    def regions(self, value:list[Region]):
 
         if len(value) != len({r.color for r in value}):
             msg = "There must not be two regions with the same color."
             raise ValueError(msg)
         
-        if {set(r.squares) for r in value}.is
+        board_size = self._m * self._n
+
+        if board_size != len({r.squares for r in value}):
+            msg = "The regions must be a partition of the board game"
+            raise ValueError(msg)
         
         self._regions = {r.color: r.squares for r in value}
-
-        
 
 
 if __name__ == "__main__":

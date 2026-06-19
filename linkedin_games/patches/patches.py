@@ -116,7 +116,7 @@ class Patches(pyo.ConcreteModel):
         )
     
     
-    def solve(self) -> None:
+    def solve(self, verbose:bool=False) -> None:
         result = pyo.SolverFactory("highs").solve(self)
 
         if result.Solver.status == SolverStatus.ok and result.Solver.termination_condition == TerminationCondition.optimal:
@@ -127,7 +127,8 @@ class Patches(pyo.ConcreteModel):
                 rect.y = int(round(self.r[k].value, 0))
                 rect.width = int(round(self.w[k].value, 0))
                 rect.height = int(round(self.h[k].value, 0))
-                print(f"{k}: {repr(rect)}")
+                if verbose:
+                    print(f"{k}: {repr(rect)}")
         else:
             print("It was not possible to find a feasible solution for the game.")
             print(result.Solver)
@@ -170,5 +171,5 @@ if __name__ == "__main__":
     }
 
     patches = Patches((6,6), rectangles)
-    patches.solve()
+    patches.solve(verbose=True)
     patches.show()
