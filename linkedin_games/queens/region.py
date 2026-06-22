@@ -1,16 +1,19 @@
+import re
+
 class Region():
 
-    def __init__(self, squares:set[tuple[int]], color:str="#FFFFFF"):
+    def __init__(self, name:str, squares:set[tuple[int, int]], color:str="#000000"):
+        self._name = name
         self._squares = squares
         self._color = color
 
 
     def __repr__(self) -> str:
-        return f"Region(color={self._color}, squares={self._squares})"
+        return f"Region(name={self._name}, color={self._color}, squares={self._squares!r})"
 
 
     def __str__(self) -> str:
-        return f"Region with color {self._color} and squares {self._squares}"
+        return f"Region {self._name} with color {self._color} and squares {self._squares!r}"
     
 
     def __len__(self) -> int:
@@ -29,15 +32,23 @@ class Region():
 
 
     @property
-    def squares(self) -> set[tuple[int]]:
-        return self._squares
+    def name(self) -> str:
+        return self._name
+    
+    @name.setter
+    def name(self, value:str) -> None:
+        self._name = value
     
 
-    @squares.setter
-    def squares(self, value:set[tuple[int]]):
+    @property
+    def squares(self) -> set[tuple[int, int]]:
+        return self._squares
 
-        if value is list:
-            self._squares = {*value}
+    @squares.setter
+    def squares(self, value:set[tuple[int, int]]):
+
+        if isinstance(value, list):
+            self._squares = set(*value)
 
         self._squares = value
 
@@ -46,97 +57,13 @@ class Region():
     def color(self) -> str:
         return self._color
     
-
     @color.setter
     def color(self, value:str):
+
+        pattern = re.compile(r"^\#[0-9A-F]{6}$", re.IGNORECASE)
+
+        if not isinstance(value, str) or re.fullmatch(pattern, value) is None:
+            msg = f"The color must be a hex code like '#RRGGBB'. Got {value!r} instead."
+            raise ValueError(msg)
+        
         self._color = value
-
-
-class QueensBoard():
-    
-    def __init__(self, rows:int, columns:int, regions:tuple[Region]):
-        self._m = rows
-        self._n = columns
-        self._regions = regions
-
-
-    def __len__(self):
-        return self._m * self._n
-
-
-    @property
-    def rows(self) -> int:
-        return self._m
-
-
-    @rows.setter
-    def rows(self, value: int):
-
-        if value < 1:
-            msg = "The number of rows must not be less than 1."
-            raise ValueError(msg)
-        
-        if value % 1 == 0:
-            msg = "The number of rows must be an integer."
-            raise TypeError(msg)
-        
-        self._m = int(round(value, 0))
-
-
-    @property
-    def columns(self) -> int:
-        return self._n
-    
-    
-    @columns.setter
-    def columns(self, value: int):
-
-        if value < 1:
-            msg = "The number of columns must not be less than 1."
-            raise ValueError(msg)
-        
-        if value % 1 == 0:
-            msg = "The number of columns must be an integer."
-            raise TypeError(msg)
-        
-        self._n = int(round(value, 0))
-    
-    
-    @property
-    def squares(self) -> set[tuple[int]]:
-        return {(i,j) for i in range(1, self._m+1) for j in range(1, self._n+1)}
-
-
-    @property
-    def regions(self) -> dict|list[Region]:
-        return self._regions
-
-
-    @regions.setter
-    def regions(self, value:list[Region]):
-
-        if len(value) != len({r.color for r in value}):
-            msg = "There must not be two regions with the same color."
-            raise ValueError(msg)
-
-        if len({r.squares for r in value}) != len(self):
-            msg = "The regions must be a partition of the board game"
-            raise ValueError(msg)
-        
-        self._regions = {r.color: r.squares for r in value}
-
-
-if __name__ == "__main__":
-
-    regions = {
-        "purple": [(1,1), (1,2), (1,3), (1,4), (1,5), (1,6), (1,7), (2,6), (2,7), (3,6), (3,7), (4,6), (4,7), (5,7), (6,7), (7,7)],
-        "orange": [(2,1), (2,2), (2,3), (2,4), (3,1), (4,1), (4,2), (5,1), (5,2), (6,1), (6,2), (6,4), (6,5), (6,6), (7,1), (7,2), (7,3), (7,4), (7,5), (7,6)],
-        "blue": [(2,5), (3,5)],
-        "green": [(3,2), (3,3)],
-        "gray": [(3,4), (4,3), (4,4), (4,5), (5,4)],
-        "red": [(5,3), (6,3)],
-        "yellow": [(5,5), (5,6)]
-    }
-
-    game_board = QueensBoard(6,6, regions)
-    print(game_board.squares)
