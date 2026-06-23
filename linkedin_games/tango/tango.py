@@ -4,81 +4,143 @@ import networkx as nx
 import pyomo.environ as pyo
 
 
-class Tango(pyo.ConcreteModel):
+class Tango:
 
-    def __init__(self, board_dims:tuple[int], like_pairs:dict, opp_pairs:dict, filled_squares:dict):
-
-        super().__init__()
-
-        # Board dimensions
-        m, n = board_dims
-        self.m = pyo.Param(initialize=m, within=pyo.PositiveIntegers)
-        self.n = pyo.Param(initialize=n, within=pyo.PositiveIntegers)
-
-        # Ranges
-        I = self.I = pyo.RangeSet(n)
-        J = self.J = pyo.RangeSet(m)
-
-        # Sets
-        S = self.squares = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J])
-        L = self.L = pyo.Set(initialize=like_pairs)
-        O = self.O = pyo.Set(initialize=opp_pairs)
-        K = self.K = pyo.Set(initialize=filled_squares.keys(), dimen=2)
-
-        # Decision variables
-        x = self.x = pyo.Var(I, J, within=pyo.Binary)
+    def __init__(self,
+                board_dims:tuple[int, int],
+                like_pairs:set[tuple[tuple[int, int], tuple[int, int]]] | None,
+                opp_pairs:set[tuple[tuple[int, int], tuple[int, int]]] | None,
+                filled_squares:dict[tuple[int, int]: bool] | None
+                ) -> None:
+        self.board_dims = board_dims
+        self.like_pairs = like_pairs
+        self.opp_pairs = opp_pairs
+        self.filled_squares = filled_squares
+        self._model: pyo.ConcreteModel | None = None
+        self._stale: bool = True # This property indicates whether the model needs to be rebuilt due to changes in the game settings.
     
-        # Parameters
-        k = self.FilledValues = pyo.Param(K, initialize=filled_squares, within=pyo.Binary)
 
-        # Objective function
-        self.obj = pyo.Objective(expr=0, sense=pyo.maximize)
+    def __hash__(self) -> int:
+        return hash((self._board_dims, self._like_pairs, self._opp_pairs, self._filled_squares))
 
-        # Constraints
-        self.equal_moons_suns_per_row_constraints = pyo.Constraint(
+
+    def __len__(self) -> int:
+        m, n = self._board_dims
+        return m * n
+
+
+    @property
+    def board_dims(self) -> tuple[int, int]:
+        return self._board_dims
+
+    @board_dims.setter
+    def board_dims(self, value: tuple[int, int] = (1, 1)) -> None:
+
+        if not isinstance(value, tuple):
+            msg = f"Board dimensions must be a tuple, got {value!r}"
+            raise ValueError(msg)
+        
+        if len(value) != 2:
+            msg = f"Board dimensions must be a pair (m,n), got {value!r}"
+            raise ValueError(msg)
+        
+        if not all(isinstance(x, int) and not isinstance(x, bool) for x in value):
+            msg = f"Board dimensions must be integers, got {value!r}"
+            raise ValueError(msg)
+        
+        if any(x < 1 for x in value):
+            msg = f"Board dimensions must be positive, got {value!r}"
+            raise ValueError(msg)
+
+        self._board_dims = value
+        self._stale = True
+    
+
+    @property
+    def like_pairs(self) -> set[tuple[tuple[int, int], tuple[int, int]]] | None:
+        return self._like_pairs
+    
+    @like_pairs.setter
+    def like_pairs(self, value:set[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
+        pass
+
+
+    def _build_model(self) -> None:
+        model = pyo.ConcreteModel()
+
+        # BOARD DIMENSIONS
+        m, n = self._board_dims
+        model.m = pyo.Param(initialize=m, within=pyo.PositiveIntegers)
+        model.n = pyo.Param(initialize=n, within=pyo.PositiveIntegers)
+
+        # RANGE SETS
+        I = model.I = pyo.RangeSet(n)
+        J = model.J = pyo.RangeSet(m)
+
+        # COMPOSITE SETS
+        S = model.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Board Squares
+        L = model.L = pyo.Set(initialize=like_pairs)
+        O = model.O = pyo.Set(initialize=opp_pairs)
+        K = model.K = pyo.Set(initialize=filled_squares.keys(), dimen=2)
+
+        # DECISION VARIABLES
+        x = model.x = pyo.Var(I, J, within=pyo.Binary)
+    
+        # PARAMETERS
+        k = model.FilledValues = pyo.Param(K, initialize=filled_squares, within=pyo.Binary)
+
+        # OBJECTIVE FUNCTION
+        model.obj = pyo.Objective(expr=0, sense=pyo.maximize)
+
+        # CONSTRAINTS
+        model.equal_moons_suns_per_row_constraints = pyo.Constraint(
             I,
             rule=lambda model, i: sum(x[i,j] for j in J) == n/2
         )
 
-        self.equal_moons_suns_per_column_constraints = pyo.Constraint(
+        model.equal_moons_suns_per_column_constraints = pyo.Constraint(
             J,
             rule=lambda model, j: sum(x[i,j] for i in I) == m/2
         )
 
-        self.no_three_consecutive_moons_per_row_constraints = pyo.Constraint(
+        model.no_three_consecutive_moons_per_row_constraints = pyo.Constraint(
             I, pyo.RangeSet(n-2),
             rule=lambda model, i, j: x[i,j] + x[i,j+1] + x[i,j+2] <= 2
         )
     
-        self.no_three_consecutive_suns_per_row_constraints = pyo.Constraint(
+        model.no_three_consecutive_suns_per_row_constraints = pyo.Constraint(
             I, pyo.RangeSet(n-2),
             rule=lambda model, i, j: x[i,j] + x[i,j+1] + x[i,j+2] >= 1
         )
 
-        self.no_three_consecutive_moons_per_column_constraints = pyo.Constraint(
+        model.no_three_consecutive_moons_per_column_constraints = pyo.Constraint(
             pyo.RangeSet(m-2), J,
             rule=lambda model, i, j: x[i,j] + x[i+1,j] + x[i+2,j] <= 2
         )
         
-        self.no_three_consecutive_suns_per_column_constraints = pyo.Constraint(
+        model.no_three_consecutive_suns_per_column_constraints = pyo.Constraint(
             pyo.RangeSet(m-2), J,
             rule=lambda model, i, j: x[i,j] + x[i+1,j] + x[i+2,j] >= 1
         )
 
-        self.like_pairs_constraints = pyo.Constraint(
+        model.like_pairs_constraints = pyo.Constraint(
             L,
             rule=lambda model, i, j, r, s: x[i,j] - x[r,s] == 0
         )
 
-        self.opposite_pairs_constraints = pyo.Constraint(
+        model.opposite_pairs_constraints = pyo.Constraint(
             O,
             rule=lambda model, i, j, r, s: x[i,j] + x[r,s] == 1
         )
 
-        self.already_filled_squares_constraints = pyo.Constraint(
+        model.already_filled_squares_constraints = pyo.Constraint(
             K,
             rule=lambda model, i, j: x[i,j] == k[i,j]
         )
+
+        # Attach model
+        self._model = model
+        self._stale = False
 
     
     def solve(self):
@@ -130,14 +192,14 @@ class Tango(pyo.ConcreteModel):
 if __name__ == "__main__":
 
     # like (=) pairs, each element is ((i,j),(r,s))
-    like_pairs = [
+    like_pairs = {
         ((2, 3), (2, 4)),
         ((2, 1), (3, 1)),
         ((2, 3), (3, 3)),
         ((2, 6), (3, 6)),
         ((4, 1), (4, 2)),
         ((6, 3), (6, 4)),
-    ]
+    }
 
     # opposite (X) pairs
     opp_pairs = [
@@ -158,4 +220,5 @@ if __name__ == "__main__":
     }
 
     tango = Tango((6,6), like_pairs, opp_pairs, filled_squares)
-    tango.solve().show()
+    tango.solve()
+    tango.show()

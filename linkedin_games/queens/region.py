@@ -1,19 +1,31 @@
+from matplotlib.colors import CSS4_COLORS
 import re
 
 class Region():
 
-    def __init__(self, name:str, squares:set[tuple[int, int]], color:str="#000000"):
-        self._name = name
-        self._squares = squares
-        self._color = color
+    """
+    A class representing a colored region on a Queens board game.
+
+    Attributes:
+        squares (set[tuple[int, int]]): A set of tuples representing the coordinates of the squares in the region.
+        color (str): The color of the region in hex format (e.g., "#RRGGBB").
+    """
+
+    def __init__(self, squares:set[tuple[int, int]], color:str="#FFFFFF"):
+        self.squares = squares
+        self.color = color
 
 
     def __repr__(self) -> str:
-        return f"Region(name={self._name}, color={self._color}, squares={self._squares!r})"
+        return (
+            "Region(\n\t"
+            f"color={self._color},\n\t"
+            f"squares={self._squares!r}\n)"
+        )
 
 
     def __str__(self) -> str:
-        return f"Region {self._name} with color {self._color} and squares {self._squares!r}"
+        return f"Region with color {self._color} and squares {self._squares!r}."
     
 
     def __len__(self) -> int:
@@ -31,13 +43,8 @@ class Region():
         return not self.__eq__(other)
 
 
-    @property
-    def name(self) -> str:
-        return self._name
-    
-    @name.setter
-    def name(self, value:str) -> None:
-        self._name = value
+    def __hash__(self) -> int:
+        return hash((frozenset(self._squares), self._color))
     
 
     @property
@@ -45,10 +52,25 @@ class Region():
         return self._squares
 
     @squares.setter
-    def squares(self, value:set[tuple[int, int]]):
+    def squares(self, value: set[tuple[int, int]]):
 
-        if isinstance(value, list):
-            self._squares = set(*value)
+        if not isinstance(value, set):
+            msg = f"Squares must be a set. Got {value!r} instead."
+            raise TypeError(msg)
+        
+        if len(value) < 1:
+            msg = f"The set of squares must contain at least one square. Got {value!r} instead."
+            raise ValueError(msg)
+        
+        invalid_squares = {square for square in value if not isinstance(square, tuple) or len(square) != 2}
+        if invalid_squares:
+            msg = f"Each square must be a tuple of length 2. Got the following set of invalid squares: {invalid_squares!r}."
+            raise ValueError(msg)
+        
+        invalid_squares = {square for square in value if any(not isinstance(coord, int) or coord < 1 for coord in square)}
+        if invalid_squares:
+            msg = f"Each coordinate in the squares must be an positive integer. Got the following set of invalid squares: {invalid_squares!r}."
+            raise ValueError(msg)
 
         self._squares = value
 
@@ -58,12 +80,29 @@ class Region():
         return self._color
     
     @color.setter
-    def color(self, value:str):
+    def color(self, value:str) -> None:
 
-        pattern = re.compile(r"^\#[0-9A-F]{6}$", re.IGNORECASE)
+        try:
+            hex_code = CSS4_COLORS[value.strip().lower()]
 
-        if not isinstance(value, str) or re.fullmatch(pattern, value) is None:
-            msg = f"The color must be a hex code like '#RRGGBB'. Got {value!r} instead."
-            raise ValueError(msg)
-        
-        self._color = value
+        except KeyError:
+            pattern = re.compile(r"^\#[0-9A-F]{6}$", re.IGNORECASE)
+
+            if not isinstance(value, str) or re.fullmatch(pattern, value) is None:
+                msg = f"The color must be a color name or a hex code like '#RRGGBB'. Got {value!r} instead."
+                raise ValueError(msg)
+            
+            self._color = value
+
+        else:
+            self._color = hex_code
+
+
+if __name__ == "__main__":
+
+    # Example usage
+    region1 = Region(color="Red", squares={(1, 1), (1, 2)})
+    region2 = Region(color="Green", squares={(2, 1), (2, 2)})
+
+    print(region1)
+    print(region2)

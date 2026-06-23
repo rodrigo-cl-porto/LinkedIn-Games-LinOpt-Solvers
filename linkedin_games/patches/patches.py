@@ -3,17 +3,29 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-from rectangle import Rectangle, RecType
+from rectangle import TipSeed, Rectangle, RecType
 
 
 class Patches:
 
-    def __init__(self, board_dims: tuple[int, int], rectangles: dict[str, Rectangle]):
-        self.board_dims = board_dims
-        self.rectangles = rectangles
-        self._model: pyo.ConcreteModel | None = None
-        self._stale = True # This tells if the model is obsolete or not.
+    """
+    A class representing a Patches board game with colored rectangles.
+    """
 
+    def __init__(self, board_dims: tuple[int, int], tip_seeds: tuple[TipSeed]):
+        self.board_dims = board_dims
+        self.tip_seeds = tip_seeds
+        self._rectangles: tuple[Rectangle] | tuple = ()
+        self._model: pyo.ConcreteModel | None = None
+        self._stale: bool = True # This property indicates whether the model needs to be rebuilt due to changes in the board dimensions or tip seeds.
+
+
+    def __len__(self) -> int:
+        m, n = self._board_dims
+        return m * n
+    
+    def __hash__(self) -> int:
+        return hash((self._board_dims, self._tip_seeds))
 
     @property
     def board_dims(self) -> tuple[int, int]:
@@ -22,20 +34,20 @@ class Patches:
     @board_dims.setter
     def board_dims(self, value: tuple[int, int] = (1, 1)) -> None:
 
-        if not isinstance(value, tuple[int, int]):
-            msg = f"board_dims must be a tuple, got {value!r}"
+        if not isinstance(value, tuple):
+            msg = f"Board dimensions must be a tuple, got {value!r}"
             raise ValueError(msg)
         
         if len(value) != 2:
-            msg = f"board_dims must be a pair (m,n), got {value!r}"
+            msg = f"Board dimensions must be a pair (m,n), got {value!r}"
             raise ValueError(msg)
         
         if not all(isinstance(x, int) and not isinstance(x, bool) for x in value):
-            msg = f"board_dims entries must be integers, got {value!r}"
+            msg = f"Board dimensions must be integers, got {value!r}"
             raise ValueError(msg)
         
         if any(x < 1 for x in value):
-            msg = f"board_dims entries must be positive, got {value!r}"
+            msg = f"Board dimensions must be positive, got {value!r}"
             raise ValueError(msg)
 
         self._board_dims = value
@@ -43,48 +55,63 @@ class Patches:
 
 
     @property
-    def rectangles(self) -> dict[str, Rectangle]:
-        return self._rectangles
+    def tip_seeds(self) -> tuple[TipSeed]:
+        return self._tip_seeds
 
-    @rectangles.setter
-    def rectangles(self, value: dict[str, Rectangle]) -> None:
+    @tip_seeds.setter
+    def tip_seeds(self, value: tuple[TipSeed]) -> None:
 
-        if not isinstance(value, dict):
-            msg = "Rectangles must be a dict keyed by rectangle names."
-            raise ValueError(msg)
+        if not isinstance(value, tuple):
+            msg = f"Tip seeds must be a tuple of TipSeed classes. Got a {type(value)} instead."
+            raise TypeError(msg)
         
         if len(value) < 1:
-            msg = "The dictionary of rectangles cannot be empty!"
+            msg = "The tip seeds cannot be empty!"
+            raise ValueError(msg)
+        
+        invalid_items = [item for item in value if not isinstance(item, TipSeed)]
+        if invalid_items:
+            msg = f"Tip seeds must be a tuple of TipSeed classes. Got the following invalid items: {invalid_items!r}."
+            raise TypeError(msg)
+        
+        if len(value) != len({tip.color for tip in value}):
+            msg = "There must not be two tip seeds with the same color."
+            raise ValueError(msg)
+        
+        seed_squares = [tip.seed_square for tip in value]
+        duplicated_squares = [square for square in seed_squares if seed_squares.count(square) > 1]
+        if duplicated_squares:
+            msg = (
+                "The seed squares must not overlap each other.\n"
+                f"The following squares are duplicated: {duplicated_squares}"
+            )
             raise ValueError(msg)
 
-        self._rectangles = value
+        self._tip_seeds = value
         self._stale = True
 
 
-    def __len__(self) -> int:
-        m, n = self._board_dims
-        return m * n
+    @property
+    def rectangles(self) -> tuple[Rectangle]:
+        return self._rectangles
 
 
     def _build_model(self) -> None:
-        m, n = self._board_dims
-        rectangles = self._rectangles
-
         model = pyo.ConcreteModel()
 
         # INDEX SETS
-        I = model.I = pyo.RangeSet(m)  # Rows
-        J = model.J = pyo.RangeSet(n)  # Columns
-        K = model.K = pyo.Set(initialize=list(rectangles.keys())) # Rectangles
+        m, n = self._board_dims
+        I = model.I = pyo.RangeSet(m) # Rows
+        J = model.J = pyo.RangeSet(n) # Columns
+        K = model.K = pyo.Set(initialize=(tip.color for tip in self.tip_seeds)) # Rectangle Tips
 
         # COMPOSITE SETS
         S = model.S = pyo.Set(initialize=[(i, j) for i in I for j in J])
-        # T is a set of triples (i,j,k) indicating tip square (i,j) for rectangle k
-        T = model.T = pyo.Set(initialize=[(rect.tip_square[0], rect.tip_square[1], key) for key, rect in rectangles.items()])
-        V = model.V = pyo.Set(initialize=[key for key, rect in rectangles.items() if rect.tip_type == RecType.VERTICAL])
-        H = model.H = pyo.Set(initialize=[key for key, rect in rectangles.items() if rect.tip_type == RecType.HORIZONTAL])
-        Q = model.Q = pyo.Set(initialize=[key for key, rect in rectangles.items() if rect.tip_type == RecType.SQUARE])
-        A = model.A = pyo.Set(initialize=[key for key, rect in rectangles.items() if rect.tip_area is not None])
+        T = model.T = pyo.Set(initialize=[(*tip.seed_square, tip.color) for tip in self.tip_seeds]) # Set of triples (i,j,k) indicating tip square (i,j) for rectangle k
+        V = model.V = pyo.Set(initialize=[tip.color for tip in self.tip_seeds if tip.rect_type == RecType.VERTICAL])
+        H = model.H = pyo.Set(initialize=[tip.color for tip in self.tip_seeds if tip.rect_type == RecType.HORIZONTAL])
+        Q = model.Q = pyo.Set(initialize=[tip.color for tip in self.tip_seeds if tip.rect_type == RecType.SQUARE])
+        A = model.A = pyo.Set(initialize=[tip.color for tip in self.tip_seeds if tip.rect_type is not None])
 
         # DECISION VARIABLES
         x = model.x = pyo.Var(I, J, K, domain=pyo.Binary)
@@ -96,7 +123,7 @@ class Patches:
         # PARAMETERS: tip area for those rectangles that specify it
         a = model.a = pyo.Param(
             K,
-            initialize= {key: rect.tip_area for key, rect in rectangles.items() if rect.tip_area is not None}
+            initialize= {tip.color: tip.seed_area for tip in self.tip_seeds if tip.seed_area is not None}
         )
 
         # OBJECTIVE FUNCTION
@@ -139,14 +166,12 @@ class Patches:
 
         # Tip Constraints
 
-        # Tip square
-        model.tip_square_constraints = pyo.Constraint(
+        model.seed_square_constraints = pyo.Constraint( # Seed square
             T,
             rule=lambda model, i, j, k: x[i, j, k] == 1
-        )
+        ) 
 
-        # Tip area
-        model.tip_area_constraints = pyo.Constraint(
+        model.seed_area_constraints = pyo.Constraint( # Tip area
             A,
             rule=lambda model, k: sum(x[i, j, k] for (i, j) in S) == a[k]
         )
@@ -179,14 +204,23 @@ class Patches:
 
         if result.Solver.status == SolverStatus.ok and result.Solver.termination_condition == TerminationCondition.optimal:
             print("Optimal solution found!")
-            for k in self._model.K:
-                rect = self._rectangles[k]
-                rect.x = int(round(pyo.value(self._model.c[k]), 0))
-                rect.y = int(round(pyo.value(self._model.r[k]), 0))
-                rect.width = int(round(pyo.value(self._model.w[k]), 0))
-                rect.height = int(round(pyo.value(self._model.h[k]), 0))
-                if verbose:
-                    print(f"{k}: {repr(rect)}")
+
+            self._rectangles = tuple(
+                Rectangle(
+                    color=tip.color,
+                    seed_square=tip.seed_square,
+                    seed_area=tip.seed_area,
+                    rect_type= tip.rect_type,
+                    x = int(round(pyo.value(self._model.c[tip.color]), 0)),
+                    y = int(round(pyo.value(self._model.r[tip.color]), 0)),
+                    width = int(round(pyo.value(self._model.w[tip.color]), 0)),
+                    height = int(round(pyo.value(self._model.h[tip.color]), 0))
+                ) for tip in self._tip_seeds
+            )
+
+            if verbose:
+                print(self._rectangles)
+
         else:
             print("It was not possible to find a feasible solution for the game.")
             print(result.Solver)
@@ -201,15 +235,12 @@ class Patches:
         G = nx.grid_2d_graph(m, n)
         plt.figure(figsize=(3, 3))
 
-        # compute color per node (i,j) by looking at x[i,j,k]
-        color_map = []
-        for (i, j) in G.nodes():
-            color = None
-            for k in self._model.K:
-                if round(pyo.value(self._model.x[i+1, j+1, k]), 0) == 1:
-                    color = self._rectangles[k].color
-                    break
-            color_map.append(color if color is not None else "#000000")
+        color_map = [
+            k
+            for (i, j) in G.nodes() 
+            for k in self._model.K
+            if round(pyo.value(self._model.x[i+1, j+1, k]), 0) == 1 
+        ]
 
         nx.draw(
             G,
@@ -225,19 +256,70 @@ class Patches:
 if __name__ == "__main__":
 
     # Solving Patches No. 16
-    rectangles = {
-        "yellow":  Rectangle((1, 2), RecType.ANY,      2, "#846A0B"),
-        "teal":    Rectangle((1, 4), RecType.ANY,      6, "#096B78"),
-        "purple":  Rectangle((2, 6), RecType.ANY,      2, "#5A3DB1"),
-        "green":   Rectangle((3, 1), RecType.ANY,      6, "#0A7541"),
-        "orange":  Rectangle((3, 3), RecType.VERTICAL, 2, "#EF6C00"),
-        "red":     Rectangle((4, 4), RecType.SQUARE,   4, "#E30102"),
-        "blue":    Rectangle((4, 6), RecType.ANY,      2, "#097BB1"),
-        "magenta": Rectangle((5, 1), RecType.ANY,      2, "#A01E4E"),
-        "brick":   Rectangle((6, 3), RecType.ANY,      6, "#9B3C1C"),
-        "brown":   Rectangle((6, 5), RecType.ANY,      4, "#503B36")
-    }
+    tip_seeds = (
+        TipSeed( # Yellow
+            color="#846A0B",
+            seed_square=(1, 2),
+            rect_type=RecType.ANY,
+            seed_area=2
+        ),
+        TipSeed( # Teal
+            color="#096B78",
+            seed_square=(1, 4),
+            rect_type=RecType.ANY,
+            seed_area=6
+        ),
+        TipSeed( # Purple
+            color="#5A3DB1",
+            seed_square=(2, 6),
+            rect_type=RecType.ANY,
+            seed_area=2
+        ),
+        TipSeed( # Green
+            color="#0A7541",
+            seed_square=(3, 1),
+            rect_type=RecType.ANY,
+            seed_area=6
+        ),
+        TipSeed( # Orange
+            color="#EF6C00",
+            seed_square=(3, 3),
+            rect_type=RecType.VERTICAL,
+            seed_area=2
+        ),
+        TipSeed( # Red
+            color="#E30102",
+            seed_square=(4, 4),
+            rect_type=RecType.SQUARE,
+            seed_area=4
+        ),
+        TipSeed(
+            color="#097BB1",
+            seed_square=(4, 6),
+            rect_type=RecType.ANY,
+            seed_area=2
+        ), # Blue
+        TipSeed( # Magenta
+            color="#A01E4E",
+            seed_square=(5, 1),
+            rect_type=RecType.ANY,
+            seed_area=2
+        ),
+        TipSeed( # Brick
+            color="#9B3C1C",
+            seed_square=(6, 3),
+            rect_type=RecType.ANY,
+            seed_area=6
+        ),
+        TipSeed( # Brown
+            color="#503B36",
+            seed_square=(6, 5),
+            rect_type=RecType.ANY,
+            seed_area=4
+        )
+    )
 
-    patches = Patches((6, 6), rectangles)
+    patches = Patches((6, 6), tip_seeds)
     patches.solve(verbose=True)
     patches.show()
+    print(patches.rectangles)
