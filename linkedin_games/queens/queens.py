@@ -1,24 +1,87 @@
-from pyomo.opt import SolverStatus
+from pprint import pprint
+
+from pyomo.opt import SolverStatus, TerminationCondition
 import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
+from linkedin_games.gameboard import GameBoard
 from region import Region
 
 
-class Queens():
+class Queens(GameBoard):
 
     """
     A class representing a Queens board game with colored regions.
     """
 
     def __init__(self, board_dims:tuple[int, int], regions:set[Region]) -> None:
-        m, n = self.board_dims = board_dims
-        self._squares: set[tuple[int, int]] = {(i,j) for i in range(1,m+1) for j in range(1,n+1)}
+        super().__init__(board_dims)
         self.regions = regions
-        self._model: pyo.ConcreteModel | None = None
-        self._crowns: list[tuple[int, int]] | list = []
-        self._stale: bool = True # This property indicates whether the model needs to be rebuilt due to changes in the board dimensions or regions.
+
+
+    def __hash__(self):
+        return hash((self._board_dims, self._regions))
+
+
+    @property
+    def regions(self) -> set[Region]:
+        return self._regions
+
+    @regions.setter
+    def regions(self, value:set[Region]) -> None:
+
+        if not isinstance(value, set):
+            msg = "Regions must be a set of Region classes."
+            raise TypeError(msg)
+        
+        if len(value) < 1:
+            msg = "The set of Regions cannot be empty!"
+            raise ValueError(msg)
+        
+        if any(not isinstance(region, Region) for region in value):
+            msg = "All elements of the set must be Region classes."
+            raise TypeError(msg)
+        
+        if len(value) != len({region.color for region in value}):
+            msg = "There must not be two regions with the same color."
+            raise ValueError(msg)
+        
+        all_region_squares = [square for region in value for square in region.squares]
+        overlapping_squares = {square for square in all_region_squares if all_region_squares.count(square) > 1}
+        if overlapping_squares:
+            msg = (
+                "The regions must not overlap each other.\n"
+                f"The following squares are in more than one region: {overlapping_squares}"
+            )
+            raise ValueError(msg)
+
+        all_region_squares = set(all_region_squares)
+        if all_region_squares != self.board_squares:
+
+            if len(all_region_squares) > len(self):
+                squares_not_in_board = all_region_squares - self.board_squares
+                msg = (
+                    "The regions must cover the entire board and must not go beyond the board's boundaries. "
+                    f"The following squares are outside the board: {squares_not_in_board!r}"
+                )
+                raise ValueError(msg)
+            
+            if len(all_region_squares) < len(self):
+                missing_squares = self.board_squares - all_region_squares
+                msg = (
+                    "The regions must cover the entire board and must not go beyond the board's boundaries. "
+                    f"The following board squares are not in any region: {missing_squares!r}"
+                )
+                raise ValueError(msg)
+
+        self._regions = value
+        self._stale = True
+
+
+    @property
+    def crowns(self) -> tuple[tuple[int, int]]:
+        return tuple(square for square, data in self._board.nodes(data=True) if data.get("value") == 1)
 
 
     def _build_model(self):
@@ -74,99 +137,6 @@ class Queens():
         self._stale = False # The model is now up to date.
 
 
-    @property
-    def board_dims(self) -> tuple[int, int]:
-        return self._board_dims
-
-    @board_dims.setter
-    def board_dims(self, value:tuple[int, int] = (1, 1)) -> None:
-
-        if not isinstance(value, tuple):
-            msg = f"Board dimensions must be a tuple. Got a {type(value)} type instead."
-            raise ValueError(msg)
-        
-        if len(value) != 2:
-            msg = f"Board dimensions must be a pair (m,n). Got a tuple with length {len(value)}."
-            raise ValueError(msg)
-        
-        if any(not isinstance(dim, int) or isinstance(dim, bool) or dim < 1 for dim in value):
-            msg = f"Board dimensions must be positive integers. Got {value!r} instead."
-            raise ValueError(msg)
-
-        self._board_dims = value
-        self._stale = True
-
-
-    @property
-    def regions(self) -> set[Region]:
-        return self._regions
-
-    @regions.setter
-    def regions(self, value:set[Region]) -> None:
-
-        if not isinstance(value, set):
-            msg = "Regions must be a set of Region classes."
-            raise TypeError(msg)
-        
-        if len(value) < 1:
-            msg = "The set of Regions cannot be empty!"
-            raise ValueError(msg)
-        
-        if any(not isinstance(region, Region) for region in value):
-            msg = "All elements of the set must be Region classes."
-            raise TypeError(msg)
-        
-        if len(value) != len({region.color for region in value}):
-            msg = "There must not be two regions with the same color."
-            raise ValueError(msg)
-        
-        all_region_squares = [square for region in value for square in region.squares]
-        overlapping_squares = {square for square in all_region_squares if all_region_squares.count(square) > 1}
-        if overlapping_squares:
-            msg = (
-                "The regions must not overlap each other.\n"
-                f"The following squares are in more than one region: {overlapping_squares}"
-            )
-            raise ValueError(msg)
-
-        all_region_squares = set(all_region_squares)
-        if all_region_squares != self.squares:
-
-            if len(all_region_squares) > len(self):
-                squares_not_in_board = all_region_squares - self.squares
-                msg = (
-                    "The regions must cover the entire board and must not go beyond the board's boundaries. "
-                    f"The following squares are outside the board: {squares_not_in_board!r}"
-                )
-                raise ValueError(msg)
-            
-            if len(all_region_squares) < len(self):
-                missing_squares = self.squares - all_region_squares
-                msg = (
-                    "The regions must cover the entire board and must not go beyond the board's boundaries. "
-                    f"The following board squares are not in any region: {missing_squares!r}"
-                )
-                raise ValueError(msg)
-
-        self._regions = value
-        self._stale = True
-
-
-    @property
-    def crowns(self) -> list[tuple[int, int]]:
-        return self._crowns
-
-
-    @property
-    def squares(self) -> set[tuple[int, int]]:
-        return self._squares
-    
-
-    def __len__(self) -> int:
-        m, n = self._board_dims
-        return m * n
-
-
     def solve(self, verbose:bool=False) -> None:
 
         if self._stale or self._model is None:
@@ -174,7 +144,11 @@ class Queens():
         
         result = pyo.SolverFactory("gurobi").solve(self._model)
 
-        if result.Solver.status == SolverStatus.ok:
+        if (result.Solver.status == SolverStatus.ok
+            and (
+                result.Solver.termination_condition == TerminationCondition.feasible
+                or result.Solver.termination_condition == TerminationCondition.optimal
+            )):
             print("Queens solved successfully!")
             self._crowns = [(i,j) for i in self._model.I for j in self._model.J if round(self._model.x[i,j].value, 0) == 1]
             if verbose:

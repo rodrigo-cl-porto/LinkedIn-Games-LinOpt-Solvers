@@ -3,55 +3,24 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
+from linkedin_games.gameboard import GameBoard
 from rectangle import TipSeed, Rectangle, RecType
 
 
-class Patches:
+class Patches(GameBoard):
 
     """
     A class representing a Patches board game with colored rectangles.
     """
 
     def __init__(self, board_dims: tuple[int, int], tip_seeds: tuple[TipSeed]):
-        self.board_dims = board_dims
+        super().__init__(board_dims)
         self.tip_seeds = tip_seeds
-        self._rectangles: tuple[Rectangle] | tuple = ()
-        self._model: pyo.ConcreteModel | None = None
-        self._stale: bool = True # This property indicates whether the model needs to be rebuilt due to changes in the board dimensions or tip seeds.
-
-
-    def __len__(self) -> int:
-        m, n = self._board_dims
-        return m * n
+        self._rectangles: tuple[Rectangle] = ()
     
+
     def __hash__(self) -> int:
         return hash((self._board_dims, self._tip_seeds))
-
-    @property
-    def board_dims(self) -> tuple[int, int]:
-        return self._board_dims
-
-    @board_dims.setter
-    def board_dims(self, value: tuple[int, int] = (1, 1)) -> None:
-
-        if not isinstance(value, tuple):
-            msg = f"Board dimensions must be a tuple, got {value!r}"
-            raise ValueError(msg)
-        
-        if len(value) != 2:
-            msg = f"Board dimensions must be a pair (m,n), got {value!r}"
-            raise ValueError(msg)
-        
-        if not all(isinstance(x, int) and not isinstance(x, bool) for x in value):
-            msg = f"Board dimensions must be integers, got {value!r}"
-            raise ValueError(msg)
-        
-        if any(x < 1 for x in value):
-            msg = f"Board dimensions must be positive, got {value!r}"
-            raise ValueError(msg)
-
-        self._board_dims = value
-        self._stale = True
 
 
     @property
@@ -60,10 +29,6 @@ class Patches:
 
     @tip_seeds.setter
     def tip_seeds(self, value: tuple[TipSeed]) -> None:
-
-        if not isinstance(value, tuple):
-            msg = f"Tip seeds must be a tuple of TipSeed classes. Got a {type(value)} instead."
-            raise TypeError(msg)
         
         if len(value) < 1:
             msg = "The tip seeds cannot be empty!"
@@ -87,7 +52,15 @@ class Patches:
             )
             raise ValueError(msg)
 
-        self._tip_seeds = value
+        if not isinstance(value, tuple):
+            print((
+                "WARNING: in order to avoid unexpected behaviours, the collection of TipSeeds should be a tuple."
+                f"Got a {type(value)} instead."
+            ))
+            self._tip_seeds = tuple(value)
+        else:
+            self._tip_seeds = value
+        
         self._stale = True
 
 
@@ -202,21 +175,23 @@ class Patches:
 
         result = pyo.SolverFactory("highs").solve(self._model)
 
-        if result.Solver.status == SolverStatus.ok and result.Solver.termination_condition == TerminationCondition.optimal:
+        if (result.Solver.status == SolverStatus.ok
+            and (
+                result.Solver.termination_condition == TerminationCondition.feasible
+                or result.Solver.termination_condition == TerminationCondition.optimal
+            )):
             print("Optimal solution found!")
 
-            self._rectangles = tuple(
-                Rectangle(
-                    color=tip.color,
-                    seed_square=tip.seed_square,
-                    seed_area=tip.seed_area,
-                    rect_type= tip.rect_type,
-                    x = int(round(pyo.value(self._model.c[tip.color]), 0)),
-                    y = int(round(pyo.value(self._model.r[tip.color]), 0)),
-                    width = int(round(pyo.value(self._model.w[tip.color]), 0)),
-                    height = int(round(pyo.value(self._model.h[tip.color]), 0))
-                ) for tip in self._tip_seeds
-            )
+            self._rectangles = tuple(Rectangle(
+                color=tip.color,
+                seed_square=tip.seed_square,
+                seed_area=tip.seed_area,
+                rect_type= tip.rect_type,
+                x = int(round(pyo.value(self._model.c[tip.color]), 0)),
+                y = int(round(pyo.value(self._model.r[tip.color]), 0)),
+                width = int(round(pyo.value(self._model.w[tip.color]), 0)),
+                height = int(round(pyo.value(self._model.h[tip.color]), 0))
+            ) for tip in self._tip_seeds)
 
             if verbose:
                 print(self._rectangles)
@@ -231,20 +206,18 @@ class Patches:
         if self._stale or self._model is None:
             self._build_model()
 
-        m, n = self._board_dims
-        G = nx.grid_2d_graph(m, n)
         plt.figure(figsize=(3, 3))
 
         color_map = [
             k
-            for (i, j) in G.nodes() 
+            for (i, j) in self._board.nodes() 
             for k in self._model.K
             if round(pyo.value(self._model.x[i+1, j+1, k]), 0) == 1 
         ]
 
         nx.draw(
-            G,
-            pos={(i, j): (j, -i) for (i, j) in G.nodes()},
+            self._board,
+            pos={(i, j): (j, -i) for (i, j) in self._board.nodes()},
             node_size=1100,
             node_shape="s",
             node_color=color_map,

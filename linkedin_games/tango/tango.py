@@ -1,68 +1,189 @@
+from pprint import pprint
+
 from pyomo.opt import SolverStatus, TerminationCondition
 import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
+try:
+    from ..gameboard import GameBoard
+except ImportError:  # pragma: no cover - allows running the module as a script
+    from linkedin_games.gameboard import GameBoard
 
-class Tango:
 
-    def __init__(self,
-                board_dims:tuple[int, int],
-                like_pairs:set[tuple[tuple[int, int], tuple[int, int]]] | None,
-                opp_pairs:set[tuple[tuple[int, int], tuple[int, int]]] | None,
-                filled_squares:dict[tuple[int, int]: bool] | None
-                ) -> None:
-        self.board_dims = board_dims
+class Tango(GameBoard):
+
+    def __init__(
+            self,
+            board_dims:tuple[int, int],
+            like_pairs:set[tuple[tuple[int, int], tuple[int, int]]] | None,
+            opp_pairs:set[tuple[tuple[int, int], tuple[int, int]]] | None,
+            filled_squares:dict[tuple[int, int]: int] | None
+            ) -> None:
+        super().__init__(board_dims)
         self.like_pairs = like_pairs
         self.opp_pairs = opp_pairs
         self.filled_squares = filled_squares
-        self._model: pyo.ConcreteModel | None = None
-        self._stale: bool = True # This property indicates whether the model needs to be rebuilt due to changes in the game settings.
-    
+        self._build_board()
+
 
     def __hash__(self) -> int:
-        return hash((self._board_dims, self._like_pairs, self._opp_pairs, self._filled_squares))
+        return hash((self._dims, self._like_pairs, self._opp_pairs, self._filled_squares))
 
 
-    def __len__(self) -> int:
-        m, n = self._board_dims
-        return m * n
+    @staticmethod
+    def __manhathan_distance(squares:tuple[tuple[int, int], tuple[int, int]]) -> int:
+        x1 = squares[0][0]
+        x2 = squares[1][0]
+        y1 = squares[0][1]
+        y2 = squares[1][1]
+        return abs(x1 - x2) + abs(y1 - y2)
+
+
+    def _build_board(self) -> None:
+        super()._build_board()
+        nx.set_node_attributes(self._board, name="value", values=self._filled_squares)
 
 
     @property
-    def board_dims(self) -> tuple[int, int]:
-        return self._board_dims
-
-    @board_dims.setter
-    def board_dims(self, value: tuple[int, int] = (1, 1)) -> None:
-
-        if not isinstance(value, tuple):
-            msg = f"Board dimensions must be a tuple, got {value!r}"
-            raise ValueError(msg)
-        
-        if len(value) != 2:
-            msg = f"Board dimensions must be a pair (m,n), got {value!r}"
-            raise ValueError(msg)
-        
-        if not all(isinstance(x, int) and not isinstance(x, bool) for x in value):
-            msg = f"Board dimensions must be integers, got {value!r}"
-            raise ValueError(msg)
-        
-        if any(x < 1 for x in value):
-            msg = f"Board dimensions must be positive, got {value!r}"
-            raise ValueError(msg)
-
-        self._board_dims = value
-        self._stale = True
-    
-
-    @property
-    def like_pairs(self) -> set[tuple[tuple[int, int], tuple[int, int]]] | None:
+    def like_pairs(self) -> tuple[tuple[tuple[int, int], tuple[int, int]]] | None:
         return self._like_pairs
     
     @like_pairs.setter
-    def like_pairs(self, value:set[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
-        pass
+    def like_pairs(self, value:tuple[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
+        
+        if value is None:
+            self._like_pairs = value
+            return None
+
+        invalid_items = [pair for pair in value if not isinstance(pair, tuple) or len(pair) != 2]
+        if invalid_items:
+            msg = (
+                "like_pairs must be a collection of pairs of tuples. "
+                f"Got the following invalid pairs: {invalid_items!r}."
+            )
+            raise TypeError(msg)
+        
+        invalid_items = [square for pair in value for square in pair if not isinstance(square, tuple)]
+        if invalid_items:
+            msg = (
+                "Squares in pair must be tuples of positive integers. "
+                f"Got the following invalid squares: {invalid_items!r}."
+            )
+            raise TypeError(msg)
+        
+        invalid_items = [square for pair in value for square in pair for coord in square if not isinstance(coord, int) or coord < 1]
+        if invalid_items:
+            msg = (
+                "Coordinates must be positive integers. "
+                f"Got the following invalid squares: {invalid_items!r}."
+            )
+            raise ValueError(msg)
+
+        invalid_items = [pair for pair in value if Tango.__manhathan_distance(pair) != 1]
+        if invalid_items:
+            msg = (
+                "Squares in a pair must be consecutive ones. "
+                f"Got the following invalid pairs: {invalid_items!r}."
+            )
+            raise ValueError(msg)
+        
+        if not isinstance(value, tuple):
+            print((
+                "WARNING: in order to avoid unexpected behaviours, "
+                "like_pairs should be a tuple. "
+                f"Got a {type(value).__name__} instead."
+            ))
+            self._like_pairs = tuple(value)
+        else:
+            self._like_pairs = value
+        
+        self._stale = True
+
+
+    @property
+    def opp_pairs(self) -> tuple[tuple[tuple[int, int], tuple[int, int]]] | None:
+        return self._opp_pairs
+    
+    @opp_pairs.setter
+    def opp_pairs(self, value:tuple[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
+        
+        if value is None:
+            self._opp_pairs = value
+            return None
+
+        invalid_items = [pair for pair in value if not isinstance(pair, tuple) or len(pair) != 2]
+        if invalid_items:
+            msg = (
+                "opp_pairs must be a collection of pairs of tuples. "
+                f"Got the following invalid pairs: {invalid_items!r}."
+            )
+            raise TypeError(msg)
+        
+        invalid_items = [square for pair in value for square in pair if not isinstance(square, tuple)]
+        if invalid_items:
+            msg = (
+                "Squares in pair must be tuples of positive integers. "
+                f"Got the following invalid squares: {invalid_items!r}."
+            )
+            raise TypeError(msg)
+        
+        invalid_items = [square for pair in value for square in pair for coord in square if not isinstance(coord, int) or coord < 1]
+        if invalid_items:
+            msg = (
+                "Coordinates must be positive integers. "
+                f"Got the following invalid squares: {invalid_items!r}."
+            )
+            raise ValueError(msg)
+
+        invalid_items = [pair for pair in value if Tango.__manhathan_distance(pair) != 1]
+        if invalid_items:
+            msg = (
+                "Squares in a pair must be consecutive ones. "
+                f"Got the following invalid pairs: {invalid_items!r}."
+            )
+            raise ValueError(msg)
+        
+        if not isinstance(value, tuple):
+            print((
+                "WARNING: in order to avoid unexpected behaviours, "
+                "opp_pairs should be a tuple. "
+                f"Got a {type(value).__name__} instead."
+            ))
+            self._opp_pairs = tuple(value)
+        else:
+            self._opp_pairs = value
+        
+        self._stale = True
+
+
+    @property
+    def filled_squares(self) -> dict[tuple[int, int]: int]:
+        return self._filled_squares
+    
+    @filled_squares.setter
+    def filled_squares(self, values:dict[tuple[int, int]: int]) -> None:
+
+        if len(values) > len(self):
+            msg = (
+                "The number of filled squares exceeds the amount of board squares! "
+                f"Got {len(values)} filled squares."
+            )
+            raise ValueError(msg)
+
+        if not isinstance(values, dict):
+            msg = f"filled_squares must be a dictionary. Got a {type(values).__name__} type instead."
+            raise ValueError(msg)
+
+        invalid_items = {square: value for square, value in values.items() if value != 1 and value != 0}
+        if invalid_items:
+            msg = (
+                "The square values must be of binary type. "
+                f"Got the following invalid values: {invalid_items!r}."
+            )
+            raise TypeError(msg)
+        
+        self._filled_squares = {square: (1 if value else 0) for square, value in values.items()}
 
 
     def _build_model(self) -> None:
@@ -74,23 +195,23 @@ class Tango:
         model.n = pyo.Param(initialize=n, within=pyo.PositiveIntegers)
 
         # RANGE SETS
-        I = model.I = pyo.RangeSet(n)
-        J = model.J = pyo.RangeSet(m)
+        I = model.I = pyo.RangeSet(n) # Rows
+        J = model.J = pyo.RangeSet(m) # Columns
 
         # COMPOSITE SETS
         S = model.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Board Squares
-        L = model.L = pyo.Set(initialize=like_pairs)
-        O = model.O = pyo.Set(initialize=opp_pairs)
-        K = model.K = pyo.Set(initialize=filled_squares.keys(), dimen=2)
+        L = model.L = pyo.Set(initialize=self._like_pairs)
+        O = model.O = pyo.Set(initialize=self._opp_pairs)
+        K = model.K = pyo.Set(initialize=self._filled_squares.keys(), dimen=2)
 
         # DECISION VARIABLES
-        x = model.x = pyo.Var(I, J, within=pyo.Binary)
-    
+        x = model.x = pyo.Var(S, within=pyo.Binary)
+
         # PARAMETERS
-        k = model.FilledValues = pyo.Param(K, initialize=filled_squares, within=pyo.Binary)
+        k = model.k = pyo.Param(K, initialize=self._filled_squares, within=pyo.Binary) # Filled values
 
         # OBJECTIVE FUNCTION
-        model.obj = pyo.Objective(expr=0, sense=pyo.maximize)
+        model.obj = pyo.Objective(expr=0) # feasibility problem
 
         # CONSTRAINTS
         model.equal_moons_suns_per_row_constraints = pyo.Constraint(
@@ -107,7 +228,7 @@ class Tango:
             I, pyo.RangeSet(n-2),
             rule=lambda model, i, j: x[i,j] + x[i,j+1] + x[i,j+2] <= 2
         )
-    
+
         model.no_three_consecutive_suns_per_row_constraints = pyo.Constraint(
             I, pyo.RangeSet(n-2),
             rule=lambda model, i, j: x[i,j] + x[i,j+1] + x[i,j+2] >= 1
@@ -117,7 +238,7 @@ class Tango:
             pyo.RangeSet(m-2), J,
             rule=lambda model, i, j: x[i,j] + x[i+1,j] + x[i+2,j] <= 2
         )
-        
+
         model.no_three_consecutive_suns_per_column_constraints = pyo.Constraint(
             pyo.RangeSet(m-2), J,
             rule=lambda model, i, j: x[i,j] + x[i+1,j] + x[i+2,j] >= 1
@@ -142,47 +263,68 @@ class Tango:
         self._model = model
         self._stale = False
 
-    
-    def solve(self):
 
-        result = pyo.SolverFactory("gurobi").solve(self)
+    def solve(self, verbose:bool=False):
 
-        if result.Solver.status == SolverStatus.ok and result.Solver.termination_condition == TerminationCondition.feasible:
+        if self._stale or self._model is None:
+            self._build_model()
+            self._build_board()
+
+        result = pyo.SolverFactory("gurobi").solve(self._model)
+
+        if (result.Solver.status == SolverStatus.ok
+            and (
+                result.Solver.termination_condition == TerminationCondition.feasible
+                or result.Solver.termination_condition == TerminationCondition.optimal
+            )):
+
             print("Tango solved successfully!")
+            nx.set_node_attributes(
+                self._board,
+                name="value",
+                values={(i-1, j-1): round(pyo.value(self._model.x[i,j])) for i, j in self._model.S}
+            )
+
+            if verbose:
+                pprint(self.board_squares)
+
         else:
             print("No feasible solution was found!")
             print(result.Solver)
 
-    
+
     def show(self):
-        
-        G = nx.grid_2d_graph(self.m, self.n)
-        pos = {(i,j): (j, -i) for i, j in G.nodes()}
+
+        if self._stale or self.model is None:
+            self._build_model()
         
         plt.figure(figsize=(3.4, 3.4))
         
+        pos = {(i, j): (j, -i) for i, j in self.board.nodes()}
+
         nx.draw(
-            G,
+            self.board,
             pos= pos,
             with_labels= True,
-            labels= {(i,j): int(self.x[i+1,j+1].value) for i, j in G.nodes()},
+            labels= {(i, j): data["value"] for (i, j), data in self.board.nodes(data=True)},
             node_size= 1000,
-            node_color= ["#EEEAE7" if (i+1,j+1) in self.K else "white" for (i,j) in G.nodes()],
+            node_color= ["#EEEAE7" if (i+1,j+1) in self.filled_squares else "white" for (i, j) in self.board.nodes()],
             node_shape="s",
             edgecolors="#EEEAE7",
             linewidths= 1,
             width= 0,
             edgelist = [
-                ((i-1, j-1), (r-1,s-1)) for i,j,r,s in self.O] + [
-                ((i-1, j-1), (r-1,s-1)) for i,j,r,s in self.L
+                ((i-1, j-1), (r-1,s-1)) for i,j,r,s in self.model.O] + [
+                ((i-1, j-1), (r-1,s-1)) for i,j,r,s in self.model.L
             ]
         )
+
         nx.draw_networkx_edge_labels(
-            G,
+            self._board,
             pos= pos,
             edge_labels= {
-                ((i-1, j-1), (r-1,s-1)): "×" for i,j,r,s in self.O} | {
-                ((i-1, j-1), (r-1,s-1)): "=" for i,j,r,s in self.L
+                ((i-1, j-1), (r-1,s-1)): "×" for i,j,r,s in self.model.O} | {
+                ((i-1, j-1), (r-1,s-1)): "=" for i,j,r,s in self.model.L
             },
             font_color="#887658"
         )
@@ -191,26 +333,27 @@ class Tango:
 
 if __name__ == "__main__":
 
+    # Solving Tango No. 151
+
     # like (=) pairs, each element is ((i,j),(r,s))
-    like_pairs = {
+    like_pairs = (
         ((2, 3), (2, 4)),
         ((2, 1), (3, 1)),
         ((2, 3), (3, 3)),
         ((2, 6), (3, 6)),
         ((4, 1), (4, 2)),
         ((6, 3), (6, 4)),
-    }
+    )
 
     # opposite (X) pairs
-    opp_pairs = [
+    opp_pairs = (
         ((2, 4), (3, 4)),
         ((3, 1), (4, 1)),
         ((3, 3), (3, 4)),
         ((3, 6), (4, 6)),
         ((4, 5), (4, 6)),
-    ]
+    )
 
-    # helper lists for the concrete instance (Tango #151)
     # already filled squares: (i,j) -> kij
     filled_squares = {
         (1, 2): 1,
@@ -220,5 +363,5 @@ if __name__ == "__main__":
     }
 
     tango = Tango((6,6), like_pairs, opp_pairs, filled_squares)
-    tango.solve()
+    tango.solve(verbose=True)
     tango.show()
