@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-from linkedin_games.gameboard import GameBoard
-from region import Region
+from ..gameboard import GameBoard
+from .region import Region
 
 
 class Queens(GameBoard):
@@ -29,25 +29,25 @@ class Queens(GameBoard):
         return self._regions
 
     @regions.setter
-    def regions(self, value:set[Region]) -> None:
+    def regions(self, values:set[Region]) -> None:
 
-        if not isinstance(value, set):
+        if not isinstance(values, set):
             msg = "Regions must be a set of Region classes."
             raise TypeError(msg)
         
-        if len(value) < 1:
+        if len(values) < 1:
             msg = "The set of Regions cannot be empty!"
             raise ValueError(msg)
         
-        if any(not isinstance(region, Region) for region in value):
+        if any(not isinstance(region, Region) for region in values):
             msg = "All elements of the set must be Region classes."
             raise TypeError(msg)
         
-        if len(value) != len({region.color for region in value}):
+        if len(values) != len({region.color for region in values}):
             msg = "There must not be two regions with the same color."
             raise ValueError(msg)
         
-        all_region_squares = [square for region in value for square in region.squares]
+        all_region_squares = [square for region in values for square in region.squares]
         overlapping_squares = {square for square in all_region_squares if all_region_squares.count(square) > 1}
         if overlapping_squares:
             msg = (
@@ -74,17 +74,24 @@ class Queens(GameBoard):
                     f"The following board squares are not in any region: {missing_squares!r}"
                 )
                 raise ValueError(msg)
+        
+        nx.set_node_attributes( # Adding a color for each square on the board
+            self._board,
+            name="color",
+            values={(i-1, j-1): region.color for region in values for (i, j) in region.squares}
+        )
 
-        self._regions = value
+        self._regions = values
         self._stale = True
 
 
     @property
     def crowns(self) -> tuple[tuple[int, int]]:
-        return tuple(square for square, data in self._board.nodes(data=True) if data.get("value") == 1)
+        return sorted(tuple((i+1, j+1) for (i,j) in self.__crowns.nodes()))
+    
 
+    def __build_model(self):
 
-    def _build_model(self):
         model = pyo.ConcreteModel()
 
         # PARAMETERS
@@ -134,26 +141,39 @@ class Queens(GameBoard):
 
         # Attach model
         self._model = model
-        self._stale = False # The model is now up to date.
+        self._stale = False
 
 
-    def solve(self, verbose:bool=False) -> None:
+    def solve(self, solver="gurobi", verbose:bool=False) -> None:
 
-        if self._stale or self._model is None:
-            self._build_model()
+        if self._stale or self.model is None:
+            self.__build_model()
         
-        result = pyo.SolverFactory("gurobi").solve(self._model)
+        result = pyo.SolverFactory(solver).solve(self.model)
 
-        if (result.Solver.status == SolverStatus.ok
+        is_model_solved = (
+            result.Solver.status == SolverStatus.ok # Checks if solver is finished with normal termination.
             and (
-                result.Solver.termination_condition == TerminationCondition.feasible
-                or result.Solver.termination_condition == TerminationCondition.optimal
-            )):
-            print("Queens solved successfully!")
-            self._crowns = [(i,j) for i in self._model.I for j in self._model.J if round(self._model.x[i,j].value, 0) == 1]
+                result.Solver.termination_condition == TerminationCondition.optimal # Checks if solver is finished with optimal solution...
+                or result.Solver.termination_condition == TerminationCondition.feasible # ... or with feasible solution.
+            ))
+        
+        if is_model_solved:
+
+            print("Queens game solved successfully!")
+            nx.set_node_attributes(
+                self.board,
+                name="value",
+                values= {(i-1, j-1): int(pyo.value(self.model.x[i,j])) for (i, j) in self.model.S}
+            )
+
+            crowns = [square for square, value in nx.get_node_attributes(self.board, "value").items() if value == 1]
+            self.__crowns = self.board.subgraph(crowns)
+
             if verbose:
-                print(self._crowns)
-                
+                print("These are the squares that contain a crown:")
+                pprint(self.crowns)
+
         else:
             print("No feasible solution was found!")
             if verbose:
@@ -162,26 +182,19 @@ class Queens(GameBoard):
 
     def show(self) -> None:
 
-        if self._stale or self._model is None:
-            self._build_model()
+        if self._stale or self.model is None:
+            self.__build_model()
 
-        m, n = self._board_dims
-        G = nx.grid_2d_graph(m, n)
         plt.figure(figsize=(3.4, 3.4))
 
-        color_map = {(i-1, j-1): region.color for region in self.regions for (i, j) in region.squares}
-        color_map = [color_map[square] for square in sorted(color_map)]
-
-        solution = [(i, j) for i in self._model.I for j in self._model.J if round(self._model.x[i,j].value, 0) == 1]
-
         nx.draw(
-            G,
-            pos= {(i, j): (j, -i) for i, j in G.nodes()},
+            self.board,
+            pos= {(i, j): (j, -i) for i, j in self.board.nodes()},
             with_labels= True,
-            labels= {(i-1, j-1): "O" for (i,j) in solution},
+            labels= {square: "O" for square in self.__crowns.nodes()},
             node_size= 1000,
-            node_color= color_map,
-            node_shape="s",
+            node_color= [color for color in nx.get_node_attributes(self.board, "color").values()],
+            node_shape="s", # Squared-shape nodes
             width=0
         )
         plt.show()
@@ -216,8 +229,8 @@ if __name__ == "__main__":
             squares={(5,3), (6,3)}
         ),
         Region( # Yellow
-            squares={(5,5), (5,6)},
-            color="#E6F388"
+            color="#E6F388",
+            squares={(5,5), (5,6)}
         )
     }
 

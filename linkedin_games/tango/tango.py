@@ -24,7 +24,6 @@ class Tango(GameBoard):
         self.like_pairs = like_pairs
         self.opp_pairs = opp_pairs
         self.filled_squares = filled_squares
-        self._build_board()
 
 
     def __hash__(self) -> int:
@@ -38,11 +37,6 @@ class Tango(GameBoard):
         y1 = squares[0][1]
         y2 = squares[1][1]
         return abs(x1 - x2) + abs(y1 - y2)
-
-
-    def _build_board(self) -> None:
-        super()._build_board()
-        nx.set_node_attributes(self._board, name="value", values=self._filled_squares)
 
 
     @property
@@ -186,7 +180,7 @@ class Tango(GameBoard):
         self._filled_squares = {square: (1 if value else 0) for square, value in values.items()}
 
 
-    def _build_model(self) -> None:
+    def __build__model(self) -> None:
         model = pyo.ConcreteModel()
 
         # BOARD DIMENSIONS
@@ -264,28 +258,31 @@ class Tango(GameBoard):
         self._stale = False
 
 
-    def solve(self, verbose:bool=False):
+    def solve(self, solver:str="gurobi", verbose:bool=False):
 
-        if self._stale or self._model is None:
-            self._build_model()
-            self._build_board()
+        if self._stale or self.model is None:
+            self.__build__model()
 
-        result = pyo.SolverFactory("gurobi").solve(self._model)
+        result = pyo.SolverFactory(solver).solve(self.model)
 
-        if (result.Solver.status == SolverStatus.ok
+        is_model_solved = (
+            result.Solver.status == SolverStatus.ok # Checks if solver is finished with normal termination.
             and (
-                result.Solver.termination_condition == TerminationCondition.feasible
-                or result.Solver.termination_condition == TerminationCondition.optimal
-            )):
+                result.Solver.termination_condition == TerminationCondition.optimal # Checks if solver is finished with optimal solution...
+                or result.Solver.termination_condition == TerminationCondition.feasible # ... or with feasible solution.
+            ))
+
+        if is_model_solved:
 
             print("Tango solved successfully!")
             nx.set_node_attributes(
                 self._board,
                 name="value",
-                values={(i-1, j-1): round(pyo.value(self._model.x[i,j])) for i, j in self._model.S}
+                values={(i-1, j-1): int(pyo.value(self.model.x[i,j])) for i, j in self.model.S}
             )
 
             if verbose:
+                print("Tango solution:")
                 pprint(self.board_squares)
 
         else:
@@ -296,7 +293,7 @@ class Tango(GameBoard):
     def show(self):
 
         if self._stale or self.model is None:
-            self._build_model()
+            self.__build__model()
         
         plt.figure(figsize=(3.4, 3.4))
         
@@ -306,7 +303,7 @@ class Tango(GameBoard):
             self.board,
             pos= pos,
             with_labels= True,
-            labels= {(i, j): data["value"] for (i, j), data in self.board.nodes(data=True)},
+            labels= nx.get_node_attributes(self.board, "value"),
             node_size= 1000,
             node_color= ["#EEEAE7" if (i+1,j+1) in self.filled_squares else "white" for (i, j) in self.board.nodes()],
             node_shape="s",

@@ -1,4 +1,4 @@
 from .patches import Patches
-from .rectangle import Rectangle, RecType
+from .rectangle import TipSeed, RecType
 
-__all__ = ["Patches", "Rectangle", "RecType"]
+__all__ = ["Patches", "TipSeed", "RecType"]

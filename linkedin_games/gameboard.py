@@ -24,6 +24,8 @@ class GameBoard:
         return len(self)
 
 
+    # BOARD DIMENSIONS
+
     @property
     def board_dims(self) -> tuple[int, int]:
         return self._board_dims
@@ -45,7 +47,7 @@ class GameBoard:
         
         m, n = value
         if m * n < 2:
-            msg = f"The board is too small for the game! Got a board dimension of {value!r}."
+            msg = f"The board is too small for the game! Got board dimensions of {value!r}."
             raise ValueError(msg)
 
         if not isinstance(value, tuple):
@@ -53,12 +55,13 @@ class GameBoard:
                 "WARNING: in order to avoid unexpected behaviours, board dimensions should be a tuple."
                 f"Got a {type(value).__name__} instead."
             ))
-            self._board_dims = tuple(value)
-        else:
-            self._board_dims = value
+            value = tuple(value)
         
+        self._board_dims = value
         self._stale = True
 
+
+    # BOARD
 
     @property
     def board(self) -> nx.Graph:
@@ -74,13 +77,18 @@ class GameBoard:
 
     @property
     def board_squares(self) -> dict[tuple[int, int]: int]:
-        return {(i+1, j+1): data["value"] for (i, j), data in self._board.nodes(data=True)}
+        #return nx.get_node_attributes()
+        return {(i+1, j+1): data["value"] for (i, j), data in self.board.nodes(data=True)}
     
     @property
-    def board_edges(self):
-        return {((i+1, j+1), (r+1, s+1)): data["value"] for ((i, j), (r, s)), data in self._board.edges(data=True)}
-    
+    def board_edges(self) -> dict[tuple[tuple[int, int], tuple[int, int]]: int]:
+        edges = nx.get_edge_attributes(self.board, "value").items()
+        return {((i+1, j+1), (r+1, s+1)): value for ((i, j), (r, s)), value in edges}
+
+
+    # MODEL
 
     @property
-    def model(self) -> pyo.ConcreteModel:
+    def model(self) -> pyo.ConcreteModel | None:
         return self._model
+    

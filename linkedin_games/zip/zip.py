@@ -10,32 +10,66 @@ from ..gameboard import GameBoard
 
 class Zip(GameBoard):
 
-    def __init__(
-            self,
-            board_dims: tuple[int, int],
-            numbered_squares: dict[tuple[int, int]: int] | list[tuple[int, int]],
-            walls: tuple[tuple[int, int]] | None
-        ):
+    def __init__(self, board_dims: tuple[int, int], numbered_squares: dict[tuple[int, int]: int], walls: tuple[tuple[int, int]] | None = None):
         super().__init__(board_dims)
         self.numbered_squares = numbered_squares
         self.walls = walls
-        self.__build_board()
 
 
     def __hash__(self):
         return hash((self._board_dims, self._numbered_squares, self._walls))
 
+    
+    @property
+    def numbered_squares(self) -> dict[tuple[int, int]: int]:
+        return self._numbered_squares
+    
+    @numbered_squares.setter
+    def numbered_squares(self, values: dict[tuple[int, int]: int]) -> None:
 
-    def __build_board(self):
-        super()._build_board()
-        nx.set_node_attributes(self._board, name="value", values=self._numbered_squares)
+        if len(values) > len(self):
+            msg = (
+                "The number of numbered squares exceeds the amount of board squares! "
+                f"Got {len(values)} numbered squares, while the game board has {len(self)} squares."
+            )
+            raise ValueError(msg)
+        
+        if len(values) < 2:
+            msg = (
+                "The quantity of numbered squares is too small for the game! "
+                f"Got a total of {len(values)} numbered squares."
+            )
+            raise ValueError(msg)
+
+        if isinstance(values, (list, tuple)):
+            print((
+                "WARNING: The numbered squares should be a dictionary mapping (i,j) coordinates to their respective numbers. "
+                f"Got a {type(values).__name__} instead."
+            ))
+            self._numbered_squares = {square: index for index, square in enumerate(values)}
+
+        elif not isinstance(values, dict):
+            msg = "The numbered squares must be a dictionary."
+            raise ValueError(msg)
+        
+        else:
+            self._numbered_squares = values
+
+        nx.set_node_attributes(self.board, name="value", values=None)
+        nx.set_node_attributes(self.board, name="value", values=self.numbered_squares)
+        self._stale = True
 
 
-    def _build_model(self):
+    @property
+    def path(self) -> list[tuple[int, int]]:
+        return [(i+1, j+1) for (i, j) in self._path]
+    
+
+    def __build_model(self) -> None:
         model = pyo.ConcreteModel()
 
         # BOARD DIMENSIONS
-        m, n = model._board_dims
+        m, n = self.board_dims
         model.m = pyo.Param(initialize=m, within=pyo.PositiveIntegers)
         model.n = pyo.Param(initialize=n, within=pyo.PositiveIntegers)
         
@@ -53,15 +87,15 @@ class Zip(GameBoard):
             ((i, j), (i, j+1)) for i in I for j in J if j+1 in J] + [
             ((i, j), (i, j-1)) for i in I for j in J if j-1 in J]
         ) # Edges
-        K = model.K = pyo.Set(initialize=model._numbered_squares.keys(), dimen=2)
-        W = model.W = pyo.Set(initialize=model._walls)
+        K = model.K = pyo.Set(initialize=self.numbered_squares.keys(), dimen=2)
+        W = model.W = pyo.Set(initialize=self.walls)
         
         # DECISION VARIABLES
         x = model.x = pyo.Var(E, within=pyo.Binary, initialize=0)
         u = model.u = pyo.Var(V, within=pyo.NonNegativeReals)
 
         # PARAMETERS
-        k = model.k = pyo.Param(V, initialize=self._numbered_squares, default=0, within=pyo.NonNegativeIntegers)
+        k = model.k = pyo.Param(V, initialize=self.numbered_squares, default=0, within=pyo.NonNegativeIntegers)
 
         # OBJECTIVE FUNCTION
         model.obj = pyo.Objective(expr=0) # feasibility problem
@@ -112,63 +146,41 @@ class Zip(GameBoard):
         self._stale = False
 
 
-    @property
-    def numbered_squares(self):
-        return self._numbered_squares
-    
-    @numbered_squares.setter
-    def numbered_squares(self, values) -> None:
-
-        if len(values) > len(self):
-            msg = (
-                "The number of numbered squares exceeds the amount of board squares! "
-                f"Got {len(values)} numbered squares."
-            )
-            raise ValueError(msg)
-        
-        if len(values) < 2:
-            msg = (
-                "The quantity of numbered squares is too small for the game! "
-                f"Got a total of {len(values)} numbered squares."
-            )
-            raise ValueError(msg)
-
-        if isinstance(values, (list, tuple)):
-            print((
-                "WARNING: The numbered squares should be a dictionary mapping (i,j) coordinates to their respective numbers. "
-                f"Got a {type(values).__name__} instead."
-            ))
-            self._numbered_squares = {square: index for index, square in enumerate(values)}
-        elif not isinstance(numbered_squares, dict):
-            msg = "The numbered squares must be a dictionary."
-            raise ValueError(msg)
-        else:
-            self._numbered_squares = values
-
-        self._stale = True
-
-
-    def solve(self, verbose:bool=False):
+    def solve(self, solver:str="gurobi", verbose:bool=False):
 
         if self._stale or self._model is None:
-            self._build_model()
+            self.__build_model()
 
-        result = pyo.SolverFactory("highs").solve(self)
+        result = pyo.SolverFactory(solver).solve(self.model)
 
-        if (result.Solver.status == SolverStatus.ok
+        is_model_solved = (
+            result.Solver.status == SolverStatus.ok # Checks if solver is finished with normal termination.
             and (
-                result.Solver.termination_condition == TerminationCondition.feasible
-                or result.Solver.termination_condition == TerminationCondition.optimal
-            )):
+                result.Solver.termination_condition == TerminationCondition.optimal # Checks if solver is finished with optimal solution...
+                or result.Solver.termination_condition == TerminationCondition.feasible # ... or with feasible solution.
+            ))
+
+        if is_model_solved:
             print("Zip solved successfully!")
-            nx.set_edge_attributes(
-                self._board,
+
+            nx.set_node_attributes(
+                self.board,
                 name="value",
-                values={((i-1, j-1), (r-1, s-1)): round(pyo.value(self._model.x[i,j,r,s])) for i, j, r, s in self._model.E}
+                values={(i-1, j-1): round(pyo.value(self.model.u[i,j])) for i, j in self.model.V}
             )
 
+            nx.set_edge_attributes(
+                self.board,
+                name="value",
+                values={((i-1, j-1), (r-1, s-1)): round(pyo.value(self.model.x[i,j,r,s])) for i, j, r, s in self.model.E}
+            )
+
+            path = nx.get_node_attributes(self.board, "value")
+            self._path = sorted(path.keys(), key=path.get)
+
             if verbose:
-                pprint(self.board_edges)
+                print("This is the path that solves the games:")
+                pprint(self.path)
 
         else:
             print("No feasible solution was found!")
@@ -177,25 +189,25 @@ class Zip(GameBoard):
 
     def show(self):
 
-        if self._stale or self._model is None:
-            self._build_model()
+        if self._stale or self.model is None:
+            self.__build_model()
 
         plt.figure(figsize=(3.4, 3.4))
         
         nx.draw(
-            self._board,
-            pos= {(i,j): (j,-i) for i, j in self._board.nodes()},
+            self.board,
+            pos= {(i,j): (j,-i) for i, j in self.board.nodes()},
             with_labels= True,
-            labels= {(i-1, j-1): self._model.k[i,j] for (i,j) in self._model.K},
+            labels= {(i-1, j-1): self.model.k[i,j] for (i, j) in self.model.K},
             arrows=False,
             node_shape="o", # round nodes
             node_size= 1000,
-            node_color= ["white" if (i+1,j+1) in self._model.K else "#EE5F12" for (i,j) in self._board.nodes()],
+            node_color= ["white" if (i+1,j+1) in self.numbered_squares else "#EE5F12" for (i,j) in self.board.nodes()],
             edge_color= "#EE5F12",
             edgecolors='#EE5F12',
             linewidths= 3,
             width= 35,
-            edgelist= [((i-1, j-1), (r-1, s-1)) for i,j,r,s in self._model.E if round(self._model.x[i,j,r,s].value) == 1]
+            edgelist= [((i-1, j-1), (r-1, s-1)) for i,j,r,s in self.model.E if int(pyo.value(self.model.x[i,j,r,s])) == 1]
         )
         plt.show()
 
@@ -224,5 +236,5 @@ if __name__ == "__main__":
     }
 
     zip = Zip((6,6), numbered_squares)
-    zip.solve()
+    zip.solve(solver="highs", verbose=True)
     zip.show()

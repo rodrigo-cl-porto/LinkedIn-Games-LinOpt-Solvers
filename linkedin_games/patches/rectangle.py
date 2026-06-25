@@ -151,7 +151,7 @@ class Rectangle(TipSeed):
     def __repr__(self) -> str:
         return (
             "Rectangle(\n\t"
-            f"color={self._color},\n\t"
+            f"color={self.color},\n\t"
             f"seed_square={self.seed_square},\n\t"
             f"rect_type={self.rect_type},\n\t"
             f"seed_area={self.seed_area},\n\t"
@@ -165,30 +165,30 @@ class Rectangle(TipSeed):
     def __str__(self) -> str:
         return (
             "Rectangle("
-            f"color={self._color}, "
-            f"x={self._x}, "
-            f"y={self._y}, "
-            f"width={self._width}, "
-            f"height={self._height}, "
+            f"color={self.color}, "
+            f"x={self.x}, "
+            f"y={self.y}, "
+            f"width={self.width}, "
+            f"height={self.height}, "
             f"squares={self.squares})"
         )
 
 
     def __hash__(self) -> int:
         return hash((
-            self._color,
-            self._seed_square,
-            self._rect_type,
-            self._seed_area,
-            self._x,
-            self._y,
-            self._width,
-            self._height
+            self.color,
+            self.seed_square,
+            self.rect_type,
+            self.seed_area,
+            self.x,
+            self.y,
+            self.width,
+            self.height
         ))
 
 
     def __len__(self) -> int:
-        return self._width * self._height
+        return self.width * self.height
     
 
     def __eq__(self, other) -> bool:
@@ -339,10 +339,13 @@ class Rectangle(TipSeed):
 
 
     @property
-    def squares(self) -> tuple[tuple[int, int], ...]:
+    def squares(self) -> tuple[tuple[int, int]]:
         """Squares covered by the rectangle (row,col) tuples"""
 
-        if self.x < 1 or self.y < 1 or self.width < 1 or self.height < 1:
-            return ()
+        squares = tuple(
+            (i, j)
+            for i in range(self.y, self.y + self.height)
+            for j in range(self.x, self.x + self.width)
+        )
         
-        return tuple((i, j) for i in range(self.y, self.y + self.height) for j in range(self.x, self.x + self.width))
+        return squares
