@@ -1,13 +1,16 @@
 # See docs at: https://mystmd.org/guide/frontmatter
 version: 1
-format: jupyter-book
 project:
   id: 8d6282a6-4c6d-4f83-b6c6-ee5a591f8a02
   title: Solving LinkedIn Games by Linear Optimization
   subtitle: Solving LinkedIn Games by Linear Optimization with Pyomo and NetworkX libraries
   description: This Jupyter Book presents examples on how to solve LinkedIn minigames by using Python libraries, such as Pyomo, for mathematical modeling, and NetworkX, for graph modeling.
+  parts:
+    abstract: |
+      This Jupyter Book presents examples on how to solve LinkedIn minigames by using Python libraries, such as Pyomo, for mathematical modeling, and NetworkX, for graph modeling.
+      The minigames are solved by formulating them as Linear Optimization Problems (LOPs) and solving them with the Gurobi and Highs solvers.
+      This book also provides a brief introduction to Linear Optimization (LO) and its applications in solving real-world problems.
   keywords:
-    - LinkedIn Minigames
     - LinkedIn Queens
     - LinkedIn Tango
     - LinkedIn Zip
@@ -33,7 +36,7 @@ project:
   open_access: true
   toc:
     - title: Introduction
-      file: landing.md
+      file: home.md
     - title: What is Optimization?
       file: ./notebooks/0-optimization.ipynb
     - title: How to Solve
@@ -60,16 +63,16 @@ project:
         url: https://www.geeksforgeeks.org/python/python-classes-and-objects/
     - title: Python Libraries
       children:
+      - title: Pyomo
+        url: https://www.pyomo.org/
+      - title: NetworkX
+        url: https://networkx.org/
       - title: Gurobipy
         url: https://www.gurobi.com/faqs/gurobipy/
       - title: Highspy
         url: https://anaconda.org/channels/conda-forge/packages/highspy/overview
       - title: Matplotlib
         url: https://matplotlib.org/
-      - title: NetworkX
-        url: https://networkx.org/
-      - title: Pyomo
-        url: https://www.pyomo.org/
   abbreviations:
     BLO: Binary Linear Optimization
     BLOP: Binary Linear Optimization Problem
@@ -92,7 +95,17 @@ project:
     \B: '\{0,1\}'
   exports:
     - format: pdf
-      template: lapreprint-typst
+      template: plain_latex_book
+      output: exports/jupyter_book.pdf
+      title: Solving LinkedIn Games by Linear Optimization
+      articles:
+        - home.md
+        - notebooks/0-optimization.ipynb
+        - notebooks/1-queens.ipynb
+        - notebooks/2-tango.ipynb
+        - notebooks/3-zip.ipynb
+        - notebooks/4-mini-sudoku.ipynb
+        - notebooks/5-patches.ipynb
 site:
   template: book-theme
   options:
