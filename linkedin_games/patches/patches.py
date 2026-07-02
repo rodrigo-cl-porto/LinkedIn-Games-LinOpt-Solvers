@@ -5,7 +5,9 @@ import networkx as nx
 import pyomo.environ as pyo
 
 from ..gameboard import GameBoard
-from .rectangle import TipSeed, Rectangle, RecType
+from .rec_type import RecType
+from .rectangle import Rectangle
+from .tip_seed import TipSeed
 
 
 class Patches(GameBoard):
@@ -79,10 +81,10 @@ class Patches(GameBoard):
         # COMPOSITE SETS
         S = model.S # Board squares
         T = model.T = pyo.Set(initialize=[(*tip.seed_square, tip.color) for tip in self.tip_seeds]) # Set of triples (i,j,k) indicating tip square (i,j) for rectangle k
-        V = model.V = pyo.Set(initialize=[tip.color for tip in self.tip_seeds if tip.rect_type == RecType.VERTICAL])
-        H = model.H = pyo.Set(initialize=[tip.color for tip in self.tip_seeds if tip.rect_type == RecType.HORIZONTAL])
-        Q = model.Q = pyo.Set(initialize=[tip.color for tip in self.tip_seeds if tip.rect_type == RecType.SQUARE])
-        A = model.A = pyo.Set(initialize=[tip.color for tip in self.tip_seeds if tip.rect_type is not None])
+        V = model.V = pyo.Set(initialize=[tip.color for tip in self.tip_seeds if tip.rec_type == RecType.VERTICAL])
+        H = model.H = pyo.Set(initialize=[tip.color for tip in self.tip_seeds if tip.rec_type == RecType.HORIZONTAL])
+        Q = model.Q = pyo.Set(initialize=[tip.color for tip in self.tip_seeds if tip.rec_type == RecType.SQUARE])
+        A = model.A = pyo.Set(initialize=[tip.color for tip in self.tip_seeds if tip.rec_type is not None])
 
         # DECISION VARIABLES
         x = model.x = pyo.Var(I, J, K, domain=pyo.Binary)
@@ -170,7 +172,7 @@ class Patches(GameBoard):
                 color=tip.color,
                 seed_square=tip.seed_square,
                 seed_area=tip.seed_area,
-                rect_type= tip.rect_type,
+                rec_type= tip.rec_type,
                 x = int(round(pyo.value(self.model.c[tip.color]), 0)),
                 y = int(round(pyo.value(self.model.r[tip.color]), 0)),
                 width = int(round(pyo.value(self.model.w[tip.color]), 0)),

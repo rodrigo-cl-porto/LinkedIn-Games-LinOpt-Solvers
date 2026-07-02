@@ -14,3 +14,7 @@ __pycache__/
 
 # Jupyter Lab checkpoints
 .ipynb_checkpoints
+
+# Distribution / packaging
+*.egg-info/
+dist/
