@@ -1,8 +1,10 @@
+from abc import ABC, abstractmethod
+from pyomo.opt import SolverStatus, TerminationCondition
 import networkx as nx
 import pyomo.environ as pyo
 
 
-class GameBoard:
+class GameBoard(ABC): # Abstract Base Class
 
     def __init__(self, board_dims:tuple[int, int]) -> None:
         self.board_dims = board_dims
@@ -11,20 +13,18 @@ class GameBoard:
         self._stale: bool = True
 
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self._board_dims)
     
     
-    def __len__(self):
+    def __len__(self) -> int:
         m, n = self._board_dims
         return m * n
 
 
-    def __abs__(self):
+    def __abs__(self) -> int:
         return len(self)
 
-
-    # BOARD DIMENSIONS
 
     @property
     def board_dims(self) -> tuple[int, int]:
@@ -61,8 +61,6 @@ class GameBoard:
         self._stale = True
 
 
-    # BOARD
-
     @property
     def board(self) -> nx.Graph:
         return self._board
@@ -77,7 +75,6 @@ class GameBoard:
 
     @property
     def board_squares(self) -> dict[tuple[int, int]: int]:
-        #return nx.get_node_attributes()
         return {(i+1, j+1): data["value"] for (i, j), data in self.board.nodes(data=True)}
     
     @property
@@ -85,10 +82,89 @@ class GameBoard:
         edges = nx.get_edge_attributes(self.board, "value").items()
         return {((i+1, j+1), (r+1, s+1)): value for ((i, j), (r, s)), value in edges}
 
-
-    # MODEL
-
     @property
     def model(self) -> pyo.ConcreteModel | None:
         return self._model
     
+
+    @property
+    def _stale(self) -> bool:
+        return self.__stale
+    
+    @_stale.setter
+    def _stale(self, value:bool) -> None:
+        self.__stale = value
+
+        if value:
+            self._is_solved = False
+    
+    
+    @property
+    def is_solved(self) -> bool:
+        return self._is_solved
+
+
+    def _build_model(self) -> None:
+        
+        model = pyo.ConcreteModel()
+
+        # BOARD DIMENSIONS
+        m, n = self._board_dims
+        model.m = pyo.Param(initialize=m, within=pyo.PositiveIntegers)
+        model.n = pyo.Param(initialize=n, within=pyo.PositiveIntegers)
+
+        # RANGE SETS
+        I = model.I = pyo.RangeSet(n) # Rows
+        J = model.J = pyo.RangeSet(m) # Columns
+
+        # COMPOSITE SETS
+        model.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Board Squares
+        
+        # Attach model
+        self._model = model
+        self._construct_model()
+        self._stale = False
+    
+    @abstractmethod
+    def _construct_model(self) -> None:
+        pass
+    
+    
+    def solve(self, solver:str="gurobi", verbose:bool=False) -> pyo.ConcreteModel:
+        
+        if self._stale or self.model is None:
+            self._build_model()
+
+        result = pyo.SolverFactory(solver).solve(self.model)
+
+        self._is_solved = (
+            result.Solver.status == SolverStatus.ok # Checks if solver is finished with normal termination.
+            and (
+                result.Solver.termination_condition == TerminationCondition.optimal # Checks if solver is finished with optimal solution...
+                or result.Solver.termination_condition == TerminationCondition.feasible # ... or with feasible solution.
+            )
+        )
+
+        if self._is_solved:
+            print(f"{type(self).__name__} game solved successfully!")
+            self._set_solution(verbose=verbose)
+        else:
+            print("No feasible solution was found!")
+            if verbose:
+                print(result.Solver)
+
+    @abstractmethod
+    def _set_solution(self, verbose:bool) -> None:
+        pass
+    
+
+    def show(self) -> None:
+
+        if self._stale or self._model is None:
+            self._build_model()
+
+        self._show()
+
+    @abstractmethod
+    def _show(self) -> None:
+        pass

@@ -1,14 +1,10 @@
 from pprint import pprint
 
-from pyomo.opt import SolverStatus, TerminationCondition
 import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-try:
-    from ..gameboard import GameBoard
-except ImportError:  # pragma: no cover - allows running the module as a script
-    from linkedin_games.gameboard import GameBoard
+from ..gameboard import GameBoard
 
 
 class Tango(GameBoard):
@@ -180,20 +176,16 @@ class Tango(GameBoard):
         self._filled_squares = {square: (1 if value else 0) for square, value in values.items()}
 
 
-    def __build__model(self) -> None:
-        model = pyo.ConcreteModel()
+    def _construct_model(self) -> None:
 
-        # BOARD DIMENSIONS
-        m, n = self._board_dims
-        model.m = pyo.Param(initialize=m, within=pyo.PositiveIntegers)
-        model.n = pyo.Param(initialize=n, within=pyo.PositiveIntegers)
+        model = self.model
 
         # RANGE SETS
-        I = model.I = pyo.RangeSet(n) # Rows
-        J = model.J = pyo.RangeSet(m) # Columns
+        I = model.I # Rows
+        J = model.J # Columns
 
         # COMPOSITE SETS
-        S = model.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Board Squares
+        S = model.S # Board Squares
         L = model.L = pyo.Set(initialize=self._like_pairs)
         O = model.O = pyo.Set(initialize=self._opp_pairs)
         K = model.K = pyo.Set(initialize=self._filled_squares.keys(), dimen=2)
@@ -202,6 +194,8 @@ class Tango(GameBoard):
         x = model.x = pyo.Var(S, within=pyo.Binary)
 
         # PARAMETERS
+        m = model.m # Total number of rows
+        n = model.n # Total number of columns
         k = model.k = pyo.Param(K, initialize=self._filled_squares, within=pyo.Binary) # Filled values
 
         # OBJECTIVE FUNCTION
@@ -210,12 +204,12 @@ class Tango(GameBoard):
         # CONSTRAINTS
         model.equal_moons_suns_per_row_constraints = pyo.Constraint(
             I,
-            rule=lambda model, i: sum(x[i,j] for j in J) == n/2
+            rule=lambda model, i: sum(x[i,j] for j in J) == n / 2
         )
 
         model.equal_moons_suns_per_column_constraints = pyo.Constraint(
             J,
-            rule=lambda model, j: sum(x[i,j] for i in I) == m/2
+            rule=lambda model, j: sum(x[i,j] for i in I) == m / 2
         )
 
         model.no_three_consecutive_moons_per_row_constraints = pyo.Constraint(
@@ -253,47 +247,21 @@ class Tango(GameBoard):
             rule=lambda model, i, j: x[i,j] == k[i,j]
         )
 
-        # Attach model
-        self._model = model
-        self._stale = False
+
+    def _set_solution(self, verbose:bool=False):
+
+        nx.set_node_attributes(
+            self._board,
+            name="value",
+            values={(i-1, j-1): int(pyo.value(self.model.x[i,j])) for i, j in self.model.S}
+        )
+
+        if verbose:
+            print("Tango solution:")
+            pprint(self.board_squares)
 
 
-    def solve(self, solver:str="gurobi", verbose:bool=False):
-
-        if self._stale or self.model is None:
-            self.__build__model()
-
-        result = pyo.SolverFactory(solver).solve(self.model)
-
-        is_model_solved = (
-            result.Solver.status == SolverStatus.ok # Checks if solver is finished with normal termination.
-            and (
-                result.Solver.termination_condition == TerminationCondition.optimal # Checks if solver is finished with optimal solution...
-                or result.Solver.termination_condition == TerminationCondition.feasible # ... or with feasible solution.
-            ))
-
-        if is_model_solved:
-
-            print("Tango solved successfully!")
-            nx.set_node_attributes(
-                self._board,
-                name="value",
-                values={(i-1, j-1): int(pyo.value(self.model.x[i,j])) for i, j in self.model.S}
-            )
-
-            if verbose:
-                print("Tango solution:")
-                pprint(self.board_squares)
-
-        else:
-            print("No feasible solution was found!")
-            print(result.Solver)
-
-
-    def show(self):
-
-        if self._stale or self.model is None:
-            self.__build__model()
+    def _show(self) -> None:
         
         plt.figure(figsize=(3.4, 3.4))
         
@@ -325,40 +293,5 @@ class Tango(GameBoard):
             },
             font_color="#887658"
         )
+
         plt.show()
-
-
-if __name__ == "__main__":
-
-    # Solving Tango No. 151
-
-    # like (=) pairs, each element is ((i,j),(r,s))
-    like_pairs = (
-        ((2, 3), (2, 4)),
-        ((2, 1), (3, 1)),
-        ((2, 3), (3, 3)),
-        ((2, 6), (3, 6)),
-        ((4, 1), (4, 2)),
-        ((6, 3), (6, 4)),
-    )
-
-    # opposite (X) pairs
-    opp_pairs = (
-        ((2, 4), (3, 4)),
-        ((3, 1), (4, 1)),
-        ((3, 3), (3, 4)),
-        ((3, 6), (4, 6)),
-        ((4, 5), (4, 6)),
-    )
-
-    # already filled squares: (i,j) -> kij
-    filled_squares = {
-        (1, 2): 1,
-        (1, 5): 1,
-        (5, 2): 0,
-        (5, 5): 1,
-    }
-
-    tango = Tango((6,6), like_pairs, opp_pairs, filled_squares)
-    tango.solve(verbose=True)
-    tango.show()

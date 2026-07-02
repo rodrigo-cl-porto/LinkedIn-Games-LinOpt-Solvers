@@ -1,6 +1,5 @@
 from pprint import pprint
 
-from pyomo.opt import SolverStatus, TerminationCondition
 import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
@@ -90,22 +89,16 @@ class Queens(GameBoard):
         return sorted(tuple((i+1, j+1) for (i,j) in self.__crowns.nodes()))
     
 
-    def __build_model(self):
-
-        model = pyo.ConcreteModel()
-
-        # PARAMETERS
-        m, n = self.board_dims
-        model.m = pyo.Param(initialize=m, within=pyo.PositiveIntegers)
-        model.n = pyo.Param(initialize=n, within=pyo.PositiveIntegers)
+    def _construct_model(self):
+        model = self.model
 
         # RANGE SETS
-        I = model.I = pyo.RangeSet(n) # Rows
-        J = model.J = pyo.RangeSet(m) # Columns
+        I = model.I # Rows
+        J = model.J # Columns
         K = model.K = pyo.Set(initialize=[region.color for region in self.regions]) # Regions
 
         # COMPOSITE SETS
-        S = model.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Board Squares
+        S = model.S # Board Squares
         R = model.R = pyo.Set(K, initialize={region.color: region.squares for region in self.regions}, dimen=2) # Region Squares
         D = model.D = pyo.Set(initialize=lambda model: [
             ((i, j), (i+1, j+1)) for (i, j) in S if (i+1, j+1) in S] + [
@@ -139,51 +132,24 @@ class Queens(GameBoard):
             rule=lambda model, i, j, r, s: x[i,j] + x[r,s] <= 1
         )
 
-        # Attach model
-        self._model = model
-        self._stale = False
+
+    def _set_solution(self, verbose:bool=False) -> None:
+
+        nx.set_node_attributes(
+            self.board,
+            name="value",
+            values= {(i-1, j-1): int(pyo.value(self.model.x[i,j])) for (i, j) in self.model.S}
+        )
+
+        crowns = [square for square, value in nx.get_node_attributes(self.board, "value").items() if value == 1]
+        self.__crowns = self.board.subgraph(crowns)
+
+        if verbose:
+            print("These are the squares that contain a crown:")
+            pprint(self.crowns)
 
 
-    def solve(self, solver="gurobi", verbose:bool=False) -> None:
-
-        if self._stale or self.model is None:
-            self.__build_model()
-        
-        result = pyo.SolverFactory(solver).solve(self.model)
-
-        is_model_solved = (
-            result.Solver.status == SolverStatus.ok # Checks if solver is finished with normal termination.
-            and (
-                result.Solver.termination_condition == TerminationCondition.optimal # Checks if solver is finished with optimal solution...
-                or result.Solver.termination_condition == TerminationCondition.feasible # ... or with feasible solution.
-            ))
-        
-        if is_model_solved:
-
-            print("Queens game solved successfully!")
-            nx.set_node_attributes(
-                self.board,
-                name="value",
-                values= {(i-1, j-1): int(pyo.value(self.model.x[i,j])) for (i, j) in self.model.S}
-            )
-
-            crowns = [square for square, value in nx.get_node_attributes(self.board, "value").items() if value == 1]
-            self.__crowns = self.board.subgraph(crowns)
-
-            if verbose:
-                print("These are the squares that contain a crown:")
-                pprint(self.crowns)
-
-        else:
-            print("No feasible solution was found!")
-            if verbose:
-                print(result.Solver)
-
-
-    def show(self) -> None:
-
-        if self._stale or self.model is None:
-            self.__build_model()
+    def _show(self) -> None:
 
         plt.figure(figsize=(3.4, 3.4))
 
@@ -198,42 +164,3 @@ class Queens(GameBoard):
             width=0
         )
         plt.show()
-
-
-if __name__ == "__main__":
-
-    # Solving Queens No. 307
-    regions = {
-        Region( # Purple
-            color="#BBA3E1",
-            squares={(1,1), (1,2), (1,3), (1,4), (1,5), (1,6), (1,7), (2,6), (2,7), (3,6), (3,7), (4,6), (4,7), (5,7), (6,7), (7,7)}
-        ),
-        Region( # Orange
-            color="#FFC794", 
-            squares={(2,1), (2,2), (2,3), (2,4), (3,1), (4,1), (4,2), (5,1), (5,2), (6,1), (6,2), (6,4), (6,5), (6,6), (7,1), (7,2), (7,3), (7,4), (7,5), (7,6)}
-        ),
-        Region( # Blue
-            color="#94BEFF",
-            squares={(2,5), (3,5)}
-        ),
-        Region( # Green
-            color="#B3DF9E",
-            squares={(3,2), (3,3)}
-        ),
-        Region( # Gray
-            color="#E0E0E0",
-            squares={(3,4), (4,3), (4,4), (4,5), (5,4)}
-        ),
-        Region( # Red
-            color="#FF7B61",
-            squares={(5,3), (6,3)}
-        ),
-        Region( # Yellow
-            color="#E6F388",
-            squares={(5,5), (5,6)}
-        )
-    }
-
-    queens = Queens((7,7), regions)
-    queens.solve(verbose=True)
-    queens.show()

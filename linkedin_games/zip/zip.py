@@ -1,6 +1,5 @@
 from pprint import pprint
 
-from pyomo.opt import SolverStatus, TerminationCondition
 import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
@@ -65,22 +64,15 @@ class Zip(GameBoard):
         return [(i+1, j+1) for (i, j) in self._path]
     
 
-    def __build_model(self) -> None:
-        model = pyo.ConcreteModel()
-
-        # BOARD DIMENSIONS
-        m, n = self.board_dims
-        model.m = pyo.Param(initialize=m, within=pyo.PositiveIntegers)
-        model.n = pyo.Param(initialize=n, within=pyo.PositiveIntegers)
-        
-        M = m * n
+    def _construct_model(self) -> None:
+        model = self.model
 
         # RANGE SETS
-        I = model.I = pyo.RangeSet(m) # Rows
-        J = model.J = pyo.RangeSet(n) # Columns
+        I = model.I # Rows
+        J = model.J # Columns
 
         # COMPOSITE SETS
-        V = model.V = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Nodes
+        S = model.S # Board Squares
         E = model.E = pyo.Set(initialize=lambda model: [
             ((i, j), (i+1, j)) for i in I for j in J if i+1 in I] + [
             ((i, j), (i-1, j)) for i in I for j in J if i-1 in I] + [
@@ -92,27 +84,27 @@ class Zip(GameBoard):
         
         # DECISION VARIABLES
         x = model.x = pyo.Var(E, within=pyo.Binary, initialize=0)
-        u = model.u = pyo.Var(V, within=pyo.NonNegativeReals)
+        u = model.u = pyo.Var(S, within=pyo.NonNegativeReals)
 
         # PARAMETERS
-        k = model.k = pyo.Param(V, initialize=self.numbered_squares, default=0, within=pyo.NonNegativeIntegers)
+        k = model.k = pyo.Param(S, initialize=self.numbered_squares, default=0, within=pyo.NonNegativeIntegers)
 
         # OBJECTIVE FUNCTION
         model.obj = pyo.Objective(expr=0) # feasibility problem
     
         # CONSTRAINTS
         model.outgoing_edges_constraints = pyo.Constraint(
-            V,
+            S,
             rule=lambda model, i, j: \
-                sum(x[(i,j),w] for w in V if ((i,j),w) in E) == 1 if k[i,j] != len(K) else \
-                sum(x[(i,j),w] for w in V if ((i,j),w) in E) == 0
+                sum(x[(i,j),w] for w in S if ((i,j),w) in E) == 1 if k[i,j] != len(K) else \
+                sum(x[(i,j),w] for w in S if ((i,j),w) in E) == 0
         )
         
         model.incoming_edges_constraints = pyo.Constraint(
-            V,
+            S,
             rule=lambda model, i, j: \
-                sum(x[v,(i,j)] for v in V if (v,(i,j)) in E) == 1 if k[i,j] != 1 else \
-                sum(x[v,(i,j)] for v in V if (v,(i,j)) in E) == 0
+                sum(x[s,(i,j)] for s in S if (s,(i,j)) in E) == 1 if k[i,j] != 1 else \
+                sum(x[s,(i,j)] for s in S if (s,(i,j)) in E) == 0
         )
     
         if W is not None:
@@ -121,6 +113,7 @@ class Zip(GameBoard):
                 rule=lambda model, i, j, r, s: x[i,j,r,s] + x[r,s,i,j] == 0
             )
 
+        M = len(self)
         model.subroute_elimination_constraints = pyo.Constraint(
             E,
             rule=lambda model, i, j, r, s: u[r,s] >= u[i,j] + 1 - M*(1 - x[i,j,r,s])
@@ -141,56 +134,29 @@ class Zip(GameBoard):
             rule= lambda model, i, j: u[i,j] == M if k[i,j] == len(K) else pyo.Constraint.Skip
         )
 
-        # Attach model
-        self._model = model
-        self._stale = False
+
+    def _set_solution(self, verbose:bool=False) -> None:
+        nx.set_node_attributes(
+            self.board,
+            name="value",
+            values={(i-1, j-1): round(pyo.value(self.model.u[i,j])) for i, j in self.model.S}
+        )
+
+        nx.set_edge_attributes(
+            self.board,
+            name="value",
+            values={((i-1, j-1), (r-1, s-1)): round(pyo.value(self.model.x[i,j,r,s])) for i, j, r, s in self.model.E}
+        )
+
+        path = nx.get_node_attributes(self.board, "value")
+        self._path = sorted(path.keys(), key=path.get)
+
+        if verbose:
+            print("This is the path that solves the games:")
+            pprint(self.path)
 
 
-    def solve(self, solver:str="gurobi", verbose:bool=False):
-
-        if self._stale or self._model is None:
-            self.__build_model()
-
-        result = pyo.SolverFactory(solver).solve(self.model)
-
-        is_model_solved = (
-            result.Solver.status == SolverStatus.ok # Checks if solver is finished with normal termination.
-            and (
-                result.Solver.termination_condition == TerminationCondition.optimal # Checks if solver is finished with optimal solution...
-                or result.Solver.termination_condition == TerminationCondition.feasible # ... or with feasible solution.
-            ))
-
-        if is_model_solved:
-            print("Zip solved successfully!")
-
-            nx.set_node_attributes(
-                self.board,
-                name="value",
-                values={(i-1, j-1): round(pyo.value(self.model.u[i,j])) for i, j in self.model.V}
-            )
-
-            nx.set_edge_attributes(
-                self.board,
-                name="value",
-                values={((i-1, j-1), (r-1, s-1)): round(pyo.value(self.model.x[i,j,r,s])) for i, j, r, s in self.model.E}
-            )
-
-            path = nx.get_node_attributes(self.board, "value")
-            self._path = sorted(path.keys(), key=path.get)
-
-            if verbose:
-                print("This is the path that solves the games:")
-                pprint(self.path)
-
-        else:
-            print("No feasible solution was found!")
-            print(result.Solver)
-
-
-    def show(self):
-
-        if self._stale or self.model is None:
-            self.__build_model()
+    def _show(self) -> None:
 
         plt.figure(figsize=(3.4, 3.4))
         
@@ -210,31 +176,3 @@ class Zip(GameBoard):
             edgelist= [((i-1, j-1), (r-1, s-1)) for i,j,r,s in self.model.E if int(pyo.value(self.model.x[i,j,r,s])) == 1]
         )
         plt.show()
-
-
-if __name__ == "__main__":
-
-    # Zip No. 166
-    
-    numbered_squares = {
-        (1,1):  9,
-        (1,2): 10,
-        (1,3): 11,
-        (2,1):  8,
-        (2,4): 13,
-        (3,1):  7,
-        (3,4): 14,
-        (3,5): 12,
-        (4,2):  6,
-        (4,3): 15,
-        (4,6): 16,
-        (5,3):  5,
-        (5,6):  3,
-        (6,4):  4,
-        (6,5):  1,
-        (6,6):  2
-    }
-
-    zip = Zip((6,6), numbered_squares)
-    zip.solve(solver="highs", verbose=True)
-    zip.show()

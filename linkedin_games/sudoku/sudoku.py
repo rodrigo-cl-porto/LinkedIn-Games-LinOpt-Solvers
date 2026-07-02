@@ -1,6 +1,5 @@
 from pprint import pprint
 
-from pyomo.opt import SolverStatus, TerminationCondition
 import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
@@ -10,14 +9,14 @@ from ..gameboard import GameBoard
 
 class Sudoku(GameBoard):
     
-    def __init__(self, size: int, subgrid_dims: tuple[int, int], filled_squares: dict[tuple[int, int]: int]) -> None:
+    def __init__(self, size: int, gridblock_dims: tuple[int, int], filled_squares: dict[tuple[int, int]: int]) -> None:
         super().__init__((size, size)) # Always a square board.
-        self.subgrid_dims = subgrid_dims
+        self.gridblock_dims = gridblock_dims
         self.filled_squares = filled_squares
 
 
     def __hash__(self):
-        return hash((self.size, self.subgrid_dims, self.filled_squares))
+        return hash((self.size, self.gridblock_dims, self.filled_squares))
 
 
     @property
@@ -26,11 +25,11 @@ class Sudoku(GameBoard):
     
 
     @property
-    def subgrid_dims(self) -> tuple[int, int]:
-        return self._subgrid_dims
+    def gridblock_dims(self) -> tuple[int, int]:
+        return self._gridblock_dims
 
-    @subgrid_dims.setter
-    def subgrid_dims(self, value:tuple[int, int] = (2, 2)) -> None:
+    @gridblock_dims.setter
+    def gridblock_dims(self, value:tuple[int, int] = (2, 2)) -> None:
         
         if len(value) != 2:
             msg = f"Board dimensions must be a pair (m,n). Got {value!r} instead."
@@ -46,21 +45,21 @@ class Sudoku(GameBoard):
         
         p, q = value
         if p * q < 2:
-            msg = f"The subgrid is too small for the game! Got subgrid dimensions of {value!r}."
+            msg = f"The grid blocks is too small for the game! Got grid blocks dimensions of {value!r}."
             raise ValueError(msg)
         
         elif p * q != self.size:
-            msg = f"The dimensions of subgrid must match with the sudoku's size of {self.size}."
+            msg = f"The dimensions of grid blocks must match with the sudoku's size of {self.size}."
             raise ValueError(msg)
 
         if not isinstance(value, tuple):
             print((
-                "WARNING: in order to avoid unexpected behaviours, board dimensions should be a tuple."
+                "WARNING: in order to avoid unexpected behaviours, grid block dimensions should be a tuple."
                 f"Got a {type(value).__name__} instead."
             ))
             value = tuple(value)
         
-        self._subgrid_dims = value
+        self._gridblock_dims = value
         self._stale = True
 
 
@@ -104,20 +103,21 @@ class Sudoku(GameBoard):
         self._stale = True
     
 
-    def __build_model(self) -> None:
-        model = pyo.ConcreteModel()
+    def _construct_model(self) -> None:
+        
+        model = self.model
         
         # RANGE SETS
         n = self.size
-        p, q = self.subgrid_dims
-        I = model.I = pyo.RangeSet(n) # Rows
-        J = model.J = pyo.RangeSet(n) # Columns
+        p, q = self.gridblock_dims
+        I = model.I # Rows
+        J = model.J # Columns
         K = model.K = pyo.RangeSet(n) # Digits
-        U = model.u = pyo.RangeSet(p) # Rows per subgrid
-        V = model.v = pyo.RangeSet(q) # Columns per subgrid
+        U = model.u = pyo.RangeSet(p) # Rows per gridblock
+        V = model.v = pyo.RangeSet(q) # Columns per gridblock
 
         # COMPOSITE SETS
-        S = model.S = pyo.Set( # Subgrids
+        B = model.B = pyo.Set( # Grid-blocks
             V, U,
             initialize= lambda model, v, u: 
             [(i, j) for i in range(p*(v-1)+1, p*v+1) for j in range(q*(u-1)+1, q*u+1)]
@@ -144,9 +144,9 @@ class Sudoku(GameBoard):
             rule=lambda model, i, k: sum(x[i,j,k] for j in J) == 1
         )
 
-        model.unique_digits_per_submatrix_constraints = pyo.Constraint(
+        model.unique_digits_per_gridblock_constraints = pyo.Constraint(
             V, U, K,
-            rule=lambda model, v, u, k: sum(x[i,j,k] for (i, j) in S[v,u]) == 1
+            rule=lambda model, v, u, k: sum(x[i,j,k] for (i, j) in B[v,u]) == 1
         )
 
         model.single_digit_per_square_constraints = pyo.Constraint(
@@ -159,54 +159,28 @@ class Sudoku(GameBoard):
             rule=lambda model, i, j, k: x[i,j,k] == 1
         )
 
-        # Attach model
-        self._model = model
-        self._stale = False
 
+    def _set_solution(self, verbose:bool=False):
 
-    def solve(self, solver:str="gurobi", verbose:bool=False):
-
-        if self._stale or self._model is None:
-            self.__build_model()
-
-        result = pyo.SolverFactory(solver).solve(self.model)
-
-        is_model_solved = (
-            result.Solver.status == SolverStatus.ok # Checks if solver is finished with normal termination.
-            and (
-                result.Solver.termination_condition == TerminationCondition.optimal # Checks if solver is finished with optimal solution...
-                or result.Solver.termination_condition == TerminationCondition.feasible # ... or with feasible solution.
-            ))
-
-        if is_model_solved:
-            print("Sudoku solved successfully!")
-
-            # Saving the solution in the Sudoku board.
-            nx.set_node_attributes(
-                self.board,
-                name="value",
-                values= {
-                    (i-1, j-1): k
-                    for i in self.model.I 
-                    for j in self.model.J
-                    for k in self.model.K
-                    if pyo.value(self.model.x[i, j, k]) == 1
-                }
-            )
-            
-            if verbose:
-                print("These are the digits for each square:")
-                pprint(self.board_squares)
+        # Saving the solution in the Sudoku board.
+        nx.set_node_attributes(
+            self.board,
+            name="value",
+            values= {
+                (i-1, j-1): k
+                for i in self.model.I 
+                for j in self.model.J
+                for k in self.model.K
+                if pyo.value(self.model.x[i, j, k]) == 1
+            }
+        )
         
-        else:
-            print("No feasible solution was found!")
-            print(result.Solver)
+        if verbose:
+            print("These are the digits for each square:")
+            pprint(self.board_squares)
 
 
-    def show(self) -> None:
-
-        if self._stale or self._model is None:
-            self.__build_model()
+    def _show(self) -> None:
 
         plt.figure(figsize=(3, 3))
 
@@ -228,22 +202,3 @@ class Sudoku(GameBoard):
         )
 
         plt.show()
-
-if __name__ == "__main__":
-
-    filled_squares = {
-        (1,1): 1,
-        (2,2): 2,
-        (2,5): 3,
-        (3,3): 3,
-        (3,4): 6,
-        (4,3): 5,
-        (4,4): 4,
-        (5,2): 4,
-        (5,5): 5,
-        (6,6): 6
-    }
-
-    mini_sudoku = Sudoku(6, (2,3), filled_squares)
-    mini_sudoku.solve(verbose=True)
-    mini_sudoku.show()
