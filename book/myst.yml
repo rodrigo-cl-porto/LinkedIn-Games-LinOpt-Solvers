@@ -96,7 +96,7 @@ project:
   exports:
     - format: pdf
       template: plain_latex_book
-      output: exports/jupyter_book.pdf
+      output: exports/solving_linkedin_games_by_linear_optimization.pdf
       title: Solving LinkedIn Games by Linear Optimization
       articles:
         - home.md
@@ -113,3 +113,5 @@ site:
     favicon: ./assets/logos/logo.svg
     logo: ./assets/logos/logo.svg
     logo_dark: ./assets/logos/logo_dark.svg
+  exports:
+    - cff

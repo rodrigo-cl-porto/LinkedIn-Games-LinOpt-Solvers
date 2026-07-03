@@ -1,4 +1,4 @@
-from .mini_sudoku import MiniSudoku
-from .sudoku import Sudoku
+from .sudoku import Sudoku, MiniSudoku
+
 
 __all__ = ["Sudoku", "MiniSudoku"]

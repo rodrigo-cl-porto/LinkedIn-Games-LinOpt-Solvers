@@ -22,7 +22,7 @@ class Sudoku(GameBoard):
     @property
     def size(self) -> int:
         return self.board_dims[0]
-    
+
 
     @property
     def gridblock_dims(self) -> tuple[int, int]:
@@ -101,7 +101,7 @@ class Sudoku(GameBoard):
         nx.set_node_attributes(self.board, name="value", values=None)
         nx.set_node_attributes(self.board, name="value", values=self.filled_squares)
         self._stale = True
-    
+
 
     def _construct_model(self) -> None:
         
@@ -202,3 +202,9 @@ class Sudoku(GameBoard):
         )
 
         plt.show()
+
+
+class MiniSudoku(Sudoku):
+
+    def __init__(self, filled_squares: dict[tuple[int, int]: int]) -> None:
+        super().__init__(6, (2,3), filled_squares)

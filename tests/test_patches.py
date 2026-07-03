@@ -1,177 +1,87 @@
-from linkedin_games.patches import Patches, TipSeed, RecType, Rectangle
+from linkedin_games.patches import Patches, RectangleSeed, RectangleShape, Rectangle
 
 
 def test_patches():
 
     # Solving Patches No. 16
 
-    tip_seeds = tuple((
-        TipSeed( # Yellow
+    seeds = tuple((
+        RectangleSeed( # Yellow
             color="#846A0B",
-            seed_square=(1, 2),
-            rec_type=RecType.ANY,
-            seed_area=2
+            square=(1, 2),
+            shape=RectangleShape.ANY,
+            area=2
         ),
-        TipSeed( # Teal
+        RectangleSeed( # Teal
             color="#096B78",
-            seed_square=(1, 4),
-            rec_type=RecType.ANY,
-            seed_area=6
+            square=(1, 4),
+            shape=RectangleShape.ANY,
+            area=6
         ),
-        TipSeed( # Purple
+        RectangleSeed( # Purple
             color="#5A3DB1",
-            seed_square=(2, 6),
-            rec_type=RecType.ANY,
-            seed_area=2
+            square=(2, 6),
+            shape=RectangleShape.ANY,
+            area=2
         ),
-        TipSeed( # Green
+        RectangleSeed( # Green
             color="#0A7541",
-            seed_square=(3, 1),
-            rec_type=RecType.ANY,
-            seed_area=6
+            square=(3, 1),
+            shape=RectangleShape.ANY,
+            area=6
         ),
-        TipSeed( # Orange
+        RectangleSeed( # Orange
             color="#EF6C00",
-            seed_square=(3, 3),
-            rec_type=RecType.VERTICAL,
-            seed_area=2
+            square=(3, 3),
+            shape=RectangleShape.VERTICAL,
+            area=2
         ),
-        TipSeed( # Red
+        RectangleSeed( # Red
             color="#E30102",
-            seed_square=(4, 4),
-            rec_type=RecType.SQUARE,
-            seed_area=4
+            square=(4, 4),
+            shape=RectangleShape.SQUARE,
+            area=4
         ),
-        TipSeed(
+        RectangleSeed(
             color="#097BB1",
-            seed_square=(4, 6),
-            rec_type=RecType.ANY,
-            seed_area=2
+            square=(4, 6),
+            shape=RectangleShape.ANY,
+            area=2
         ), # Blue
-        TipSeed( # Magenta
+        RectangleSeed( # Magenta
             color="#A01E4E",
-            seed_square=(5, 1),
-            rec_type=RecType.ANY,
-            seed_area=2
+            square=(5, 1),
+            shape=RectangleShape.ANY,
+            area=2
         ),
-        TipSeed( # Brick
+        RectangleSeed( # Brick
             color="#9B3C1C",
-            seed_square=(6, 3),
-            rec_type=RecType.ANY,
-            seed_area=6
+            square=(6, 3),
+            shape=RectangleShape.ANY,
+            area=6
         ),
-        TipSeed( # Brown
+        RectangleSeed( # Brown
             color="#503B36",
-            seed_square=(6, 5),
-            rec_type=RecType.ANY,
-            seed_area=4
+            square=(6, 5),
+            shape=RectangleShape.ANY,
+            area=4
         )
     ))
 
-    patches = Patches((6, 6), tip_seeds)
+    patches = Patches((6, 6), seeds)
     patches.solve(solver="highs")
 
     solution =  tuple((
-        Rectangle(
-            color="#846A0B",
-            seed_square=(1, 2),
-            rec_type=RecType.ANY,
-            seed_area=2,
-            x=1,
-            y=1,
-            width=2,
-            height=1
-        ),
-        Rectangle(
-            color="#096B78",
-            seed_square=(1, 4),
-            rec_type=RecType.ANY,
-            seed_area=6,
-            x=3,
-            y=1,
-            width=3,
-            height=2
-        ),
-        Rectangle(
-            color="#5A3DB1",
-            seed_square=(2, 6),
-            rec_type=RecType.ANY,
-            seed_area=2,
-            x=6,
-            y=1,
-            width=1,
-            height=2
-        ),
-        Rectangle(
-            color="#0A7541",
-            seed_square=(3, 1),
-            rec_type=RecType.ANY,
-            seed_area=6,
-            x=1,
-            y=2,
-            width=2,
-            height=3
-        ),
-        Rectangle(
-            color="#EF6C00",
-            seed_square=(3, 3),
-            rec_type=RecType.VERTICAL,
-            seed_area=2,
-            x=3,
-            y=3,
-            width=1,
-            height=2
-        ),
-        Rectangle(
-            color="#E30102",
-            seed_square=(4, 4),
-            rec_type=RecType.SQUARE,
-            seed_area=4,
-            x=4,
-            y=3,
-            width=2,
-            height=2
-        ),
-        Rectangle(
-            color="#097BB1",
-            seed_square=(4, 6),
-            rec_type=RecType.ANY,
-            seed_area=2,
-            x=6,
-            y=3,
-            width=1,
-            height=2
-        ),
-        Rectangle(
-            color="#A01E4E",
-            seed_square=(5, 1),
-            rec_type=RecType.ANY,
-            seed_area=2,
-            x=1,
-            y=5,
-            width=1,
-            height=2
-        ),
-        Rectangle(
-            color="#9B3C1C",
-            seed_square=(6, 3),
-            rec_type=RecType.ANY,
-            seed_area=6,
-            x=2,
-            y=5,
-            width=3,
-            height=2
-        ),
-        Rectangle(
-            color="#503B36",
-            seed_square=(6, 5),
-            rec_type=RecType.ANY,
-            seed_area=4,
-            x=5,
-            y=5,
-            width=2,
-            height=2
-        )
+        Rectangle(left=1, top=1, width=2, height=1),
+        Rectangle(left=3, top=1, width=3, height=2),
+        Rectangle(left=6, top=1, width=1, height=2),
+        Rectangle(left=1, top=2, width=2, height=3),
+        Rectangle(left=3, top=3, width=1, height=2),
+        Rectangle(left=4, top=3, width=2, height=2),
+        Rectangle(left=6, top=3, width=1, height=2),
+        Rectangle(left=1, top=5, width=1, height=2),
+        Rectangle(left=2, top=5, width=3, height=2),
+        Rectangle(left=5, top=5, width=2, height=2)
     ))
 
     assert patches.rectangles == solution

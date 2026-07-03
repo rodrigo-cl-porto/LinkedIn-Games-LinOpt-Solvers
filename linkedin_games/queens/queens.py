@@ -48,6 +48,7 @@ class Queens(GameBoard):
         
         all_region_squares = [square for region in values for square in region.squares]
         overlapping_squares = {square for square in all_region_squares if all_region_squares.count(square) > 1}
+
         if overlapping_squares:
             msg = (
                 "The regions must not overlap each other.\n"
@@ -90,6 +91,7 @@ class Queens(GameBoard):
     
 
     def _construct_model(self):
+
         model = self.model
 
         # RANGE SETS
@@ -163,4 +165,5 @@ class Queens(GameBoard):
             node_shape="s", # Squared-shape nodes
             width=0
         )
+        
         plt.show()
