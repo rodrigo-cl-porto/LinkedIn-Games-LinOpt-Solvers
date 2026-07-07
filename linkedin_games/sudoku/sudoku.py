@@ -8,6 +8,7 @@ from ..gameboard import GameBoard
 
 
 class Sudoku(GameBoard):
+    """Sudoku game board class."""
     
     def __init__(self, size: int, gridblock_dims: tuple[int, int], filled_squares: dict[tuple[int, int]: int]) -> None:
         super().__init__((size, size)) # Always a square board.
@@ -21,11 +22,13 @@ class Sudoku(GameBoard):
 
     @property
     def size(self) -> int:
+        """The size of the Sudoku board (number of rows or columns)."""
         return self.board_dims[0]
 
 
     @property
     def gridblock_dims(self) -> tuple[int, int]:
+        """The dimensions of the grid blocks in the Sudoku board (rows, columns)."""
         return self._gridblock_dims
 
     @gridblock_dims.setter
@@ -65,6 +68,7 @@ class Sudoku(GameBoard):
 
     @property
     def filled_squares(self) -> dict[tuple[int, int]: int]:
+        """Returns the filled squares in the Sudoku board as a dictionary mapping (i,j) coordinates to their respective numbers."""
         return self._filled_squares
     
     @filled_squares.setter
@@ -205,6 +209,7 @@ class Sudoku(GameBoard):
 
 
 class MiniSudoku(Sudoku):
+    """A 6x6 Sudoku game with 2x3 grid blocks."""
 
     def __init__(self, filled_squares: dict[tuple[int, int]: int]) -> None:
         super().__init__(6, (2,3), filled_squares)

@@ -49,6 +49,7 @@ class Region():
 
     @property
     def squares(self) -> set[tuple[int, int]]:
+        """Squares in the region."""
         return self._squares
 
     @squares.setter
@@ -77,6 +78,7 @@ class Region():
 
     @property
     def color(self) -> str:
+        """Color of the region in hex format (e.g., "#RRGGBB")."""
         return self._color
     
     @color.setter

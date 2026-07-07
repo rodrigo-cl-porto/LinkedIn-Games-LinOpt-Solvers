@@ -1,9 +1,9 @@
 from linkedin_games.sudoku import MiniSudoku
 
 
-# Solving Mini Sudoku No. 60
-
 def test_mini_sudoku():
+
+    # Solving Mini Sudoku No. 60
 
     filled_squares = {
         (1,1): 1,

@@ -8,6 +8,7 @@ from ..gameboard import GameBoard
 
 
 class Zip(GameBoard):
+    """Zip is a game where the player must find a path through a grid of squares, starting from the square numbered 1 and ending at the square with the highest number. The player can only move to adjacent squares (up, down, left, right) and must visit the squares in numerical order. Some paths may be blocked by walls that cannot be traversed."""
 
     def __init__(self, board_dims: tuple[int, int], numbered_squares: dict[tuple[int, int]: int], walls: tuple[tuple[int, int]] | None = None):
         super().__init__(board_dims)
@@ -21,6 +22,7 @@ class Zip(GameBoard):
     
     @property
     def numbered_squares(self) -> dict[tuple[int, int]: int]:
+        """Returns the dictionary of numbered squares on the game board, where the keys are (row, column) coordinates and the values are the corresponding numbers assigned to those squares."""
         return self._numbered_squares
     
     @numbered_squares.setter
@@ -61,8 +63,9 @@ class Zip(GameBoard):
 
     @property
     def path(self) -> list[tuple[int, int]]:
+        """Returns the path that solves the game, as a list of (row, column) coordinates."""
         return [(i+1, j+1) for (i, j) in self._path]
-    
+
 
     def _construct_model(self) -> None:
         model = self.model
@@ -80,7 +83,7 @@ class Zip(GameBoard):
             ((i, j), (i, j-1)) for i in I for j in J if j-1 in J]
         ) # Edges
         K = model.K = pyo.Set(initialize=self.numbered_squares.keys(), dimen=2)
-        W = model.W = pyo.Set(initialize=self.walls)
+        W = model.W = pyo.Set(initialize=self.walls) # Walls
         
         # DECISION VARIABLES
         x = model.x = pyo.Var(E, within=pyo.Binary, initialize=0)

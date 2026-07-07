@@ -15,8 +15,8 @@ class GameBoard(ABC): # Abstract Base Class
 
     def __hash__(self) -> int:
         return hash(self._board_dims)
-    
-    
+
+
     def __len__(self) -> int:
         m, n = self._board_dims
         return m * n
@@ -28,6 +28,7 @@ class GameBoard(ABC): # Abstract Base Class
 
     @property
     def board_dims(self) -> tuple[int, int]:
+        """A tuple of two integers representing the board dimensions (m,n)."""
         return self._board_dims
 
     @board_dims.setter
@@ -62,9 +63,10 @@ class GameBoard(ABC): # Abstract Base Class
 
 
     @property
-    def board(self) -> nx.Graph:
+    def board(self) -> nx.DiGraph:
+        """A NetworkX DiGraph (directed graph) representing the game board."""
         return self._board
-    
+
     def _build_board(self) -> None:
         board = nx.grid_2d_graph(*self._board_dims).to_directed()
         nx.set_node_attributes(board, name="value", values=None)
@@ -75,20 +77,24 @@ class GameBoard(ABC): # Abstract Base Class
 
     @property
     def board_squares(self) -> dict[tuple[int, int]: int]:
+        """A dictionary of the board squares and their values."""
         return {(i+1, j+1): data["value"] for (i, j), data in self.board.nodes(data=True)}
     
     @property
     def board_edges(self) -> dict[tuple[tuple[int, int], tuple[int, int]]: int]:
+        """A dictionary of the board edges and their values."""
         edges = nx.get_edge_attributes(self.board, "value").items()
         return {((i+1, j+1), (r+1, s+1)): value for ((i, j), (r, s)), value in edges}
 
     @property
     def model(self) -> pyo.ConcreteModel | None:
+        """A Pyomo ConcreteModel representing the Linear Optimization Problem for the game."""
         return self._model
-    
+
 
     @property
     def _stale(self) -> bool:
+        """A boolean indicating whether the model is stale and needs to be rebuilt."""
         return self.__stale
     
     @_stale.setter
@@ -96,15 +102,17 @@ class GameBoard(ABC): # Abstract Base Class
         self.__stale = value
 
         if value:
-            self._is_solved = False
+            self.__is_solved = False
     
     
     @property
     def is_solved(self) -> bool:
-        return self._is_solved
+        """A boolean indicating whether the game has been solved."""
+        return self.__is_solved
 
 
     def _build_model(self) -> None:
+        """Builds the Pyomo model for the game board."""
         
         model = pyo.ConcreteModel()
 
@@ -124,20 +132,22 @@ class GameBoard(ABC): # Abstract Base Class
         self._model = model
         self._construct_model()
         self._stale = False
-    
+
     @abstractmethod
     def _construct_model(self) -> None:
+        """Constructs the Pyomo model for the game board."""
         pass
     
     
     def solve(self, solver:str="gurobi", verbose:bool=False) -> pyo.ConcreteModel:
+        """Solves the game board using the specified solver."""
         
         if self._stale or self.model is None:
             self._build_model()
 
         result = pyo.SolverFactory(solver).solve(self.model)
 
-        self._is_solved = (
+        self.__is_solved = (
             result.Solver.status == SolverStatus.ok # Checks if solver is finished with normal termination.
             and (
                 result.Solver.termination_condition == TerminationCondition.optimal # Checks if solver is finished with optimal solution...
@@ -145,7 +155,7 @@ class GameBoard(ABC): # Abstract Base Class
             )
         )
 
-        if self._is_solved:
+        if self.__is_solved:
             print(f"{type(self).__name__} game solved successfully!")
             self._set_solution(verbose=verbose)
         else:
@@ -155,10 +165,12 @@ class GameBoard(ABC): # Abstract Base Class
 
     @abstractmethod
     def _set_solution(self, verbose:bool) -> None:
+        """Sets the solution of the game board."""
         pass
-    
+
 
     def show(self) -> None:
+        """Displays the game board."""
 
         if self._stale or self._model is None:
             self._build_model()
@@ -167,4 +179,5 @@ class GameBoard(ABC): # Abstract Base Class
 
     @abstractmethod
     def _show(self) -> None:
+        """Displays the game board."""
         pass

@@ -10,10 +10,7 @@ from .rectangle import Rectangle
 
 
 class Patches(GameBoard):
-
-    """
-    A class representing a Patches board game with colored rectangles.
-    """
+    """A Patches board game with colored rectangles."""
 
     def __init__(self, board_dims: tuple[int, int], seeds: tuple[RectangleSeed]):
         super().__init__(board_dims)
@@ -26,6 +23,7 @@ class Patches(GameBoard):
 
     @property
     def seeds(self) -> tuple[RectangleSeed]:
+        """All the seeds of the game. Each seed is a RectangleSeed object."""
         return self._seeds
 
     @seeds.setter
@@ -67,6 +65,7 @@ class Patches(GameBoard):
 
     @property
     def rectangles(self) -> tuple[Rectangle]:
+        """All the rectangles of the game. Each rectangle is a Rectangle object."""
         return tuple(seed.rectangle for seed in self.seeds)
 
 
@@ -106,13 +105,13 @@ class Patches(GameBoard):
         model.obj = pyo.Objective(expr=sum(w[k] + h[k] for k in K), sense=pyo.minimize)
 
         # CONSTRAINTS
-        # Non overlapping rectangles
+        ## Non overlapping rectangles
         model.unique_rectangle_per_square_constraints = pyo.Constraint(
             S,
             rule=lambda model, i, j: sum(x[i, j, k] for k in K) == 1
         )
 
-        # Rectangles inside board
+        ## Rectangles inside board
         model.last_row_position_constraints = pyo.Constraint(
             K,
             rule=lambda model, k: t[k] + h[k] - 1 <= m
@@ -122,7 +121,7 @@ class Patches(GameBoard):
             rule=lambda model, k: l[k] + w[k] - 1 <= n
         )
 
-        # Coverage constraints (if a square is inside a rectangle, then its coordinates must be between the rectangle dimensions)
+        ## Coverage constraints (if a square is inside a rectangle, then its coordinates must be between the rectangle dimensions)
         model.row_lower_bound_coverage_constraints = pyo.Constraint(
             I, J, K,
             rule=lambda model, i, j, k: t[k] - i <= m * (1 - x[i, j, k])
@@ -140,7 +139,7 @@ class Patches(GameBoard):
             rule=lambda model, i, j, k: j - (l[k] + w[k] - 1) <= n * (1 - x[i, j, k])
         )
 
-        # Seed Constraints
+        ## Seed Constraints
         model.seed_square_constraints = pyo.Constraint( # Seed squares
             E,
             rule=lambda model, i, j, k: x[i, j, k] == 1
@@ -151,7 +150,7 @@ class Patches(GameBoard):
             rule=lambda model, k: sum(x[i, j, k] for (i, j) in S) == a[k]
         )
 
-        # Orientation constraints
+        ### Required shape constraints
         model.vertical_shaped_rectangles_constraints = pyo.Constraint(
             V,
             rule=lambda model, k: w[k] <= h[k] - 1

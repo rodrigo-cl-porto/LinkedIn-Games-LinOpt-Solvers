@@ -11,9 +11,10 @@ _build/
 __pycache__/
 *.py[codz]
 *$py.class
+.pytest_cache/
 
 # Jupyter Lab checkpoints
-.ipynb_checkpoints
+.ipynb_checkpoints/
 
 # Distribution / packaging
 *.egg-info/

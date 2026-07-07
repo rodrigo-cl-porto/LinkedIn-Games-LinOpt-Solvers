@@ -1,4 +1,5 @@
 class Rectangle:
+    """A Zip rectangle defined by its left, top, width, and height."""
 
     def __init__(self, left:int, top:int, width:int, height:int) -> None:
         self.left = left
@@ -60,6 +61,7 @@ class Rectangle:
 
     @property
     def left(self) -> int:
+        """The position of the rectangle's leftmost column."""
         return self._left
 
     @left.setter
@@ -78,6 +80,7 @@ class Rectangle:
 
     @property
     def top(self) -> int:
+        """The position of the rectangle's topmost row."""
         return self._top
 
     @top.setter
@@ -96,6 +99,7 @@ class Rectangle:
 
     @property
     def width(self) -> int:
+        """The width of the rectangle."""
         return self._width
 
     @width.setter
@@ -122,6 +126,7 @@ class Rectangle:
 
     @property
     def height(self) -> int:
+        """The height of the rectangle."""
         return self._height
 
     @height.setter
@@ -148,11 +153,10 @@ class Rectangle:
 
     @property
     def squares(self) -> tuple[tuple[int, int]]:
+        """The squares occupied by the rectangle."""
 
-        squares = tuple(
+        return tuple(
             (i, j)
             for i in range(self.top, self.top + self.height)
             for j in range(self.left, self.left + self.width)
         )
-        
-        return squares

@@ -7,6 +7,8 @@ from .rectangle import Rectangle
 
 
 class RectangleShape(StrEnum):
+    """Type of rectangle shape for a RectangleSeed."""
+
     ANY = "ANY"
     VERTICAL = "VERTICAL"
     HORIZONTAL = "HORIZONTAL"
@@ -14,6 +16,7 @@ class RectangleShape(StrEnum):
 
 
 class RectangleSeed:
+    """A seed for a rectangle in the Patches game, defined by its color, square position, shape, and area."""
 
     def __init__(
             self,
@@ -84,6 +87,7 @@ class RectangleSeed:
 
     @property
     def color(self) -> str:
+        """Color of the rectangle seed as a hexcode string (#RRGGBB)."""
         return self._color
 
     @color.setter
@@ -107,6 +111,7 @@ class RectangleSeed:
 
     @property
     def square(self) -> tuple[int, int]:
+        """Position of the rectangle seed on the Zip board as a tuple (row, column)."""
         return self._square
 
     @square.setter
@@ -129,6 +134,7 @@ class RectangleSeed:
 
     @property
     def shape(self) -> RectangleShape:
+        """Required shape of the rectangle seed as a RectangleShape enum."""
         return self._shape
 
     @shape.setter
@@ -143,6 +149,7 @@ class RectangleSeed:
 
     @property
     def area(self) -> int | None:
+        """Required rea of the rectangle seed as a positive integer or None."""
         return self._area
 
     @area.setter
@@ -166,9 +173,11 @@ class RectangleSeed:
 
     @property
     def rectangle(self) -> Rectangle:
+        """Rectangle object created by the rectangle seed."""
         return self.__rectangle
 
     def _set_rectangle(self, value:Rectangle) -> None:
+        """Set the rectangle object created by the rectangle seed."""
 
         if self.area is not None:
             if len(value) != self.area:

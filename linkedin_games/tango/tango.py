@@ -8,6 +8,7 @@ from ..gameboard import GameBoard
 
 
 class Tango(GameBoard):
+    """Tango game board class."""
 
     def __init__(
             self,
@@ -28,6 +29,7 @@ class Tango(GameBoard):
 
     @staticmethod
     def __manhathan_distance(squares:tuple[tuple[int, int], tuple[int, int]]) -> int:
+        """Calculates the Manhattan distance between two squares."""
         x1 = squares[0][0]
         x2 = squares[1][0]
         y1 = squares[0][1]
@@ -37,6 +39,7 @@ class Tango(GameBoard):
 
     @property
     def like_pairs(self) -> tuple[tuple[tuple[int, int], tuple[int, int]]] | None:
+        """Returns the pairs of squares that are separated by a equal (=) sign, i.e. the squares that must have the same symbol."""
         return self._like_pairs
     
     @like_pairs.setter
@@ -93,6 +96,7 @@ class Tango(GameBoard):
 
     @property
     def opp_pairs(self) -> tuple[tuple[tuple[int, int], tuple[int, int]]] | None:
+        """Returns the pairs of squares that are separated by a cross (×) sign, i.e. the squares that must have opposite symbols."""
         return self._opp_pairs
     
     @opp_pairs.setter
@@ -149,6 +153,7 @@ class Tango(GameBoard):
 
     @property
     def filled_squares(self) -> dict[tuple[int, int]: int]:
+        """Returns the squares that are already filled with a symbol."""
         return self._filled_squares
     
     @filled_squares.setter

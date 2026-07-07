@@ -11,7 +11,11 @@ from .region import Region
 class Queens(GameBoard):
 
     """
-    A class representing a Queens board game with colored regions.
+    Queens is a board game where the objective is to place queens on the board such that no two queens threaten each other. The board is divided into colored regions, and each region must contain exactly one queen. Additionally, no two queens can be placed in adjacent squares, including diagonally adjacent squares.
+
+    Attributes:
+        board_dims: A tuple of board dimensions (m, n).
+        regions: A set of Region objects representing the colored regions on the board.
     """
 
     def __init__(self, board_dims:tuple[int, int], regions:set[Region]) -> None:
@@ -25,6 +29,7 @@ class Queens(GameBoard):
 
     @property
     def regions(self) -> set[Region]:
+        """Returns the set of Region objects representing the colored regions on the board. It's assumed that the regions are non-overlapping and cover the entire board."""
         return self._regions
 
     @regions.setter
@@ -87,8 +92,9 @@ class Queens(GameBoard):
 
     @property
     def crowns(self) -> tuple[tuple[int, int]]:
+        """The solution of the game, i.e. the squares that contain a crown."""
         return sorted(tuple((i+1, j+1) for (i,j) in self.__crowns.nodes()))
-    
+
 
     def _construct_model(self):
 
@@ -102,10 +108,10 @@ class Queens(GameBoard):
         # COMPOSITE SETS
         S = model.S # Board Squares
         R = model.R = pyo.Set(K, initialize={region.color: region.squares for region in self.regions}, dimen=2) # Region Squares
-        D = model.D = pyo.Set(initialize=lambda model: [
+        D = model.D = pyo.Set(initialize=lambda model: [ # Diagonals
             ((i, j), (i+1, j+1)) for (i, j) in S if (i+1, j+1) in S] + [
             ((i, j), (i+1, j-1)) for (i, j) in S if (i+1, j-1) in S
-        ]) # Diagonals
+        ])
 
         # OBJECTIVE FUNCTION
         model.obj = pyo.Objective(expr=0) # feasibility problem
