@@ -5,8 +5,7 @@ def test_tango():
 
     # Solving Tango No. 151
 
-    # like (=) pairs, each element is ((i,j),(r,s))
-    like_pairs = (
+    matching_pairs = (
         ((2, 3), (2, 4)),
         ((2, 1), (3, 1)),
         ((2, 3), (3, 3)),
@@ -15,8 +14,7 @@ def test_tango():
         ((6, 3), (6, 4)),
     )
 
-    # opposite (X) pairs
-    opp_pairs = (
+    opposite_pairs = (
         ((2, 4), (3, 4)),
         ((3, 1), (4, 1)),
         ((3, 3), (3, 4)),
@@ -24,7 +22,6 @@ def test_tango():
         ((4, 5), (4, 6)),
     )
 
-    # already filled squares: (i,j) -> kij
     filled_squares = {
         (1, 2): 1,
         (1, 5): 1,
@@ -32,7 +29,7 @@ def test_tango():
         (5, 5): 1,
     }
 
-    tango = Tango((6,6), like_pairs, opp_pairs, filled_squares)
+    tango = Tango(matching_pairs, opposite_pairs, filled_squares)
     tango.solve()
 
     solution = {

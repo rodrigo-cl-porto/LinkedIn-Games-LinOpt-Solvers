@@ -8,16 +8,16 @@ from ..gameboard import GameBoard
 
 
 class Sudoku(GameBoard):
-    """Sudoku game board class."""
+    """General Sudoku game."""
     
-    def __init__(self, size: int, gridblock_dims: tuple[int, int], filled_squares: dict[tuple[int, int]: int]) -> None:
+    def __init__(self, size: int, block_dims: tuple[int, int], filled_squares: dict[tuple[int, int]: int]) -> None:
         super().__init__((size, size)) # Always a square board.
-        self.gridblock_dims = gridblock_dims
+        self.block_dims = block_dims
         self.filled_squares = filled_squares
 
 
     def __hash__(self):
-        return hash((self.size, self.gridblock_dims, self.filled_squares))
+        return hash((self.size, self.block_dims, self.filled_squares))
 
 
     @property
@@ -27,12 +27,12 @@ class Sudoku(GameBoard):
 
 
     @property
-    def gridblock_dims(self) -> tuple[int, int]:
+    def block_dims(self) -> tuple[int, int]:
         """The dimensions of the grid blocks in the Sudoku board (rows, columns)."""
-        return self._gridblock_dims
+        return self._block_dims
 
-    @gridblock_dims.setter
-    def gridblock_dims(self, value:tuple[int, int] = (2, 2)) -> None:
+    @block_dims.setter
+    def block_dims(self, value:tuple[int, int] = (2, 2)) -> None:
         
         if len(value) != 2:
             msg = f"Board dimensions must be a pair (m,n). Got {value!r} instead."
@@ -48,7 +48,7 @@ class Sudoku(GameBoard):
         
         p, q = value
         if p * q < 2:
-            msg = f"The grid blocks is too small for the game! Got grid blocks dimensions of {value!r}."
+            msg = f"The grid blocks is too small for the game! Got block dimensions of {value!r}."
             raise ValueError(msg)
         
         elif p * q != self.size:
@@ -57,12 +57,12 @@ class Sudoku(GameBoard):
 
         if not isinstance(value, tuple):
             print((
-                "WARNING: in order to avoid unexpected behaviours, grid block dimensions should be a tuple."
+                "WARNING: in order to avoid unexpected behaviours, block dimensions should be a tuple."
                 f"Got a {type(value).__name__} instead."
             ))
             value = tuple(value)
         
-        self._gridblock_dims = value
+        self._block_dims = value
         self._stale = True
 
 
@@ -113,12 +113,12 @@ class Sudoku(GameBoard):
         
         # RANGE SETS
         n = self.size
-        p, q = self.gridblock_dims
+        p, q = self.block_dims
         I = model.I # Rows
         J = model.J # Columns
         K = model.K = pyo.RangeSet(n) # Digits
-        U = model.u = pyo.RangeSet(p) # Rows per gridblock
-        V = model.v = pyo.RangeSet(q) # Columns per gridblock
+        U = model.u = pyo.RangeSet(p) # Rows per block
+        V = model.v = pyo.RangeSet(q) # Columns per block
 
         # COMPOSITE SETS
         B = model.B = pyo.Set( # Grid-blocks
@@ -148,7 +148,7 @@ class Sudoku(GameBoard):
             rule=lambda model, i, k: sum(x[i,j,k] for j in J) == 1
         )
 
-        model.unique_digits_per_gridblock_constraints = pyo.Constraint(
+        model.unique_digits_per_block_constraints = pyo.Constraint(
             V, U, K,
             rule=lambda model, v, u, k: sum(x[i,j,k] for (i, j) in B[v,u]) == 1
         )
@@ -212,4 +212,11 @@ class MiniSudoku(Sudoku):
     """A 6x6 Sudoku game with 2x3 grid blocks."""
 
     def __init__(self, filled_squares: dict[tuple[int, int]: int]) -> None:
-        super().__init__(6, (2,3), filled_squares)
+        super().__init__(size=6, block_dims=(2,3), filled_squares=filled_squares)
+
+
+class ClassicSudoku(Sudoku):
+    """A 9x9 Sudoku game with 3x3 grid blocks."""
+
+    def __init__(self, filled_squares: dict[tuple[int, int]: int]) -> None:
+        super().__init__(size=9, block_dims=(3,3), filled_squares=filled_squares)

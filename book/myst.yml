@@ -37,8 +37,12 @@ project:
   toc:
     - title: Introduction
       file: home.md
-    - title: What is Optimization?
-      file: ./notebooks/0-optimization.ipynb
+    - title: Getting Started
+      children:
+      - title: What is Optimization?
+        file: ./notebooks/0a-what-is-optimization.ipynb
+      - title: LinkedIn Games Library
+        file: ./notebooks/0b-linkedin-games-library.md
     - title: How to Solve
       children:
       - title: Queens
@@ -51,28 +55,6 @@ project:
         file: ./notebooks/4-mini-sudoku.ipynb
       - title: Patches
         file: ./notebooks/5-patches.ipynb
-    - title: Useful Pythonic Concepts
-      children:
-      - title: Chained and Multiple Assigments
-        url: https://www.w3schools.com/python/python_variables_multiple.asp
-      - title: Python Comprehensions
-        url: https://www.geeksforgeeks.org/python/comprehensions-in-python/
-      - title: Lambda Functions
-        url: https://www.geeksforgeeks.org/python/python-lambda-anonymous-functions-filter-map-reduce/
-      - title: Classes and Objects
-        url: https://www.geeksforgeeks.org/python/python-classes-and-objects/
-    - title: Python Libraries
-      children:
-      - title: Pyomo
-        url: https://www.pyomo.org/
-      - title: NetworkX
-        url: https://networkx.org/
-      - title: Gurobipy
-        url: https://www.gurobi.com/faqs/gurobipy/
-      - title: Highspy
-        url: https://anaconda.org/channels/conda-forge/packages/highspy/overview
-      - title: Matplotlib
-        url: https://matplotlib.org/
   abbreviations:
     BLO: Binary Linear Optimization
     BLOP: Binary Linear Optimization Problem
@@ -100,7 +82,7 @@ project:
       title: Solving LinkedIn Games by Linear Optimization
       articles:
         - home.md
-        - notebooks/0-optimization.ipynb
+        - notebooks/0a-what-is-optimization.ipynb
         - notebooks/1-queens.ipynb
         - notebooks/2-tango.ipynb
         - notebooks/3-zip.ipynb
@@ -115,3 +97,26 @@ site:
     logo_dark: ./assets/logos/logo_dark.svg
   exports:
     - cff
+  nav:
+    - title: Useful Pythonic Concepts
+      children:
+      - title: Chained and Multiple Assigments
+        url: https://www.w3schools.com/python/python_variables_multiple.asp
+      - title: Python Comprehensions
+        url: https://www.geeksforgeeks.org/python/comprehensions-in-python/
+      - title: Lambda Functions
+        url: https://www.geeksforgeeks.org/python/python-lambda-anonymous-functions-filter-map-reduce/
+      - title: Classes and Objects
+        url: https://www.geeksforgeeks.org/python/python-classes-and-objects/
+    - title: Python Libraries
+      children:
+      - title: Pyomo
+        url: https://www.pyomo.org/
+      - title: NetworkX
+        url: https://networkx.org/
+      - title: Matplotlib
+        url: https://matplotlib.org/
+      - title: Gurobipy
+        url: https://www.gurobi.com/faqs/gurobipy/
+      - title: Highspy
+        url: https://anaconda.org/channels/conda-forge/packages/highspy/overview

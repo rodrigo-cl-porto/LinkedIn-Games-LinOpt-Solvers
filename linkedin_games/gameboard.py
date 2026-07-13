@@ -26,6 +26,16 @@ class GameBoard(ABC): # Abstract Base Class
         return len(self)
 
 
+    @staticmethod
+    def __manhathan_distance(square1:tuple[int, int], square2:tuple[int, int]) -> int:
+        """Calculates the Manhattan distance between two squares."""
+        x1 = square1[0]
+        x2 = square2[0]
+        y1 = square1[1]
+        y2 = square2[1]
+        return abs(x1 - x2) + abs(y1 - y2)
+
+
     @property
     def board_dims(self) -> tuple[int, int]:
         """A tuple of two integers representing the board dimensions (m,n)."""
@@ -150,8 +160,8 @@ class GameBoard(ABC): # Abstract Base Class
         self.__is_solved = (
             result.Solver.status == SolverStatus.ok # Checks if solver is finished with normal termination.
             and (
-                result.Solver.termination_condition == TerminationCondition.optimal # Checks if solver is finished with optimal solution...
-                or result.Solver.termination_condition == TerminationCondition.feasible # ... or with feasible solution.
+                result.Solver.termination_condition == TerminationCondition.optimal # Checks if solver is finished with an optimal solution...
+                or result.Solver.termination_condition == TerminationCondition.feasible # ... or with a feasible one.
             )
         )
 

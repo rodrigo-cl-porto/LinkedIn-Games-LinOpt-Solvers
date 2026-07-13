@@ -12,7 +12,7 @@ site:
 
 A public Jupyter book to learn ludically how to apply Linear Optimization with Python to solve LinkedIn Games
 
-{button}`Let's get it started! <./notebooks/0-optimization.ipynb>`
+{button}`Let's get it started! <./notebooks/0a-what-is-optimization.ipynb>`
 
 :::{image} ./assets/logos/cover.png
 :alt: Solving LinkedIn Games by Linear Optimization

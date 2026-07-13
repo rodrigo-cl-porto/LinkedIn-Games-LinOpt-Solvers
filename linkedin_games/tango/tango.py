@@ -8,56 +8,44 @@ from ..gameboard import GameBoard
 
 
 class Tango(GameBoard):
-    """Tango game board class."""
 
     def __init__(
             self,
-            board_dims:tuple[int, int],
-            like_pairs:set[tuple[tuple[int, int], tuple[int, int]]] | None,
-            opp_pairs:set[tuple[tuple[int, int], tuple[int, int]]] | None,
+            matching_pairs:set[tuple[tuple[int, int], tuple[int, int]]] | None,
+            opposite_pairs:set[tuple[tuple[int, int], tuple[int, int]]] | None,
             filled_squares:dict[tuple[int, int]: int] | None
             ) -> None:
-        super().__init__(board_dims)
-        self.like_pairs = like_pairs
-        self.opp_pairs = opp_pairs
+        super().__init__(board_dims=(6,6)) # It's assumed that Tango board dimensions will always be a 6x6
+        self.matching_pairs = matching_pairs
+        self.opposite_pairs = opposite_pairs
         self.filled_squares = filled_squares
 
 
     def __hash__(self) -> int:
-        return hash((self._dims, self._like_pairs, self._opp_pairs, self._filled_squares))
-
-
-    @staticmethod
-    def __manhathan_distance(squares:tuple[tuple[int, int], tuple[int, int]]) -> int:
-        """Calculates the Manhattan distance between two squares."""
-        x1 = squares[0][0]
-        x2 = squares[1][0]
-        y1 = squares[0][1]
-        y2 = squares[1][1]
-        return abs(x1 - x2) + abs(y1 - y2)
+        return hash((self._dims, self._matching_pairs, self._opposite_pairs, self._filled_squares))
 
 
     @property
-    def like_pairs(self) -> tuple[tuple[tuple[int, int], tuple[int, int]]] | None:
+    def matching_pairs(self) -> tuple[tuple[tuple[int, int], tuple[int, int]]] | None:
         """Returns the pairs of squares that are separated by a equal (=) sign, i.e. the squares that must have the same symbol."""
-        return self._like_pairs
+        return self._matching_pairs
     
-    @like_pairs.setter
-    def like_pairs(self, value:tuple[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
+    @matching_pairs.setter
+    def matching_pairs(self, values:tuple[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
         
-        if value is None:
-            self._like_pairs = value
+        if values is None:
+            self._matching_pairs = values
             return None
 
-        invalid_items = [pair for pair in value if not isinstance(pair, tuple) or len(pair) != 2]
+        invalid_items = [pair for pair in values if not isinstance(pair, tuple) or len(pair) != 2]
         if invalid_items:
             msg = (
-                "like_pairs must be a collection of pairs of tuples. "
+                "matching_pairs must be a collection of pairs of tuples. "
                 f"Got the following invalid pairs: {invalid_items!r}."
             )
             raise TypeError(msg)
         
-        invalid_items = [square for pair in value for square in pair if not isinstance(square, tuple)]
+        invalid_items = [square for pair in values for square in pair if not isinstance(square, tuple)]
         if invalid_items:
             msg = (
                 "Squares in pair must be tuples of positive integers. "
@@ -65,7 +53,7 @@ class Tango(GameBoard):
             )
             raise TypeError(msg)
         
-        invalid_items = [square for pair in value for square in pair for coord in square if not isinstance(coord, int) or coord < 1]
+        invalid_items = [square for pair in values for square in pair for coord in square if not isinstance(coord, int) or coord < 1]
         if invalid_items:
             msg = (
                 "Coordinates must be positive integers. "
@@ -73,7 +61,7 @@ class Tango(GameBoard):
             )
             raise ValueError(msg)
 
-        invalid_items = [pair for pair in value if Tango.__manhathan_distance(pair) != 1]
+        invalid_items = [pair for pair in values if GameBoard.__manhathan_distance(*pair) != 1]
         if invalid_items:
             msg = (
                 "Squares in a pair must be consecutive ones. "
@@ -81,35 +69,35 @@ class Tango(GameBoard):
             )
             raise ValueError(msg)
         
-        if not isinstance(value, tuple):
+        if not isinstance(values, tuple):
             print((
                 "WARNING: in order to avoid unexpected behaviours, "
-                "like_pairs should be a tuple. "
-                f"Got a {type(value).__name__} instead."
+                "matching_pairs should be a tuple. "
+                f"Got a {type(values).__name__} instead."
             ))
-            self._like_pairs = tuple(value)
+            self._matching_pairs = tuple(values)
         else:
-            self._like_pairs = value
+            self._matching_pairs = values
         
         self._stale = True
 
 
     @property
-    def opp_pairs(self) -> tuple[tuple[tuple[int, int], tuple[int, int]]] | None:
+    def opposite_pairs(self) -> tuple[tuple[tuple[int, int], tuple[int, int]]] | None:
         """Returns the pairs of squares that are separated by a cross (×) sign, i.e. the squares that must have opposite symbols."""
-        return self._opp_pairs
+        return self._opposite_pairs
     
-    @opp_pairs.setter
-    def opp_pairs(self, value:tuple[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
+    @opposite_pairs.setter
+    def opposite_pairs(self, value:tuple[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
         
         if value is None:
-            self._opp_pairs = value
+            self._opposite_pairs = value
             return None
 
         invalid_items = [pair for pair in value if not isinstance(pair, tuple) or len(pair) != 2]
         if invalid_items:
             msg = (
-                "opp_pairs must be a collection of pairs of tuples. "
+                "opposite_pairs must be a collection of pairs of tuples. "
                 f"Got the following invalid pairs: {invalid_items!r}."
             )
             raise TypeError(msg)
@@ -130,7 +118,7 @@ class Tango(GameBoard):
             )
             raise ValueError(msg)
 
-        invalid_items = [pair for pair in value if Tango.__manhathan_distance(pair) != 1]
+        invalid_items = [pair for pair in value if Tango.__manhathan_distance(*pair) != 1]
         if invalid_items:
             msg = (
                 "Squares in a pair must be consecutive ones. "
@@ -141,12 +129,12 @@ class Tango(GameBoard):
         if not isinstance(value, tuple):
             print((
                 "WARNING: in order to avoid unexpected behaviours, "
-                "opp_pairs should be a tuple. "
+                "opposite_pairs should be a tuple. "
                 f"Got a {type(value).__name__} instead."
             ))
-            self._opp_pairs = tuple(value)
+            self._opposite_pairs = tuple(value)
         else:
-            self._opp_pairs = value
+            self._opposite_pairs = value
         
         self._stale = True
 
@@ -191,8 +179,8 @@ class Tango(GameBoard):
 
         # COMPOSITE SETS
         S = model.S # Board Squares
-        L = model.L = pyo.Set(initialize=self._like_pairs)
-        O = model.O = pyo.Set(initialize=self._opp_pairs)
+        M = model.M = pyo.Set(initialize=self._matching_pairs)
+        O = model.O = pyo.Set(initialize=self._opposite_pairs)
         K = model.K = pyo.Set(initialize=self._filled_squares.keys(), dimen=2)
 
         # DECISION VARIABLES
@@ -237,8 +225,8 @@ class Tango(GameBoard):
             rule=lambda model, i, j: x[i,j] + x[i+1,j] + x[i+2,j] >= 1
         )
 
-        model.like_pairs_constraints = pyo.Constraint(
-            L,
+        model.matching_pairs_constraints = pyo.Constraint(
+            M,
             rule=lambda model, i, j, r, s: x[i,j] - x[r,s] == 0
         )
 
@@ -285,7 +273,7 @@ class Tango(GameBoard):
             width= 0,
             edgelist = [
                 ((i-1, j-1), (r-1,s-1)) for i,j,r,s in self.model.O] + [
-                ((i-1, j-1), (r-1,s-1)) for i,j,r,s in self.model.L
+                ((i-1, j-1), (r-1,s-1)) for i,j,r,s in self.model.M
             ]
         )
 
@@ -294,7 +282,7 @@ class Tango(GameBoard):
             pos= pos,
             edge_labels= {
                 ((i-1, j-1), (r-1,s-1)): "×" for i,j,r,s in self.model.O} | {
-                ((i-1, j-1), (r-1,s-1)): "=" for i,j,r,s in self.model.L
+                ((i-1, j-1), (r-1,s-1)): "=" for i,j,r,s in self.model.M
             },
             font_color="#887658"
         )
