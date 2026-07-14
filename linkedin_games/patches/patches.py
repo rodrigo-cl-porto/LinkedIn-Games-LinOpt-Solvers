@@ -4,15 +4,16 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-from ..gameboard import GameBoard
-from .rectangle_seed import RectangleSeed, RectangleShape
+from ..game_board import GameBoard
 from .rectangle import Rectangle
+from .rectangle_shape import RectangleShape
+from .seed_square import SeedSquare
 
 
 class Patches(GameBoard):
-    """A Patches board game with colored rectangles."""
+    """A Patches board game with colorful rectangles."""
 
-    def __init__(self, board_dims: tuple[int, int], seeds: tuple[RectangleSeed]):
+    def __init__(self, board_dims: tuple[int, int], seeds: tuple[SeedSquare]):
         super().__init__(board_dims)
         self.seeds = seeds
 
@@ -22,20 +23,20 @@ class Patches(GameBoard):
 
 
     @property
-    def seeds(self) -> tuple[RectangleSeed]:
-        """All the seeds of the game. Each seed is a RectangleSeed object."""
+    def seeds(self) -> tuple[SeedSquare]:
+        """All the seeds of the game. Each seed is a SeedSquare object."""
         return self._seeds
 
     @seeds.setter
-    def seeds(self, values: tuple[RectangleSeed]) -> None:
+    def seeds(self, values: tuple[SeedSquare]) -> None:
         
         if len(values) < 1:
             msg = "The seeds cannot be empty!"
             raise ValueError(msg)
         
-        invalid_items = [item for item in values if not isinstance(item, RectangleSeed)]
+        invalid_items = [item for item in values if not isinstance(item, SeedSquare)]
         if invalid_items:
-            msg = f"Seeds must be a tuple of RectangleSeed classes. Got the following invalid items: {invalid_items!r}."
+            msg = f"Seeds must be a tuple of SeedSquare classes. Got the following invalid items: {invalid_items!r}."
             raise TypeError(msg)
         
         if len(values) != len({seed.color for seed in values}):
@@ -54,7 +55,7 @@ class Patches(GameBoard):
 
         if not isinstance(values, tuple):
             print((
-                "WARNING: in order to avoid unexpected behaviours, the collection of RectangleSeeds should be a tuple."
+                "WARNING: in order to avoid unexpected behaviours, the collection of SeedSquares should be a tuple."
                 f"Got a {type(values)} instead."
             ))
             values = tuple(values)
@@ -88,8 +89,8 @@ class Patches(GameBoard):
 
         # DECISION VARIABLES
         x = model.x = pyo.Var(I, J, K, domain=pyo.Binary)
-        l = model.l = pyo.Var(K, domain=pyo.PositiveIntegers) # Column index of first cell of rectangle k
-        t = model.t = pyo.Var(K, domain=pyo.PositiveIntegers) # Row index of first cell of rectangle k
+        l = model.l = pyo.Var(K, domain=pyo.PositiveIntegers) # Index of the leftmost column of the rectangle k
+        t = model.t = pyo.Var(K, domain=pyo.PositiveIntegers) # Index of the top row of the rectangle k
         w = model.w = pyo.Var(K, domain=pyo.PositiveIntegers) # Width of rectangle k
         h = model.h = pyo.Var(K, domain=pyo.PositiveIntegers) # Height of rectangle k
 
@@ -111,36 +112,36 @@ class Patches(GameBoard):
             rule=lambda model, i, j: sum(x[i, j, k] for k in K) == 1
         )
 
-        ## Rectangles inside board
-        model.last_row_position_constraints = pyo.Constraint(
+        ## Rectangle-Within-Board-Boundaries Constraints
+        model.top_row_constraints = pyo.Constraint(
             K,
             rule=lambda model, k: t[k] + h[k] - 1 <= m
         )
-        model.last_column_position_constraints = pyo.Constraint(
+        model.leftmost_column_position_constraints = pyo.Constraint(
             K,
             rule=lambda model, k: l[k] + w[k] - 1 <= n
         )
 
-        ## Coverage constraints (if a square is inside a rectangle, then its coordinates must be between the rectangle dimensions)
-        model.row_lower_bound_coverage_constraints = pyo.Constraint(
+        ## Square-Within-Rectangle-Boundaries Constraints (if a square is inside a rectangle, then its coordinates must be between the rectangle dimensions)
+        model.top_boundary_square_position_constraints = pyo.Constraint(
             I, J, K,
             rule=lambda model, i, j, k: t[k] - i <= m * (1 - x[i, j, k])
         )
-        model.row_upper_bound_coverage_constraints = pyo.Constraint(
+        model.bottom_boundary_square_position_constraints = pyo.Constraint(
             I, J, K,
             rule=lambda model, i, j, k: i - (t[k] + h[k] - 1) <= m * (1 - x[i, j, k])
         )
-        model.column_lower_bound_coverage_constraints = pyo.Constraint(
+        model.leftmost_boundary_square_position_constraints = pyo.Constraint(
             I, J, K,
             rule=lambda model, i, j, k: l[k] - j <= n * (1 - x[i, j, k])
         )
-        model.column_upper_bound_coverage_constraints = pyo.Constraint(
+        model.rightmost_boundary_square_position_constraints = pyo.Constraint(
             I, J, K,
             rule=lambda model, i, j, k: j - (l[k] + w[k] - 1) <= n * (1 - x[i, j, k])
         )
 
-        ## Seed Constraints
-        model.seed_square_constraints = pyo.Constraint( # Seed squares
+        ## Seed Square Constraints
+        model.seed_square_coverage_constraints = pyo.Constraint( # Seed squares
             E,
             rule=lambda model, i, j, k: x[i, j, k] == 1
         )
@@ -150,16 +151,17 @@ class Patches(GameBoard):
             rule=lambda model, k: sum(x[i, j, k] for (i, j) in S) == a[k]
         )
 
-        ### Required shape constraints
-        model.vertical_shaped_rectangles_constraints = pyo.Constraint(
+        model.vertical_rectangles_constraints = pyo.Constraint(
             V,
             rule=lambda model, k: w[k] <= h[k] - 1
         )
-        model.horizontal_shaped_rectangles_constraints = pyo.Constraint(
+
+        model.horizontal_rectangles_constraints = pyo.Constraint(
             H,
             rule=lambda model, k: w[k] >= h[k] + 1
         )
-        model.square_shaped_rectangles_constraints = pyo.Constraint(
+
+        model.square_rectangles_constraints = pyo.Constraint(
             Q,
             rule=lambda model, k: w[k] == h[k]
         )

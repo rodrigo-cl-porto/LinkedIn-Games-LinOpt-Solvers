@@ -1,4 +1,4 @@
-from linkedin_games.tango import Tango
+from linkedin_games import Tango
 
 
 def test_tango():

@@ -1,59 +1,42 @@
-from enum import StrEnum
 from math import sqrt
 from matplotlib.colors import CSS4_COLORS
 import re
 
 from .rectangle import Rectangle
+from .rectangle_shape import RectangleShape
 
 
-class RectangleShape(StrEnum):
-    """Type of rectangle shape for a RectangleSeed."""
+class SeedSquare:
+    """A seed square that creates a rectangle in the Patches game"""
 
-    ANY = "ANY"
-    VERTICAL = "VERTICAL"
-    HORIZONTAL = "HORIZONTAL"
-    SQUARE = "SQUARE"
-
-
-class RectangleSeed:
-    """A seed for a rectangle in the Patches game, defined by its color, square position, shape, and area."""
-
-    def __init__(
-            self,
-            color:str,
-            square:tuple[int, int],
-            shape:RectangleShape,
-            area:int | None
-        ) -> None:
-        self.color = color
+    def __init__(self, square:tuple[int, int], shape:RectangleShape=RectangleShape.ANY, area:int|None=None, color:str="#FFFFFF") -> None:
         self.square = square
         self.shape = shape
         self.area = area
+        self.color = color
         self.__rectangle = None
 
 
     def __repr__(self) -> str:
         return (
             f"{type(self).__name__}(\n\t"
-            f"color={self.color},\n\t"
             f"square={self.square},\n\t"
             f"shape={type(self.shape).__name__}.{self.shape},\n\t"
-            f"area={self.area}\n)"
+            f"area={self.area},\n\t"
+            f"color={self.color}\n)"
         )
 
 
     def __str__(self) -> str:
         return (
-            f"{type(self).__name__}("
-            f"square={self.square}, "
-            f"shape={type(self.shape).__name__}.{self.shape}, "
-            f"area={self.area} "
-            f"color={self.color})"
+            f"A Patches seed square located at {self.square}"
+            f" that creates a {self.color_name} {self.shape.lower() + " " if self.shape != RectangleShape.ANY else ""}rectangle"
+            f" with{f" a required area of {self.area} squares" if self.area is not None else "out any required area"}."
         )
 
 
     def __hash__(self) -> int:
-        return hash((self.color, self.square, self.shape, self.area,))
+        return hash((self.square, self.shape, self.area, self.color))
 
 
     def __len__(self) -> int:
@@ -66,7 +49,7 @@ class RectangleSeed:
 
     def __eq__(self, other):
 
-        if not isinstance(other, RectangleSeed):
+        if not isinstance(other, SeedSquare):
             return False
         
         return (
@@ -83,6 +66,32 @@ class RectangleSeed:
     @staticmethod
     def __is_perfect_square(n:int) -> bool:
         return sqrt(n) % 1 == 0
+    
+
+    @staticmethod
+    def __hex_to_rgb(hex_code:str) -> tuple[int, int, int]:
+        """Converts '#RRGGBB' to an (R, G, B) tuple."""
+        hex_code = hex_code.lstrip('#')
+        return tuple(int(hex_code[i:i+2], 16) for i in (0, 2, 4))
+
+
+    @staticmethod
+    def __get_closest_color_name(hex_code:str) -> str:
+        """Finds the closest named color by calculating Euclidean distance."""
+        target_rgb = SeedSquare.__hex_to_rgb(hex_code)
+        closest_name = None
+        min_distance = float('inf')
+
+        for name, hex_val in CSS4_COLORS.items():
+            color_rgb = SeedSquare.__hex_to_rgb(hex_val)
+            # Calculate 3D Euclidean distance between RGB values
+            distance_squared = sum((t - c) ** 2 for t, c in zip(target_rgb, color_rgb))
+            
+            if distance_squared < min_distance:
+                min_distance = distance_squared
+                closest_name = name
+                
+        return closest_name
 
 
     @property
@@ -94,9 +103,11 @@ class RectangleSeed:
     def color(self, value:str="#FFFFFF") -> None:
 
         try:
-            hex_code = CSS4_COLORS[value.strip().lower()]
+            color_name = value.strip().lower()
+            hex_code = CSS4_COLORS[color_name]
 
         except KeyError:
+            # Informed a hex code"
             pattern = re.compile(r"^\#[0-9A-F]{6}$", re.IGNORECASE)
 
             if not isinstance(value, str) or re.fullmatch(pattern, value) is None:
@@ -104,9 +115,20 @@ class RectangleSeed:
                 raise ValueError(msg)
             
             self._color = value
+            self.__set_color_name(value)
 
         else:
+            # Informed a valid color name
+            self._color_name = color_name
             self._color = hex_code
+
+
+    @property
+    def color_name(self) -> str:
+        return self._color_name
+    
+    def __set_color_name(self, value:str) -> None:
+        self._color_name = SeedSquare.__get_closest_color_name(value)
 
 
     @property
@@ -133,12 +155,12 @@ class RectangleSeed:
 
 
     @property
-    def shape(self) -> RectangleShape:
-        """Required shape of the rectangle seed as a RectangleShape enum."""
-        return self._shape
+    def shape(self) -> str:
+        """Required shape of the seed square as a RectangleShape enum."""
+        return str(self._shape)
 
     @shape.setter
-    def shape(self, value:RectangleShape = RectangleShape.ANY) -> None:
+    def shape(self, value:RectangleShape=RectangleShape.ANY) -> None:
 
         if not isinstance(value, RectangleShape):
             msg = f"The rectangle type must be a RectangleShape class. Got a {type(value).__name__} type instead."
@@ -149,23 +171,23 @@ class RectangleSeed:
 
     @property
     def area(self) -> int | None:
-        """Required rea of the rectangle seed as a positive integer or None."""
+        """Required rea of the seed square as a positive integer or None."""
         return self._area
 
     @area.setter
     def area(self, value: int | None) -> None:
         
         if value is not None and not isinstance(value, int):
-            msg = f"The tip area must be an integer or None. Got {type(value).__name__} instead."
+            msg = f"The required area must be an integer or None. Got {type(value).__name__} instead."
             raise TypeError(msg)
 
         if value is not None:
             if value < 1:
-                msg = f"The tip area must be a positive integer. Got {value!r} instead."
+                msg = f"The required area must be a positive integer. Got {value!r} instead."
                 raise ValueError(msg)
 
-            if self.shape == RectangleShape.SQUARE and not RectangleSeed.__is_perfect_square(value):
-                msg = f"The tip area ({value!r}) is not a perfect square."
+            if self.shape == RectangleShape.SQUARE and not SeedSquare.__is_perfect_square(value):
+                msg = f"The required area ({value!r}) is not a perfect square."
                 raise ValueError(msg)
 
         self._area = value
@@ -173,7 +195,7 @@ class RectangleSeed:
 
     @property
     def rectangle(self) -> Rectangle:
-        """Rectangle object created by the rectangle seed."""
+        """Rectangle object created by the seed square."""
         return self.__rectangle
 
     def _set_rectangle(self, value:Rectangle) -> None:

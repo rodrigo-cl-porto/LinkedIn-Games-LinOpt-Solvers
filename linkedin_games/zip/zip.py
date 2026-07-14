@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-from ..gameboard import GameBoard
+from ..game_board import GameBoard
 
 
 class Zip(GameBoard):
@@ -66,7 +66,12 @@ class Zip(GameBoard):
         return self._walls
     
     @walls.setter
-    def walls(self, values:tuple[tuple[int, int], tuple[int, int]]) -> None:
+    def walls(self, values:tuple[tuple[int, int], tuple[int, int]] = None) -> None:
+
+        if values is None:
+            self._walls = None
+            self._stale = True
+            return None
 
         if len(values) > len(self.board.edges) / 2:
             msg = (
@@ -89,7 +94,7 @@ class Zip(GameBoard):
         else:
             self._walls = values
 
-        invalid_items = [pair for pair in values if GameBoard.__manhathan_distance(*pair) != 1]
+        invalid_items = [pair for pair in values if super()._manhattan_distance(*pair) != 1]
         if invalid_items:
             msg = (
                 "Squares in a pair must be consecutive ones. "

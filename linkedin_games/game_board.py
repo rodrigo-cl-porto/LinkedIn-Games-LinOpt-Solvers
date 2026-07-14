@@ -27,7 +27,7 @@ class GameBoard(ABC): # Abstract Base Class
 
 
     @staticmethod
-    def __manhathan_distance(square1:tuple[int, int], square2:tuple[int, int]) -> int:
+    def _manhattan_distance(square1:tuple[int, int], square2:tuple[int, int]) -> int:
         """Calculates the Manhattan distance between two squares."""
         x1 = square1[0]
         x2 = square2[0]

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-from ..gameboard import GameBoard
+from ..game_board import GameBoard
 
 
 class Tango(GameBoard):
@@ -61,7 +61,7 @@ class Tango(GameBoard):
             )
             raise ValueError(msg)
 
-        invalid_items = [pair for pair in values if GameBoard.__manhathan_distance(*pair) != 1]
+        invalid_items = [pair for pair in values if super()._manhattan_distance(*pair) != 1]
         if invalid_items:
             msg = (
                 "Squares in a pair must be consecutive ones. "
@@ -118,7 +118,7 @@ class Tango(GameBoard):
             )
             raise ValueError(msg)
 
-        invalid_items = [pair for pair in value if Tango.__manhathan_distance(*pair) != 1]
+        invalid_items = [pair for pair in value if super()._manhattan_distance(*pair) != 1]
         if invalid_items:
             msg = (
                 "Squares in a pair must be consecutive ones. "

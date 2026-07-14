@@ -36,25 +36,25 @@ project:
   open_access: true
   toc:
     - title: Introduction
-      file: home.md
+      file: ./content/home.md
     - title: Getting Started
       children:
       - title: What is Optimization?
-        file: ./notebooks/0a-what-is-optimization.ipynb
+        file: ./content/0-getting-started/1-what-is-optimization.ipynb
       - title: LinkedIn Games Library
-        file: ./notebooks/0b-linkedin-games-library.md
+        file: ./content/0-getting-started/2-linkedin-games-library.md
     - title: How to Solve
       children:
       - title: Queens
-        file: ./notebooks/1-queens.ipynb
+        file: ./content/1-how-to-solve/1-queens.ipynb
       - title: Tango
-        file: ./notebooks/2-tango.ipynb
+        file: ./content/1-how-to-solve/2-tango.ipynb
       - title: Zip
-        file: ./notebooks/3-zip.ipynb
+        file: ./content/1-how-to-solve/3-zip.ipynb
       - title: Mini Sudoku
-        file: ./notebooks/4-mini-sudoku.ipynb
+        file: ./content/1-how-to-solve/4-mini-sudoku.ipynb
       - title: Patches
-        file: ./notebooks/5-patches.ipynb
+        file: ./content/1-how-to-solve/5-patches.ipynb
   abbreviations:
     BLO: Binary Linear Optimization
     BLOP: Binary Linear Optimization Problem
@@ -67,10 +67,6 @@ project:
     NLOP: Non-Linear Optimization Problem
     No.: Number
     S.t.: Subject to
-  kernelspec:
-    language: python
-    name: python3
-    display_name: 'Python 3'
   math:
     \N: '\mathbb{N}'
     \R: '\mathbb{R}'
@@ -81,13 +77,14 @@ project:
       output: exports/solving_linkedin_games_by_linear_optimization.pdf
       title: Solving LinkedIn Games by Linear Optimization
       articles:
-        - home.md
-        - notebooks/0a-what-is-optimization.ipynb
-        - notebooks/1-queens.ipynb
-        - notebooks/2-tango.ipynb
-        - notebooks/3-zip.ipynb
-        - notebooks/4-mini-sudoku.ipynb
-        - notebooks/5-patches.ipynb
+        - ./content/home.md
+        - ./content/0-getting-started/1-what-is-optimization.ipynb
+        - ./content/0-getting-started/2-linkedin-games-library.md
+        - ./content/1-how-to-solve/1-queens.ipynb
+        - ./content/1-how-to-solve/2-tango.ipynb
+        - ./content/1-how-to-solve/3-zip.ipynb
+        - ./content/1-how-to-solve/4-mini-sudoku.ipynb
+        - ./content/1-how-to-solve/5-patches.ipynb
 site:
   template: book-theme
   options:
@@ -95,8 +92,6 @@ site:
     favicon: ./assets/logos/logo.svg
     logo: ./assets/logos/logo.svg
     logo_dark: ./assets/logos/logo_dark.svg
-  exports:
-    - cff
   nav:
     - title: Useful Pythonic Concepts
       children:

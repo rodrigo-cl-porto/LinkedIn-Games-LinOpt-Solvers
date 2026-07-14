@@ -1,4 +1,4 @@
-from linkedin_games.zip import Zip
+from linkedin_games import Zip
 
 
 def test_zip():

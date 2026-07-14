@@ -1,4 +1,5 @@
-from linkedin_games.queens import Queens, Region
+from linkedin_games import Queens
+from linkedin_games.queens import Region
 
 
 def test_queens():

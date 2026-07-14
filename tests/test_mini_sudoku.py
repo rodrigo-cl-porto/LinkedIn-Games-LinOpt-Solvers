@@ -1,4 +1,4 @@
-from linkedin_games.sudoku import MiniSudoku
+from linkedin_games import MiniSudoku
 
 
 def test_mini_sudoku():

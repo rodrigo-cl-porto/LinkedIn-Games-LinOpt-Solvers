@@ -1,8 +1,9 @@
 ---
-title: Zip 
+title: LinkedIn Games Library
+short_title: LinkedIn Games
 date: 2026-07-13
 downloads:
-    - file: 0b-linkedin-games-library.md
+    - file: 2-linkedin-games-library.md
       title: This Article
       filename: linkedin-games-library.md
 ---

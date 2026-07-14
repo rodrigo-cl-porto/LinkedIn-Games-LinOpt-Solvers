@@ -1,4 +1,5 @@
-from linkedin_games.patches import Patches, RectangleSeed, RectangleShape, Rectangle
+from linkedin_games import Patches
+from linkedin_games.patches import SeedSquare, RectangleShape, Rectangle
 
 
 def test_patches():
@@ -6,64 +7,56 @@ def test_patches():
     # Solving Patches No. 16
 
     seeds = tuple((
-        RectangleSeed( # Yellow
-            color="#846A0B",
+        SeedSquare(
+            color="#846A0B", # Olive
             square=(1, 2),
-            shape=RectangleShape.ANY,
             area=2
         ),
-        RectangleSeed( # Teal
-            color="#096B78",
+        SeedSquare(
+            color="#096B78", # Teal
             square=(1, 4),
-            shape=RectangleShape.ANY,
             area=6
         ),
-        RectangleSeed( # Purple
-            color="#5A3DB1",
+        SeedSquare(
+            color="#5A3DB1", # Purple
             square=(2, 6),
-            shape=RectangleShape.ANY,
             area=2
         ),
-        RectangleSeed( # Green
-            color="#0A7541",
+        SeedSquare(
+            color="#0A7541", # Green
             square=(3, 1),
-            shape=RectangleShape.ANY,
             area=6
         ),
-        RectangleSeed( # Orange
-            color="#EF6C00",
+        SeedSquare(
+            color="#EF6C00", # Orange
             square=(3, 3),
             shape=RectangleShape.VERTICAL,
             area=2
         ),
-        RectangleSeed( # Red
-            color="#E30102",
+        SeedSquare( 
+            color="#E30102", # Red
             square=(4, 4),
             shape=RectangleShape.SQUARE,
             area=4
         ),
-        RectangleSeed(
-            color="#097BB1",
+        SeedSquare(
+            color="#097BB1", # Blue
             square=(4, 6),
-            shape=RectangleShape.ANY,
             area=2
-        ), # Blue
-        RectangleSeed( # Magenta
-            color="#A01E4E",
+        ), 
+        SeedSquare( 
+            color="#A01E4E", # Magenta
             square=(5, 1),
-            shape=RectangleShape.ANY,
             area=2
         ),
-        RectangleSeed( # Brick
-            color="#9B3C1C",
+        SeedSquare( 
+            color="#9B3C1C", # Brick
             square=(6, 3),
-            shape=RectangleShape.ANY,
             area=6
         ),
-        RectangleSeed( # Brown
-            color="#503B36",
+        SeedSquare( 
+            color="#503B36", # Brown
             square=(6, 5),
-            shape=RectangleShape.ANY,
             area=4
         )
     ))
