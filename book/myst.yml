@@ -11,11 +11,13 @@ project:
       The minigames are solved by formulating them as Linear Optimization Problems (LOPs) and solving them with the Gurobi and Highs solvers.
       This book also provides a brief introduction to Linear Optimization (LO) and its applications in solving real-world problems.
   keywords:
-    - LinkedIn Queens
-    - LinkedIn Tango
-    - LinkedIn Zip
-    - LinkedIn Mini Sudoku
-    - LinkedIn Patches
+    - LinkedIn
+    - Games
+    - Queens
+    - Tango
+    - Zip
+    - Mini Sudoku
+    - Patches
     - Linear Optimization
     - Python
     - Pyomo
@@ -36,25 +38,25 @@ project:
   open_access: true
   toc:
     - title: Introduction
-      file: ./content/home.md
+      file: ./home.md
     - title: Getting Started
       children:
       - title: What is Optimization?
-        file: ./content/0-getting-started/1-what-is-optimization.ipynb
+        file: ./1-getting-started/1-what-is-optimization.ipynb
       - title: LinkedIn Games Library
-        file: ./content/0-getting-started/2-linkedin-games-library.md
+        file: ./1-getting-started/2-linkedin-games-library.md
     - title: How to Solve
       children:
       - title: Queens
-        file: ./content/1-how-to-solve/1-queens.ipynb
+        file: ./2-how-to-solve/1-queens.ipynb
       - title: Tango
-        file: ./content/1-how-to-solve/2-tango.ipynb
+        file: ./2-how-to-solve/2-tango.ipynb
       - title: Zip
-        file: ./content/1-how-to-solve/3-zip.ipynb
+        file: ./2-how-to-solve/3-zip.ipynb
       - title: Mini Sudoku
-        file: ./content/1-how-to-solve/4-mini-sudoku.ipynb
+        file: ./2-how-to-solve/4-mini-sudoku.ipynb
       - title: Patches
-        file: ./content/1-how-to-solve/5-patches.ipynb
+        file: ./2-how-to-solve/5-patches.ipynb
   abbreviations:
     BLO: Binary Linear Optimization
     BLOP: Binary Linear Optimization Problem
@@ -77,21 +79,21 @@ project:
       output: exports/solving_linkedin_games_by_linear_optimization.pdf
       title: Solving LinkedIn Games by Linear Optimization
       articles:
-        - ./content/home.md
-        - ./content/0-getting-started/1-what-is-optimization.ipynb
-        - ./content/0-getting-started/2-linkedin-games-library.md
-        - ./content/1-how-to-solve/1-queens.ipynb
-        - ./content/1-how-to-solve/2-tango.ipynb
-        - ./content/1-how-to-solve/3-zip.ipynb
-        - ./content/1-how-to-solve/4-mini-sudoku.ipynb
-        - ./content/1-how-to-solve/5-patches.ipynb
+        - ./home.md
+        - ./1-getting-started/1-what-is-optimization.ipynb
+        - ./1-getting-started/2-linkedin-games-library.md
+        - ./2-how-to-solve/1-queens.ipynb
+        - ./2-how-to-solve/2-tango.ipynb
+        - ./2-how-to-solve/3-zip.ipynb
+        - ./2-how-to-solve/4-mini-sudoku.ipynb
+        - ./2-how-to-solve/5-patches.ipynb
 site:
   template: book-theme
   options:
     folders: true
-    favicon: ./assets/logos/logo.svg
-    logo: ./assets/logos/logo.svg
-    logo_dark: ./assets/logos/logo_dark.svg
+    favicon: ./assets/site/logo.svg
+    logo: ./assets/site/logo.svg
+    logo_dark: ./assets/site/logo_dark.svg
   nav:
     - title: Useful Pythonic Concepts
       children:

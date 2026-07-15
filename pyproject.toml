@@ -1,7 +1,19 @@
 [project]
 name = "Solving-LinkedIn-Games-by-Linear-Optimization"
 version = "0.1.3"
-description = "A Python package for solving LinkedIn games using linear optimization techniques."
+description = "A Python package for solving LinkedIn mini games by using linear optimization techniques."
+keywords = [
+    "LinkedIn",
+    "Games",
+    "Queens",
+    "Tango",
+    "Zip",
+    "Mini Sudoku",
+    "Patches",
+    "Pyomo",
+    "Optimization",
+    "Linear Optimization"
+]
 authors = [{ name = "Rodrigo Celso de Lima Porto", email = "rodrigo.cl.porto@gmail.com" }]
 readme = "README.md"
 license = { file = "LICENSE.md" }
@@ -14,12 +26,18 @@ dependencies = [
     "pyomo>=6.10.0",
 ]
 
+[project.urls]
+Homepage = "https://rodrigo-cl-porto.github.io/Solving-LinkedIn-Games-by-Linear-Optimization/"
+Documentation = "https://rodrigo-cl-porto.github.io/Solving-LinkedIn-Games-by-Linear-Optimization/"
+Repository = "https://github.com/rodrigo-cl-porto/Solving-LinkedIn-Games-by-Linear-Optimization"
+
 [dependency-groups]
 dev = [
     "ipywidgets>=8.1.8",
     "jupyter-book>=2.1.4",
     "jupyterlab>=4.5.6",
     "jupyterlab-myst>=2.6.0",
+    "poethepoet>=0.48.0",
     "pytest>=9.1.1",
 ]
 
@@ -27,5 +45,25 @@ dev = [
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
+
 [tool.setuptools]
 packages = ["linkedin_games"]
+
+
+[tool.poe.tasks]
+
+clean = "rm -rf .venv"
+
+setup = [
+    { cmd = "uv venv --python 3.13" },
+    { cmd = "uv python pin 3.13" },
+    { cmd = "uv sync" }
+]
+
+serve = { cmd = "jupyter-book start", cwd = "book", env = { NODE_TLS_REJECT_UNAUTHORIZED = "0" } }
+
+build = { cmd = "jupyter-book build --html", cwd = "book", env = { NODE_TLS_REJECT_UNAUTHORIZED = "0" } }
+
+deploy = { cmd = "jupyter-book init --gh-pages", cwd = "book" }
+
+test = "pytest tests --maxfail=1"
