@@ -1,8 +1,9 @@
 [project]
-name = "Solving-LinkedIn-Games-by-Linear-Optimization"
+name = "linkedin-games"
 version = "0.1.3"
-description = "A Python package for solving LinkedIn mini games by using linear optimization techniques."
+description = "A Python package for solving LinkedIn mini games like Queens, Tango, Zip, Mini Sudoku and Patches using linear optimization models."
 keywords = [
+    "LinkedIn Games",
     "LinkedIn",
     "Games",
     "Queens",
@@ -17,6 +18,12 @@ keywords = [
 authors = [{ name = "Rodrigo Celso de Lima Porto", email = "rodrigo.cl.porto@gmail.com" }]
 readme = "README.md"
 license = { file = "LICENSE.md" }
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Natural Language :: English",
+    "Intended Audience :: Education",
+    "Topic :: Games/Entertainment"
+]
 requires-python = ">=3.13"
 dependencies = [
     "gurobipy>=13.0.1",
@@ -27,9 +34,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://rodrigo-cl-porto.github.io/Solving-LinkedIn-Games-by-Linear-Optimization/"
-Documentation = "https://rodrigo-cl-porto.github.io/Solving-LinkedIn-Games-by-Linear-Optimization/"
-Repository = "https://github.com/rodrigo-cl-porto/Solving-LinkedIn-Games-by-Linear-Optimization"
+"Source Code" = "https://github.com/rodrigo-cl-porto/Solving-LinkedIn-Games-by-Linear-Optimization"
+"Jupyter Book" = "https://rodrigo-cl-porto.github.io/Solving-LinkedIn-Games-by-Linear-Optimization/"
+"LinkedIn Profile" = "https://www.linkedin.com/in/rodrigo-cl-porto/"
 
 [dependency-groups]
 dev = [
@@ -47,6 +54,7 @@ build-backend = "setuptools.build_meta"
 
 
 [tool.setuptools]
+package-dir = {"" = "src"}
 packages = ["linkedin_games"]
 
 

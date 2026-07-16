@@ -1,20 +1,25 @@
 from math import sqrt
-from matplotlib.colors import CSS4_COLORS
-import re
 
+from ..color_mixin import ColorMixin
 from .rectangle import Rectangle
 from .rectangle_shape import RectangleShape
 
 
-class SeedSquare:
+class SeedSquare(ColorMixin):
     """A seed square that creates a rectangle in the Patches game"""
 
-    def __init__(self, square:tuple[int, int], shape:RectangleShape=RectangleShape.ANY, area:int|None=None, color:str="#FFFFFF") -> None:
+    def __init__(self, 
+        square:tuple[int, int],
+        area:int|None=None,
+        shape:RectangleShape=RectangleShape.ANY,
+        color:str|None=None,
+        color_code:str|None=None
+    ) -> None:
+        super().__init__(color=color, color_code=color_code)
         self.square = square
         self.shape = shape
         self.area = area
-        self.color = color
-        self.__rectangle = None
+        self.__rectangle: Rectangle | None = None
 
 
     def __repr__(self) -> str:
@@ -67,69 +72,6 @@ class SeedSquare:
     def __is_perfect_square(n:int) -> bool:
         return sqrt(n) % 1 == 0
     
-
-    @staticmethod
-    def __hex_to_rgb(hex_code:str) -> tuple[int, int, int]:
-        """Converts '#RRGGBB' to an (R, G, B) tuple."""
-        hex_code = hex_code.lstrip('#')
-        return tuple(int(hex_code[i:i+2], 16) for i in (0, 2, 4))
-
-
-    @staticmethod
-    def __get_closest_color_name(hex_code:str) -> str:
-        """Finds the closest named color by calculating Euclidean distance."""
-        target_rgb = SeedSquare.__hex_to_rgb(hex_code)
-        closest_name = None
-        min_distance = float('inf')
-
-        for name, hex_val in CSS4_COLORS.items():
-            color_rgb = SeedSquare.__hex_to_rgb(hex_val)
-            # Calculate 3D Euclidean distance between RGB values
-            distance_squared = sum((t - c) ** 2 for t, c in zip(target_rgb, color_rgb))
-            
-            if distance_squared < min_distance:
-                min_distance = distance_squared
-                closest_name = name
-                
-        return closest_name
-
-
-    @property
-    def color(self) -> str:
-        """Color of the rectangle seed as a hexcode string (#RRGGBB)."""
-        return self._color
-
-    @color.setter
-    def color(self, value:str="#FFFFFF") -> None:
-
-        try:
-            color_name = value.strip().lower()
-            hex_code = CSS4_COLORS[color_name]
-
-        except KeyError:
-            # Informed a hex code"
-            pattern = re.compile(r"^\#[0-9A-F]{6}$", re.IGNORECASE)
-
-            if not isinstance(value, str) or re.fullmatch(pattern, value) is None:
-                msg = f"The color must be a color name or a hex code like '#RRGGBB'. Got {value!r} instead."
-                raise ValueError(msg)
-            
-            self._color = value
-            self.__set_color_name(value)
-
-        else:
-            # Informed a valid color name
-            self._color_name = color_name
-            self._color = hex_code
-
-
-    @property
-    def color_name(self) -> str:
-        return self._color_name
-    
-    def __set_color_name(self, value:str) -> None:
-        self._color_name = SeedSquare.__get_closest_color_name(value)
-
 
     @property
     def square(self) -> tuple[int, int]:

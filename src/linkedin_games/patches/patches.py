@@ -85,7 +85,7 @@ class Patches(GameBoard):
         V = model.V = pyo.Set(initialize=[seed.color for seed in self.seeds if seed.shape == RectangleShape.VERTICAL])
         H = model.H = pyo.Set(initialize=[seed.color for seed in self.seeds if seed.shape == RectangleShape.HORIZONTAL])
         Q = model.Q = pyo.Set(initialize=[seed.color for seed in self.seeds if seed.shape == RectangleShape.SQUARE])
-        A = model.A = pyo.Set(initialize=[seed.color for seed in self.seeds if seed.shape is not None])
+        A = model.A = pyo.Set(initialize=[seed.color for seed in self.seeds if seed.area is not None])
 
         # DECISION VARIABLES
         x = model.x = pyo.Var(I, J, K, domain=pyo.Binary)

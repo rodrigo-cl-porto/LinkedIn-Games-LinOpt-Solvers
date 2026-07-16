@@ -20,12 +20,8 @@ class Rectangle:
 
     def __str__(self) -> str:
         return (
-            f"{type(self).__name__}("
-            f"left={self.left}, "
-            f"top={self.top}, "
-            f"width={self.width}, "
-            f"height={self.height}, "
-            f"squares={self.squares})"
+            f"A {type(self).__name__} with square at ({self.left}, {self.top}) "
+            f"with a width of {self.width} squares and a height of {self.height} squares."
         )
 
 

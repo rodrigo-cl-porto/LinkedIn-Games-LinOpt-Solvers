@@ -9,7 +9,7 @@ from ..game_board import GameBoard
 
 class Zip(GameBoard):
 
-    def __init__(self, board_dims: tuple[int, int], numbered_squares: dict[tuple[int, int]: int], walls: tuple[tuple[int, int]] | None = None):
+    def __init__(self, board_dims: tuple[int, int], numbered_squares: dict[tuple[int, int]: int], walls: tuple[tuple[int, int]]|None = None):
         super().__init__(board_dims)
         self.numbered_squares = numbered_squares
         self.walls = walls
