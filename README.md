@@ -1,12 +1,12 @@
 <div align="center">
-    <img src="./docs/images/linkedin-games-logo.svg" alt="LinkedIn Games' logo" height="150">
+    <img src="./docs/images/linkedin-games-logo.svg" alt="LinkedinGames logo" width="40%">
 </div>
 
-# 🐍 LinkedInGames 𖣯
+# 𖣯 LinkedinGames 🐍
 
-LinkedInGames is a Python library that provides a set of tools to solve LinkedIn games ([Queens][linkedin-queens], [Tango][linkedin-tango], [Zip][linkedin-zip], [Mini Sudoku][linkedin-mini-sudoku] and [Patches][linkedin-patches] for now) by using linear optimization models. The library leverages popular Python libraries such as [Pyomo] for mathematical modeling and [NetworkX] for graph-based representations of game boards. 
+LinkedinGames is a Python library that provides a set of tools to solve LinkedIn board games ([Queens][linkedin-queens], [Tango][linkedin-tango], [Zip][linkedin-zip], [Mini Sudoku][linkedin-mini-sudoku] and [Patches][linkedin-patches] for now) by using linear optimization models. The library leverages popular Python libraries such as [Pyomo] for mathematical modeling and [NetworkX] for graph-based representations of game boards. 
 
-This repository also contains a Jupyter Book that serves as a comprehensive guide to understanding and solving LinkedIn games using the LinkedInGames library. The book covers various topics, including the basics of optimization, the model structure of LinkedIn games, and step-by-step tutorials for solving them by using linear optimization.
+This repository also contains a Jupyter Book that serves as a comprehensive guide to understanding and solving LinkedIn games using the LinkedinGames library. The book covers various topics, including the basics of optimization, the model structure of LinkedIn games, and step-by-step tutorials for solving them by using linear optimization.
 
 [linkedin-queens]: https://www.linkedin.com/games/queens/
 [linkedin-tango]: https://www.linkedin.com/games/tango/
@@ -18,7 +18,7 @@ This repository also contains a Jupyter Book that serves as a comprehensive guid
 
 # Installing
 
-To install the LinkedInGames library, you can use `pip`:
+To install the LinkedinGames library, you can use `pip`:
 
 ```bash
 pip install linkedin-games
@@ -35,7 +35,7 @@ uv add linkedin-games
 In order to solve this Patches game:
 
 <div align="center">
-    <img src="./docs/images/patches-121.jpg" alt="Patches No. 121" height="150">
+    <img src="./docs/images/patches-121.jpg" alt="Patches No. 121" width="40%">
 </div>
 
 One can run this simple code snippet.
@@ -45,28 +45,30 @@ from linkedin_games import Patches
 from linkedin_games.patches import SeedSquare, RectangleShape
 
 
-seeds = tuple((
-    SeedSquare(color="#846A0B", square=(1, 2), area=2),
-    SeedSquare(color="#846A0B", square=(1, 2), area=2),
-    SeedSquare(color="#846A0B", square=(1, 2), area=2),
-    SeedSquare(color="#846A0B", square=(1, 2), area=2),
-))
+seeds = [
+    SeedSquare(color="yellow", square=(1, 1), area=8),
+    SeedSquare(color="green",  square=(2, 5), area=8),
+    SeedSquare(color="purple", square=(3, 3)),
+    SeedSquare(color="orange", square=(4, 4)),
+    SeedSquare(color="teal",   square=(5, 2), area=8),
+    SeedSquare(color="red",    square=(6, 6), area=6, shape=RectangleShape.VERTICAL)
+]
 
 patches = Patches((6, 6), seeds)
-patches.solve(solver="highs") # Uses Highs solver
+patches.solve()
 patches.show()
 ```
 
 Which will return the following result:
 
 <div align="center">
-    <img src="" alt="" height="150px">
+    <img src="./docs/images/patches-121-solved.png" alt="Patches No. 121 solved" width="40%">
 </div>
 
 Which, by its turn, matches the official solution of this game:
 
 <div align="center">
-    <img src="./docs/images/patches-121-solution.jpg" alt="Solution of Patches No. 121" height="150">
+    <img src="./docs/images/patches-121-solution.jpg" alt="Solution of Patches No. 121" width="40%">
 </div>
 
 # 📙 Jupyter Book

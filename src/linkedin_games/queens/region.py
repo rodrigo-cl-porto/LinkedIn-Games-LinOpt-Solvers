@@ -1,35 +1,35 @@
-from ..color_mixin import ColorMixin
+from ..color import Color
 
 
-class Region(ColorMixin):
+class Region:
     """A class representing a colored region on a Queens board game."""
 
-    def __init__(self, squares:set[tuple[int, int]], color:str|None=None, color_code:str|None = None):
-        super().__init__(color=color, color_code=color_code)
+    def __init__(self, squares:set[tuple[int, int]], color:str|None=None):
         self.squares = squares
+        self.__color = Color(color)
 
 
     def __repr__(self) -> str:
         return (
             "Region(\n\t"
-            f"color={self._color},\n\t"
-            f"squares={self._squares!r}\n)"
+            f"color_code={self.color_code},\n\t"
+            f"squares={self.squares!r}\n)"
         )
 
 
     def __str__(self) -> str:
-        return f"Region with color {self._color} and squares {self._squares!r}."
+        return f"A {self.color} Queens Region on squares {self.squares!r}."
     
 
     def __len__(self) -> int:
-        return len(self._squares)
+        return len(self.squares)
 
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, Region):
             return False
         
-        return self._squares == other.squares and self._color == other.color
+        return self.squares == other.squares
 
 
     def __ne__(self, other) -> bool:
@@ -37,8 +37,8 @@ class Region(ColorMixin):
 
 
     def __hash__(self) -> int:
-        return hash((frozenset(self._squares), self._color))
-    
+        return hash((frozenset(self.squares), self.color_code))
+
 
     @property
     def squares(self) -> set[tuple[int, int]]:
@@ -67,3 +67,21 @@ class Region(ColorMixin):
             raise ValueError(msg)
 
         self._squares = value
+
+
+    @property
+    def color(self) -> str:
+        return self.__color.name
+    
+    @color.setter
+    def color(self, value:str) -> None:
+        self.__color.color = value
+
+
+    @property
+    def color_code(self) -> str:
+        return self.__color.hex
+    
+    @color_code.setter
+    def color_code(self, value:str) -> None:
+        self.__color.hex = value

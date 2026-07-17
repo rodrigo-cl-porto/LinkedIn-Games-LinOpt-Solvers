@@ -29,10 +29,8 @@ class GameBoard(ABC): # Abstract Base Class
     @staticmethod
     def _manhattan_distance(square1:tuple[int, int], square2:tuple[int, int]) -> int:
         """Calculates the Manhattan distance between two squares."""
-        x1 = square1[0]
-        x2 = square2[0]
-        y1 = square1[1]
-        y2 = square2[1]
+        x1, y1 = square1
+        x2, y2 = square2
         return abs(x1 - x2) + abs(y1 - y2)
 
 
@@ -95,6 +93,7 @@ class GameBoard(ABC): # Abstract Base Class
         """A dictionary of the board edges and their values."""
         edges = nx.get_edge_attributes(self.board, "value").items()
         return {((i+1, j+1), (r+1, s+1)): value for ((i, j), (r, s)), value in edges}
+
 
     @property
     def model(self) -> pyo.ConcreteModel | None:

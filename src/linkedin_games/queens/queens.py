@@ -9,14 +9,7 @@ from .region import Region
 
 
 class Queens(GameBoard):
-
-    """
-    Queens is a board game where the objective is to place queens on the board such that no two queens threaten each other. The board is divided into colored regions, and each region must contain exactly one queen. Additionally, no two queens can be placed in adjacent squares, including diagonally adjacent squares.
-
-    Attributes:
-        board_dims: A tuple of board dimensions (m, n).
-        regions: A set of Region objects representing the colored regions on the board.
-    """
+    """A Queens is board game with colored regions"""
 
     def __init__(self, board_dims:tuple[int, int], regions:set[Region]) -> None:
         super().__init__(board_dims)

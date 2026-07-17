@@ -39,7 +39,7 @@ class Patches(GameBoard):
             msg = f"Seeds must be a tuple of SeedSquare classes. Got the following invalid items: {invalid_items!r}."
             raise TypeError(msg)
         
-        if len(values) != len({seed.color for seed in values}):
+        if len(values) != len({seed.color_code for seed in values}):
             msg = "There must not be two seeds with the same color."
             raise ValueError(msg)
         
@@ -77,18 +77,20 @@ class Patches(GameBoard):
         # RANGE SETS
         I = model.I # Rows
         J = model.J # Columns
-        K = model.K = pyo.Set(initialize=(seed.color for seed in self.seeds)) # Rectangle Seeds
+        K = model.K = pyo.Set(initialize=(seed.color_code for seed in self.seeds)) # Rectangle Seeds
 
         # COMPOSITE SETS
         S = model.S # Board squares
-        E = model.E = pyo.Set(initialize=[(*seed.square, seed.color) for seed in self.seeds]) # Seed squares
-        V = model.V = pyo.Set(initialize=[seed.color for seed in self.seeds if seed.shape == RectangleShape.VERTICAL])
-        H = model.H = pyo.Set(initialize=[seed.color for seed in self.seeds if seed.shape == RectangleShape.HORIZONTAL])
-        Q = model.Q = pyo.Set(initialize=[seed.color for seed in self.seeds if seed.shape == RectangleShape.SQUARE])
-        A = model.A = pyo.Set(initialize=[seed.color for seed in self.seeds if seed.area is not None])
+        E = model.E = pyo.Set(initialize=[(*seed.square, seed.color_code) for seed in self.seeds]) # Seed squares
+        V = model.V = pyo.Set(initialize=[seed.color_code for seed in self.seeds if seed.shape == RectangleShape.VERTICAL])
+        H = model.H = pyo.Set(initialize=[seed.color_code for seed in self.seeds if seed.shape == RectangleShape.HORIZONTAL])
+        Q = model.Q = pyo.Set(initialize=[seed.color_code for seed in self.seeds if seed.shape == RectangleShape.SQUARE])
+        A = model.A = pyo.Set(initialize=[seed.color_code for seed in self.seeds if seed.area is not None])
 
         # DECISION VARIABLES
-        x = model.x = pyo.Var(I, J, K, domain=pyo.Binary)
+        x = model.x = pyo.Var(I, J, K, domain=pyo.Binary, initialize=0)
+        u = model.u = pyo.Var(I, K, domain=pyo.Binary, initialize=0)
+        v = model.v = pyo.Var(J, K, domain=pyo.Binary, initialize=0)
         l = model.l = pyo.Var(K, domain=pyo.PositiveIntegers) # Index of the leftmost column of the rectangle k
         t = model.t = pyo.Var(K, domain=pyo.PositiveIntegers) # Index of the top row of the rectangle k
         w = model.w = pyo.Var(K, domain=pyo.PositiveIntegers) # Width of rectangle k
@@ -99,7 +101,7 @@ class Patches(GameBoard):
         n = model.n # Total number of columns
         a = model.a = pyo.Param( # Required areas
             K,
-            initialize= {seed.color: seed.area for seed in self.seeds if seed.area is not None}
+            initialize= {seed.color_code: seed.area for seed in self.seeds if seed.area is not None}
         )
 
         # OBJECTIVE FUNCTION
@@ -113,7 +115,7 @@ class Patches(GameBoard):
         )
 
         ## Rectangle-Within-Board-Boundaries Constraints
-        model.top_row_constraints = pyo.Constraint(
+        model.top_row_position_constraints = pyo.Constraint(
             K,
             rule=lambda model, k: t[k] + h[k] - 1 <= m
         )
@@ -122,26 +124,47 @@ class Patches(GameBoard):
             rule=lambda model, k: l[k] + w[k] - 1 <= n
         )
 
-        ## Square-Within-Rectangle-Boundaries Constraints (if a square is inside a rectangle, then its coordinates must be between the rectangle dimensions)
-        model.top_boundary_square_position_constraints = pyo.Constraint(
-            I, J, K,
-            rule=lambda model, i, j, k: t[k] - i <= m * (1 - x[i, j, k])
+        ## Square-Within-Rectangle-Boundaries Constraints
+        ### Rows-Within-Rectangle Constraints
+        model.row_not_above_top_constraints = pyo.Constraint(
+            I, K,
+            rule=lambda model, i, k: t[k] - i <= m * (1 - u[i, k])
         )
-        model.bottom_boundary_square_position_constraints = pyo.Constraint(
-            I, J, K,
-            rule=lambda model, i, j, k: i - (t[k] + h[k] - 1) <= m * (1 - x[i, j, k])
+
+        model.row_not_under_bottom_constraints = pyo.Constraint(
+            I, K,
+            rule=lambda model, i, k: i - (t[k] + h[k] - 1) <= m * (1 - u[i, k])
         )
-        model.leftmost_boundary_square_position_constraints = pyo.Constraint(
-            I, J, K,
-            rule=lambda model, i, j, k: l[k] - j <= n * (1 - x[i, j, k])
+
+        ### Columns-Within-Rectangle Constraints
+        model.col_not_before_left_border_constraints = pyo.Constraint(
+            J, K,
+            rule=lambda model, j, k: l[k] - j <= n * (1 - v[j, k])
         )
-        model.rightmost_boundary_square_position_constraints = pyo.Constraint(
+
+        model.col_not_after_right_border_constraints = pyo.Constraint(
+            J, K,
+            rule=lambda model, j, k: j - (l[k] + w[k] - 1) <= n * (1 - v[j, k])
+        )
+
+        # Square link row and column binaries
+        model.x_row_link = pyo.Constraint(
             I, J, K,
-            rule=lambda model, i, j, k: j - (l[k] + w[k] - 1) <= n * (1 - x[i, j, k])
+            rule=lambda model, i, j, k: x[i, j, k] <= u[i, k]
+        )
+
+        model.x_col_link = pyo.Constraint(
+            I, J, K,
+            rule=lambda model, i, j, k: x[i, j, k] <= v[j, k]
+        )
+
+        model.x_inside_link = pyo.Constraint(
+            I, J, K,
+            rule=lambda model, i, j, k: x[i, j, k] >= u[i, k] + v[j, k] - 1
         )
 
         ## Seed Square Constraints
-        model.seed_square_coverage_constraints = pyo.Constraint( # Seed squares
+        model.seed_square_coverage_constraints = pyo.Constraint(
             E,
             rule=lambda model, i, j, k: x[i, j, k] == 1
         )
@@ -168,21 +191,29 @@ class Patches(GameBoard):
 
 
     def _set_solution(self, verbose:bool=False) -> None:
-
+        
         for seed in self.seeds:
+            top = round(pyo.value(self.model.t[seed.color_code]))
+            left = round(pyo.value(self.model.l[seed.color_code]))
+            width = round(pyo.value(self.model.w[seed.color_code]))
+            height = round(pyo.value(self.model.h[seed.color_code]))
+
             seed._set_rectangle(
                 Rectangle(
-                    left = int(round(pyo.value(self.model.l[seed.color]), 0)),
-                    top = int(round(pyo.value(self.model.t[seed.color]), 0)),
-                    width = int(round(pyo.value(self.model.w[seed.color]), 0)),
-                    height = int(round(pyo.value(self.model.h[seed.color]), 0))
+                    color=seed.color_code,
+                    top_left_square=(top, left),
+                    dims=(width, height)
                 )
             )
 
         nx.set_node_attributes(
             self.board,
             name="color",
-            values={(i-1, j-1): seed.color for seed in self.seeds for (i, j) in seed.rectangle.squares}
+            values={
+                (i-1, j-1): seed.color_code
+                for seed in self.seeds
+                for (i, j) in seed.rectangle.squares
+            }
         )
 
         if verbose:

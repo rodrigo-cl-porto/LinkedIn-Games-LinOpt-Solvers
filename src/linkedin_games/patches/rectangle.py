@@ -1,11 +1,13 @@
-class Rectangle:
-    """A Zip rectangle defined by its left, top, width, and height."""
+from ..color import Color
 
-    def __init__(self, left:int, top:int, width:int, height:int) -> None:
-        self.left = left
-        self.top = top
-        self.width = width
-        self.height = height
+
+class Rectangle:
+    """A Patches rectangle defined by its left, top, width, and height."""
+
+    def __init__(self, top_left_square:tuple[int, int], dims:tuple[int, int], color:str|None=None):
+        self.top_left_square = top_left_square
+        self.dims = dims
+        self.__color = Color(color)
 
 
     def __repr__(self) -> str:
@@ -14,23 +16,26 @@ class Rectangle:
             f"left={self.left},\n\t"
             f"top={self.top},\n\t"
             f"width={self.width},\n\t"
-            f"height={self.height}\n)"
+            f"height={self.height},\n\t"
+            f"color_code={self.color_code}\n)"
         )
 
 
     def __str__(self) -> str:
         return (
-            f"A {type(self).__name__} with square at ({self.left}, {self.top}) "
-            f"with a width of {self.width} squares and a height of {self.height} squares."
+            f"A {self.color} {type(self).__name__}"
+            f" with top-left square at ({self.top_left_square})"
+            f" with dimensions of {self.dims}"
         )
 
 
     def __hash__(self) -> int:
         return hash((
-            self.left,
             self.top,
+            self.left,
             self.width,
-            self.height
+            self.height,
+            self.color_code
         ))
 
 
@@ -56,22 +61,23 @@ class Rectangle:
 
 
     @property
-    def left(self) -> int:
-        """The position of the rectangle's leftmost column."""
-        return self._left
+    def dims(self) -> tuple[int, int]:
+        return (self._width, self._height)
+    
+    @dims.setter
+    def dims(self, value:tuple[int, int])-> None:
+        self.width = value[0]
+        self.height = value[1]
 
-    @left.setter
-    def left(self, value: int) -> None:
 
-        if not isinstance(value, int):
-            msg = f"The left position must be an integer. Got {value!r} instead."
-            raise TypeError(msg)
-        
-        if value < 1:
-            msg = f"The left position must be positive. Got {value!r} instead."
-            raise ValueError(msg)
-        
-        self._left = value
+    @property
+    def top_left_square(self) -> tuple[int, int]:
+        return (self._top, self._left)
+    
+    @top_left_square.setter
+    def top_left_square(self, value:tuple[int, int])-> None:
+        self.top = value[0]
+        self.left = value[1]
 
 
     @property
@@ -83,14 +89,33 @@ class Rectangle:
     def top(self, value: int) -> None:
 
         if not isinstance(value, int):
-            msg = f"The top position must be an integer. Got {value!r} instead."
+            msg = f"The top row's position must be an integer. Got {value!r} instead."
             raise TypeError(msg)
         
         if value < 1:
-            msg = f"The top position must be positive. Got {value!r} instead."
+            msg = f"The top row's position must be positive. Got {value!r} instead."
             raise ValueError(msg)
         
         self._top = value
+
+
+    @property
+    def left(self) -> int:
+        """The position of the rectangle's leftmost column."""
+        return self._left
+
+    @left.setter
+    def left(self, value: int) -> None:
+
+        if not isinstance(value, int):
+            msg = f"The leftmost column's position must be an integer. Got {value!r} instead."
+            raise TypeError(msg)
+        
+        if value < 1:
+            msg = f"The leftmost column's position must be positive. Got {value!r} instead."
+            raise ValueError(msg)
+        
+        self._left = value
 
 
     @property
@@ -156,3 +181,21 @@ class Rectangle:
             for i in range(self.top, self.top + self.height)
             for j in range(self.left, self.left + self.width)
         )
+
+
+    @property
+    def color(self) -> str:
+        return self.__color.name
+    
+    @color.setter
+    def color(self, value:str) -> None:
+        self.__color.color = value
+
+
+    @property
+    def color_code(self) -> str:
+        return self.__color.hex
+    
+    @color_code.setter
+    def color_code(self, value:str) -> None:
+        self.__color.hex = value

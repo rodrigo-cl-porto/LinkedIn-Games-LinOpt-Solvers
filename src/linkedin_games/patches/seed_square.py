@@ -1,11 +1,11 @@
 from math import sqrt
 
-from ..color_mixin import ColorMixin
+from ..color import Color
 from .rectangle import Rectangle
 from .rectangle_shape import RectangleShape
 
 
-class SeedSquare(ColorMixin):
+class SeedSquare:
     """A seed square that creates a rectangle in the Patches game"""
 
     def __init__(self, 
@@ -13,12 +13,11 @@ class SeedSquare(ColorMixin):
         area:int|None=None,
         shape:RectangleShape=RectangleShape.ANY,
         color:str|None=None,
-        color_code:str|None=None
-    ) -> None:
-        super().__init__(color=color, color_code=color_code)
+    ):
         self.square = square
         self.shape = shape
         self.area = area
+        self.__color = Color(color)
         self.__rectangle: Rectangle | None = None
 
 
@@ -28,20 +27,20 @@ class SeedSquare(ColorMixin):
             f"square={self.square},\n\t"
             f"shape={type(self.shape).__name__}.{self.shape},\n\t"
             f"area={self.area},\n\t"
-            f"color={self.color}\n)"
+            f"color_code={self.color_code}\n)"
         )
 
 
     def __str__(self) -> str:
         return (
             f"A Patches seed square located at {self.square}"
-            f" that creates a {self.color_name} {self.shape.lower() + " " if self.shape != RectangleShape.ANY else ""}rectangle"
+            f" that creates a {self.color} {self.shape.lower() + " " if self.shape != RectangleShape.ANY else ""}rectangle"
             f" with{f" a required area of {self.area} squares" if self.area is not None else "out any required area"}."
         )
 
 
     def __hash__(self) -> int:
-        return hash((self.square, self.shape, self.area, self.color))
+        return hash((self.square, self.shape, self.area, self.color_code))
 
 
     def __len__(self) -> int:
@@ -133,6 +132,24 @@ class SeedSquare(ColorMixin):
                 raise ValueError(msg)
 
         self._area = value
+
+
+    @property
+    def color(self) -> str:
+        return self.__color.name
+    
+    @color.setter
+    def color(self, value:str) -> None:
+        self.__color.color = value
+
+
+    @property
+    def color_code(self) -> str:
+        return self.__color.hex
+    
+    @color_code.setter
+    def color_code(self, value:str) -> None:
+        self.__color.hex = value
 
 
     @property
