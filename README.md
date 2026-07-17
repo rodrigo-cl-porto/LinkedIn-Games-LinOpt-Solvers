@@ -2,11 +2,11 @@
     <img src="./docs/images/linkedin-games-logo.svg" alt="LinkedinGames logo" width="40%">
 </div>
 
-# 𖣯 LinkedinGames 🐍
+# 𖣯 LinkedIn-Games-Python-Package 🐍
 
-LinkedinGames is a Python library that provides a set of tools to solve LinkedIn board games ([Queens][linkedin-queens], [Tango][linkedin-tango], [Zip][linkedin-zip], [Mini Sudoku][linkedin-mini-sudoku] and [Patches][linkedin-patches] for now) by using linear optimization models. The library leverages popular Python libraries such as [Pyomo] for mathematical modeling and [NetworkX] for graph-based representations of game boards. 
+LinkedIn-Games-Python-Package is a Python library that provides a set of tools to solve LinkedIn board games ([Queens][linkedin-queens], [Tango][linkedin-tango], [Zip][linkedin-zip], [Mini Sudoku][linkedin-mini-sudoku] and [Patches][linkedin-patches] for now) by using linear optimization models. The library leverages popular Python libraries such as [Pyomo] for mathematical modeling and [NetworkX] for graph-based representations of game boards. 
 
-This repository also contains a Jupyter Book that serves as a comprehensive guide to understanding and solving LinkedIn games using the LinkedinGames library. The book covers various topics, including the basics of optimization, the model structure of LinkedIn games, and step-by-step tutorials for solving them by using linear optimization.
+This repository also contains a Jupyter Book that serves as a comprehensive guide to understanding and solving LinkedIn games using the LinkedIn-Games-Python-Package library. The book covers various topics, including the basics of optimization, the model structure of LinkedIn games, and step-by-step tutorials for solving them by using linear optimization.
 
 [linkedin-queens]: https://www.linkedin.com/games/queens/
 [linkedin-tango]: https://www.linkedin.com/games/tango/
@@ -18,7 +18,7 @@ This repository also contains a Jupyter Book that serves as a comprehensive guid
 
 # Installing
 
-To install the LinkedinGames library, you can use `pip`:
+To install the LinkedIn-Games-Python-Package library, you can use `pip`:
 
 ```bash
 pip install linkedin-games
@@ -75,7 +75,7 @@ Which, by its turn, matches the official solution of this game:
 
 You can read the Jupyter Book to know more about the usage and behind-the-scenes implementation of this library on this 🔗[website].
 
-[website]: https://rodrigo-cl-porto.github.io/Solving-LinkedIn-Games-by-Linear-Optimization/
+[website]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-Python-Package/
 
 ## Table of Contents
 
@@ -91,14 +91,14 @@ You can read the Jupyter Book to know more about the usage and behind-the-scenes
     - [Mini Sudoku][how-to-solve-mini-sudoku]
     - [Patches][how-to-solve-patches]
 
-[home]: https://rodrigo-cl-porto.github.io/Solving-LinkedIn-Games-by-Linear-Optimization/
-[what-is-optimization]: https://rodrigo-cl-porto.github.io/Solving-LinkedIn-Games-by-Linear-Optimization/getting-started/what-is-optimization/
-[linkedin-games-library]: https://rodrigo-cl-porto.github.io/Solving-LinkedIn-Games-by-Linear-Optimization/getting-started/linkedin-games-library/
-[how-to-solve-queens]: https://rodrigo-cl-porto.github.io/Solving-LinkedIn-Games-by-Linear-Optimization/how-to-solve/queens/
-[how-to-solve-tango]: https://rodrigo-cl-porto.github.io/Solving-LinkedIn-Games-by-Linear-Optimization/how-to-solve/tango/
-[how-to-solve-zip]: https://rodrigo-cl-porto.github.io/Solving-LinkedIn-Games-by-Linear-Optimization/how-to-solve/zip/
-[how-to-solve-mini-sudoku]: https://rodrigo-cl-porto.github.io/Solving-LinkedIn-Games-by-Linear-Optimization/how-to-solve/mini-sudoku/
-[how-to-solve-patches]: https://rodrigo-cl-porto.github.io/Solving-LinkedIn-Games-by-Linear-Optimization/how-to-solve/patches/
+[home]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-Python-Package/
+[what-is-optimization]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-Python-Package/getting-started/what-is-optimization/
+[linkedin-games-library]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-Python-Package/getting-started/linkedin-games-library/
+[how-to-solve-queens]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-Python-Package/how-to-solve/queens/
+[how-to-solve-tango]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-Python-Package/how-to-solve/tango/
+[how-to-solve-zip]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-Python-Package/how-to-solve/zip/
+[how-to-solve-mini-sudoku]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-Python-Package/how-to-solve/mini-sudoku/
+[how-to-solve-patches]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-Python-Package/how-to-solve/patches/
 
 # ❤️ Donate
 
