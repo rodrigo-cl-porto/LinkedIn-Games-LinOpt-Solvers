@@ -88,13 +88,13 @@ class Patches(GameBoard):
         A = model.A = pyo.Set(initialize=[seed.color_code for seed in self.seeds if seed.area is not None])
 
         # DECISION VARIABLES
-        x = model.x = pyo.Var(I, J, K, domain=pyo.Binary, initialize=0)
-        u = model.u = pyo.Var(I, K, domain=pyo.Binary, initialize=0)
-        v = model.v = pyo.Var(J, K, domain=pyo.Binary, initialize=0)
         l = model.l = pyo.Var(K, domain=pyo.PositiveIntegers) # Index of the leftmost column of the rectangle k
         t = model.t = pyo.Var(K, domain=pyo.PositiveIntegers) # Index of the top row of the rectangle k
         w = model.w = pyo.Var(K, domain=pyo.PositiveIntegers) # Width of rectangle k
         h = model.h = pyo.Var(K, domain=pyo.PositiveIntegers) # Height of rectangle k
+        u = model.u = pyo.Var(I, K, domain=pyo.Binary, initialize=0) # Decision about if row i passes through rectangle k
+        v = model.v = pyo.Var(J, K, domain=pyo.Binary, initialize=0) # Decision about if column j passes through rectangle k
+        x = model.x = pyo.Var(I, J, K, domain=pyo.Binary, initialize=0) # Decision about if a square (i,j) is covered by rectangle k
 
         # PARAMETERS
         m = model.m # Total number of rows
@@ -114,51 +114,44 @@ class Patches(GameBoard):
             rule=lambda model, i, j: sum(x[i, j, k] for k in K) == 1
         )
 
-        ## Rectangle-Within-Board-Boundaries Constraints
-        model.top_row_position_constraints = pyo.Constraint(
+        ## Board-Boundaries Constraints
+        model.top_row_constraints = pyo.Constraint(
             K,
             rule=lambda model, k: t[k] + h[k] - 1 <= m
         )
-        model.leftmost_column_position_constraints = pyo.Constraint(
+        model.leftmost_column_constraints = pyo.Constraint(
             K,
             rule=lambda model, k: l[k] + w[k] - 1 <= n
         )
 
-        ## Square-Within-Rectangle-Boundaries Constraints
-        ### Rows-Within-Rectangle Constraints
-        model.row_not_above_top_constraints = pyo.Constraint(
+        ## Boundaries Constraints
+        model.top_boundary_constraints = pyo.Constraint(
             I, K,
             rule=lambda model, i, k: t[k] - i <= m * (1 - u[i, k])
         )
-
-        model.row_not_under_bottom_constraints = pyo.Constraint(
+        model.bottom_boundary_constraints = pyo.Constraint(
             I, K,
             rule=lambda model, i, k: i - (t[k] + h[k] - 1) <= m * (1 - u[i, k])
         )
-
-        ### Columns-Within-Rectangle Constraints
-        model.col_not_before_left_border_constraints = pyo.Constraint(
+        model.left_boundary_constraints = pyo.Constraint(
             J, K,
             rule=lambda model, j, k: l[k] - j <= n * (1 - v[j, k])
         )
-
-        model.col_not_after_right_border_constraints = pyo.Constraint(
+        model.right_boundary_constraints = pyo.Constraint(
             J, K,
             rule=lambda model, j, k: j - (l[k] + w[k] - 1) <= n * (1 - v[j, k])
         )
 
-        # Square link row and column binaries
-        model.x_row_link = pyo.Constraint(
+        ## Linking-Binary-Variables Constraints
+        model.cutout_row_constraints = pyo.Constraint(
             I, J, K,
             rule=lambda model, i, j, k: x[i, j, k] <= u[i, k]
         )
-
-        model.x_col_link = pyo.Constraint(
+        model.cutout_column_constraints = pyo.Constraint(
             I, J, K,
             rule=lambda model, i, j, k: x[i, j, k] <= v[j, k]
         )
-
-        model.x_inside_link = pyo.Constraint(
+        model.square_activator_constraints = pyo.Constraint(
             I, J, K,
             rule=lambda model, i, j, k: x[i, j, k] >= u[i, k] + v[j, k] - 1
         )
@@ -168,22 +161,18 @@ class Patches(GameBoard):
             E,
             rule=lambda model, i, j, k: x[i, j, k] == 1
         )
-
         model.area_constraints = pyo.Constraint( # Required area
             A,
             rule=lambda model, k: sum(x[i, j, k] for (i, j) in S) == a[k]
         )
-
         model.vertical_rectangles_constraints = pyo.Constraint(
             V,
             rule=lambda model, k: w[k] <= h[k] - 1
         )
-
         model.horizontal_rectangles_constraints = pyo.Constraint(
             H,
             rule=lambda model, k: w[k] >= h[k] + 1
         )
-
         model.square_rectangles_constraints = pyo.Constraint(
             Q,
             rule=lambda model, k: w[k] == h[k]
