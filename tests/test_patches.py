@@ -1,5 +1,5 @@
 from linkedin_games import Patches
-from linkedin_games.patches import SeedSquare, RectangleShape, Rectangle
+from linkedin_games.patches import SeedSquare, Rectangle
 
 
 def test_patches_16():
@@ -9,8 +9,8 @@ def test_patches_16():
         SeedSquare(color="#096B78", square=(1, 4), area=6),
         SeedSquare(color="#5A3DB1", square=(2, 6), area=2),
         SeedSquare(color="#0A7541", square=(3, 1), area=6),
-        SeedSquare(color="#EF6C00", square=(3, 3), area=2, shape=RectangleShape.VERTICAL),
-        SeedSquare(color="#E30102", square=(4, 4), area=4, shape=RectangleShape.SQUARE),
+        SeedSquare(color="#EF6C00", square=(3, 3), area=2, shape="vertical"),
+        SeedSquare(color="#E30102", square=(4, 4), area=4, shape="square"),
         SeedSquare(color="#097BB1", square=(4, 6), area=2),
         SeedSquare(color="#A01E4E", square=(5, 1), area=2),
         SeedSquare(color="#9B3C1C", square=(6, 3), area=6),
@@ -44,7 +44,7 @@ def test_patches_121():
         SeedSquare(color="#5A3DB1", square=(3, 3)),
         SeedSquare(color="#EF6C00", square=(4, 4)),
         SeedSquare(color="#096B78", square=(5, 2), area=8),
-        SeedSquare(color="#E30102", square=(6, 6), area=6, shape=RectangleShape.VERTICAL)
+        SeedSquare(color="#E30102", square=(6, 6), area=6, shape="vertical")
     ]
 
     patches = Patches((6, 6), seeds)

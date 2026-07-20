@@ -1,8 +1,15 @@
+from typing import Self
+
 from ..color import Color
 
 
 class Rectangle:
-    """A Patches rectangle defined by its left, top, width, and height."""
+    """A Patches rectangle defined by its left, top, width, and height.
+
+    PARAMETERS
+    ----------
+
+    """
 
     def __init__(self, top_left_square:tuple[int, int], dims:tuple[int, int], color:str|None=None):
         self.top_left_square = top_left_square
@@ -43,7 +50,7 @@ class Rectangle:
         return self.width * self.height
 
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other:Self) -> bool:
 
         if not isinstance(other, Rectangle):
             return False
@@ -86,7 +93,7 @@ class Rectangle:
         return self._top
 
     @top.setter
-    def top(self, value: int) -> None:
+    def top(self, value:int) -> None:
 
         if not isinstance(value, int):
             msg = f"The top row's position must be an integer. Got {value!r} instead."
@@ -105,7 +112,7 @@ class Rectangle:
         return self._left
 
     @left.setter
-    def left(self, value: int) -> None:
+    def left(self, value:int) -> None:
 
         if not isinstance(value, int):
             msg = f"The leftmost column's position must be an integer. Got {value!r} instead."

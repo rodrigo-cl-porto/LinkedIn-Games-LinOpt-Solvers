@@ -2,11 +2,11 @@
     <img src="./docs/images/linkedin-games-logo.svg" alt="LinkedinGames logo" width="40%">
 </div>
 
-# 𖣯 LinkedIn-Games-Python-Package 🐍
+# 𖣯 LinkedIn Games Solvers 🐍
 
-LinkedIn-Games-Python-Package is a Python library that provides a set of tools to solve LinkedIn board games ([Queens][linkedin-queens], [Tango][linkedin-tango], [Zip][linkedin-zip], [Mini Sudoku][linkedin-mini-sudoku] and [Patches][linkedin-patches] for now) by using linear optimization models. The library leverages popular Python libraries such as [Pyomo] for mathematical modeling and [NetworkX] for graph-based representations of game boards. 
+LinkedIn Games is a Python library that provides a set of tools to solve LinkedIn board games ([Queens][linkedin-queens], [Tango][linkedin-tango], [Zip][linkedin-zip], [Mini Sudoku][linkedin-mini-sudoku] and [Patches][linkedin-patches] for now) by using Linear Optimization models. This library leverages popular Python libraries such as [Pyomo] for mathematical modeling and [NetworkX] for graph-based representations of game boards. 
 
-This repository also contains a Jupyter Book that serves as a comprehensive guide to understanding and solving LinkedIn games using the LinkedIn-Games-Python-Package library. The book covers various topics, including the basics of optimization, the model structure of LinkedIn games, and step-by-step tutorials for solving them by using linear optimization.
+This repository also contains a Jupyter Book that serves as a comprehensive guide to understanding and solving LinkedIn games using the LinOptIn Games library. The book covers various topics, including the basics of optimization, the model structure of LinkedIn games, and step-by-step tutorials for solving them by using linear optimization.
 
 [linkedin-queens]: https://www.linkedin.com/games/queens/
 [linkedin-tango]: https://www.linkedin.com/games/tango/
@@ -18,7 +18,7 @@ This repository also contains a Jupyter Book that serves as a comprehensive guid
 
 # Installing
 
-To install the LinkedIn-Games-Python-Package library, you can use `pip`:
+To install the LinkedIn Games library, you can use `pip`:
 
 ```bash
 pip install linkedin-games
@@ -42,7 +42,7 @@ One can run this simple code snippet.
 
 ```python
 from linkedin_games import Patches
-from linkedin_games.patches import SeedSquare, RectangleShape
+from linkedin_games.patches import SeedSquare
 
 
 seeds = [
@@ -51,7 +51,7 @@ seeds = [
     SeedSquare(color="purple", square=(3, 3)),
     SeedSquare(color="orange", square=(4, 4)),
     SeedSquare(color="teal",   square=(5, 2), area=8),
-    SeedSquare(color="red",    square=(6, 6), area=6, shape=RectangleShape.VERTICAL)
+    SeedSquare(color="red",    square=(6, 6), area=6, shape="vertical")
 ]
 
 patches = Patches((6, 6), seeds)

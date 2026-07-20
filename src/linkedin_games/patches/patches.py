@@ -6,7 +6,7 @@ import pyomo.environ as pyo
 
 from ..game_board import GameBoard
 from .rectangle import Rectangle
-from .rectangle_shape import RectangleShape
+from .rectangle_shapes import RectangleShapes
 from .seed_square import SeedSquare
 
 
@@ -82,16 +82,18 @@ class Patches(GameBoard):
         # COMPOSITE SETS
         S = model.S # Board squares
         E = model.E = pyo.Set(initialize=[(*seed.square, seed.color_code) for seed in self.seeds]) # Seed squares
-        V = model.V = pyo.Set(initialize=[seed.color_code for seed in self.seeds if seed.shape == RectangleShape.VERTICAL])
-        H = model.H = pyo.Set(initialize=[seed.color_code for seed in self.seeds if seed.shape == RectangleShape.HORIZONTAL])
-        Q = model.Q = pyo.Set(initialize=[seed.color_code for seed in self.seeds if seed.shape == RectangleShape.SQUARE])
+        V = model.V = pyo.Set(initialize=[seed.color_code for seed in self.seeds if seed.shape == RectangleShapes.VERTICAL])
+        H = model.H = pyo.Set(initialize=[seed.color_code for seed in self.seeds if seed.shape == RectangleShapes.HORIZONTAL])
+        Q = model.Q = pyo.Set(initialize=[seed.color_code for seed in self.seeds if seed.shape == RectangleShapes.SQUARE])
         A = model.A = pyo.Set(initialize=[seed.color_code for seed in self.seeds if seed.area is not None])
 
         # DECISION VARIABLES
+        ## Integer variables
         l = model.l = pyo.Var(K, domain=pyo.PositiveIntegers) # Index of the leftmost column of the rectangle k
         t = model.t = pyo.Var(K, domain=pyo.PositiveIntegers) # Index of the top row of the rectangle k
         w = model.w = pyo.Var(K, domain=pyo.PositiveIntegers) # Width of rectangle k
         h = model.h = pyo.Var(K, domain=pyo.PositiveIntegers) # Height of rectangle k
+        ## Binary variables
         u = model.u = pyo.Var(I, K, domain=pyo.Binary, initialize=0) # Decision about if row i passes through rectangle k
         v = model.v = pyo.Var(J, K, domain=pyo.Binary, initialize=0) # Decision about if column j passes through rectangle k
         x = model.x = pyo.Var(I, J, K, domain=pyo.Binary, initialize=0) # Decision about if a square (i,j) is covered by rectangle k
