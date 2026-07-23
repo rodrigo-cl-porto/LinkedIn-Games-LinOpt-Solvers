@@ -1,4 +1,5 @@
 from math import sqrt
+from typing import Self
 
 from ..color import Color
 from .rectangle import Rectangle
@@ -8,7 +9,9 @@ from .rectangle_shapes import RectangleShapes
 class SeedSquare:
     """A seed square that creates a rectangle in the Patches game"""
 
-    def __init__(self, square:tuple[int, int], area:int|None=None, shape:str="any", color:str|None=None):
+    def __init__(self, 
+            square:tuple[int, int], area:int|None=None,
+            shape:str="any", color:str|None=None) -> Self:
         self.square = square
         self.shape = shape
         self.area = area
@@ -29,8 +32,11 @@ class SeedSquare:
     def __str__(self) -> str:
         return (
             f"A Patches seed square located at {self.square}"
-            f" that creates a {self.color} {self.shape.lower() + " " if self.shape != RectangleShapes.ANY else ""}rectangle"
-            f" with{f" a required area of {self.area} squares" if self.area is not None else "out any required area"}."
+            f" that creates a {self.color}"
+            f" {self.shape.lower() + " " 
+            if self.shape != RectangleShapes.ANY else ""}rectangle"
+            f" with{f" a required area of {self.area} squares" 
+            if self.area is not None else "out any required area"}."
         )
 
 
@@ -46,7 +52,7 @@ class SeedSquare:
         return 1
 
 
-    def __eq__(self, other):
+    def __eq__(self, other:Self) -> bool:
 
         if not isinstance(other, SeedSquare):
             return False
@@ -58,7 +64,7 @@ class SeedSquare:
         )
 
 
-    def __ne__(self, other):
+    def __ne__(self, other:Self) -> bool:
         return not self.__eq__(other)
 
 
@@ -76,15 +82,28 @@ class SeedSquare:
     def square(self, value: tuple[int, int]) -> None:
 
         if not isinstance(value, tuple):
-            msg = f"Seed square must be a tuple. Got a {type(value).__name__} type instead."
+            msg = (
+                "Seed square must be a tuple."
+                f" Got a {type(value).__name__} type instead."
+            )
             raise ValueError(msg)
         
         if len(value) != 2:
-            msg = f"Seed square must be a pair (m,n). Got a tuple with length {len(value)}."
+            msg = (
+                "Seed square must be a pair (m,n)."
+                f" Got a tuple with length {len(value)}."
+            )
             raise ValueError(msg)
         
-        if any(not isinstance(coord, int) or isinstance(coord, bool) or coord < 1 for coord in value):
-            msg = f"Seed square coordinates must be positive integers. Got {value!r} instead."
+        if (
+            any(not isinstance(coord, int)
+            or isinstance(coord, bool)
+            or coord < 1 for coord in value)
+        ):
+            msg = (
+                "Seed square coordinates must be positive integers."
+                f" Got {value!r} instead."
+            )
             raise ValueError(msg)
         
         self._square = value
@@ -97,16 +116,32 @@ class SeedSquare:
 
     @shape.setter
     def shape(self, value:str) -> None:
+        """The required shape of the seed square.
+        
+        It must be one of the following: 'any', 'vertical', 'horizontal', or 'square'.
 
+        Args:
+            value (str): The required shape of the seed square.
+
+        Raises:
+            TypeError: The rectangle shape must be a string.
+            ValueError: The rectangle shape is not valid.
+        """
         if not isinstance(value, str):
-            msg = f"The rectangle shape must be a string. Got a {type(value).__name__} instead."
+            msg = (
+                "The rectangle shape must be a string."
+                f" Got a {type(value).__name__} instead."
+            )
             raise TypeError(msg)
         
         try:
             self._shape = RectangleShapes(value.strip().lower())
         except ValueError:
             valid_shapes = f"'{"', '".join(str(shape) for shape in RectangleShapes)}'"
-            msg = f"'{value}' is not a valid rectangle shape. Please, input one of theses shapes: {valid_shapes}"
+            msg = (
+                f"'{value}' is not a valid rectangle shape."
+                f"Please, input one of theses shapes: {valid_shapes}"
+            )
             raise ValueError(msg)
 
 
@@ -119,15 +154,24 @@ class SeedSquare:
     def area(self, value: int | None) -> None:
         
         if value is not None and not isinstance(value, int):
-            msg = f"The required area must be an integer or None. Got {type(value).__name__} instead."
+            msg = (
+                "The required area must be an integer or None."
+                f" Got {type(value).__name__} instead."
+            )
             raise TypeError(msg)
 
         if value is not None:
             if value < 1:
-                msg = f"The required area must be a positive integer. Got {value!r} instead."
+                msg = (
+                    "The required area must be a positive integer."
+                    f"Got {value!r} instead."
+                )
                 raise ValueError(msg)
 
-            if self.shape == RectangleShapes.SQUARE and not SeedSquare.__is_perfect_square(value):
+            if (
+                self.shape == RectangleShapes.SQUARE
+                and not SeedSquare.__is_perfect_square(value)
+            ):
                 msg = f"The required area ({value!r}) is not a perfect square."
                 raise ValueError(msg)
 
@@ -162,24 +206,28 @@ class SeedSquare:
 
         if self.area is not None:
             if len(value) != self.area:
-                msg = f"The rectangle's area ({len(value)}) doesn't attend to the required area ({self.area})."
+                msg = (
+                    f"The rectangle's area ({len(value)})"
+                    f" doesn't attend to the required area ({self.area})."
+                )
                 raise ValueError(msg)
 
         match self.shape:
-            
             case RectangleShapes.VERTICAL:
                 if value.height <= value.width:
                     msg = (
                         f"The rectangle doesn't have {self.shape.lower} shape."
-                        f"Its height ({value.height!r}) should be greater than its width ({value.width!r})."
+                        f" Its height ({value.height!r}) should be"
+                        f" greater than its width ({value.width!r})."
                     )
                     raise ValueError(msg)
-
+            
             case RectangleShapes.HORIZONTAL:
                 if value.height >= value.width:
                     msg = (
                         f"The rectangle doesn't have {self.shape.lower} shape."
-                        f"Its width ({value.width!r}) should be greater than its height ({value.height!r})."
+                        f"Its width ({value.width!r}) should be"
+                        f" greater than its height ({value.height!r})."
                     )
                     raise ValueError(msg)
             
@@ -187,7 +235,8 @@ class SeedSquare:
                 if value.height != value.width:
                     msg = (
                         f"The rectangle doesn't have {self.shape.lower} shape."
-                        f"Its height ({value.height!r}) should be equal to its width ({value.width!r})."
+                        f" Its height ({value.height!r}) should be"
+                        f" equal to its width ({value.width!r})."
                     )
                     raise ValueError(msg)
 

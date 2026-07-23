@@ -1,10 +1,12 @@
+from typing import Self
+
 from ..color import Color
 
 
 class Region:
     """A class representing a colored region on a Queens board game."""
 
-    def __init__(self, squares:set[tuple[int, int]], color:str|None=None):
+    def __init__(self, squares:set[tuple[int, int]], color:str|None=None) -> Self:
         self.squares = squares
         self.__color = Color(color)
 
@@ -25,14 +27,14 @@ class Region:
         return len(self.squares)
 
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Self) -> bool:
         if not isinstance(other, Region):
             return False
         
         return self.squares == other.squares
 
 
-    def __ne__(self, other) -> bool:
+    def __ne__(self, other: Self) -> bool:
         return not self.__eq__(other)
 
 
@@ -53,17 +55,29 @@ class Region:
             raise TypeError(msg)
         
         if len(value) < 1:
-            msg = f"The set of squares must contain at least one square. Got {value!r} instead."
+            msg = f"The set of squares cannot be empty. Got {value!r} instead."
             raise ValueError(msg)
         
-        invalid_squares = {square for square in value if not isinstance(square, tuple) or len(square) != 2}
+        invalid_squares = {
+            square for square in value 
+            if not isinstance(square, tuple) or len(square) != 2
+        }
         if invalid_squares:
-            msg = f"Each square must be a tuple of length 2. Got the following set of invalid squares: {invalid_squares!r}."
+            msg = (
+                "Each square must be a tuple of length 2."
+                f" Invalid squares: {invalid_squares!r}."
+            )
             raise ValueError(msg)
         
-        invalid_squares = {square for square in value if any(not isinstance(coord, int) or coord < 1 for coord in square)}
+        invalid_squares = {
+            square for square in value
+            if any(not isinstance(coord, int) or coord < 1 for coord in square)
+        }
         if invalid_squares:
-            msg = f"Each coordinate in the squares must be an positive integer. Got the following set of invalid squares: {invalid_squares!r}."
+            msg = (
+                "Each coordinate in the squares must be an positive integer."
+                f" Invalid squares: {invalid_squares!r}."
+            )
             raise ValueError(msg)
 
         self._squares = value

@@ -1,5 +1,5 @@
 from linkedin_games import Patches
-from linkedin_games.patches import SeedSquare, Rectangle
+from linkedin_games.patches import Rectangle, SeedSquare
 
 
 def test_patches_16():

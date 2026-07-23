@@ -1,4 +1,5 @@
 from pprint import pprint
+from typing import Self
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -8,15 +9,17 @@ from ..game_board import GameBoard
 
 
 class Sudoku(GameBoard):
-    """General Sudoku game."""
+    """A general Sudoku game."""
     
-    def __init__(self, size: int, block_dims: tuple[int, int], filled_squares: dict[tuple[int, int]: int]) -> None:
+    def __init__(self,
+            size: int, block_dims: tuple[int, int],
+            filled_squares: dict[tuple[int, int], int]) -> Self:
         super().__init__((size, size)) # Always a square board.
         self.block_dims = block_dims
         self.filled_squares = filled_squares
 
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.size, self.block_dims, self.filled_squares))
 
 
@@ -48,27 +51,29 @@ class Sudoku(GameBoard):
         
         p, q = value
         if p * q < 2:
-            msg = f"The grid blocks is too small for the game! Got block dimensions of {value!r}."
+            msg = (
+                "The grid blocks is too small for the game."
+                f" Got block dimensions of {value!r}."
+            )
             raise ValueError(msg)
         
         elif p * q != self.size:
-            msg = f"The dimensions of grid blocks must match with the sudoku's size of {self.size}."
+            msg = (
+                "The dimensions of grid blocks must match"
+                f"with the sudoku's size of {self.size}."
+            )
             raise ValueError(msg)
-
-        if not isinstance(value, tuple):
-            print((
-                "WARNING: in order to avoid unexpected behaviours, block dimensions should be a tuple."
-                f"Got a {type(value).__name__} instead."
-            ))
-            value = tuple(value)
         
-        self._block_dims = value
+        self._block_dims = tuple(value)
         self._stale = True
 
 
     @property
     def filled_squares(self) -> dict[tuple[int, int]: int]:
-        """Returns the filled squares in the Sudoku board as a dictionary mapping (i,j) coordinates to their respective numbers."""
+        """
+        Return the filled squares in the Sudoku board as a dictionary mapping (i,j)
+        coordinates to their respective numbers.
+        """
         return self._filled_squares
     
     @filled_squares.setter
@@ -76,24 +81,22 @@ class Sudoku(GameBoard):
 
         if len(values) > len(self):
             msg = (
-                "The number of filled squares exceeds the amount of board squares! "
-                f"Got {len(values)} filled squares, while the game board has {len(self)} squares."
+                "The number of filled squares exceeds the amount of board squares."
+                f" Got {len(values)} squares, but the board has {len(self)} squares."
             )
             raise ValueError(msg)
         
         if len(values) < 2:
             msg = (
-                "The quantity of filled squares is too small for the game! "
-                f"Got a total of {len(values)} filled squares."
+                "The quantity of filled squares is too small for the game."
+                f" Got a total of {len(values)} filled squares."
             )
             raise ValueError(msg)
 
         if isinstance(values, (list, tuple)):
-            print((
-                "WARNING: The filled squares should be a dictionary mapping (i,j) coordinates to their respective numbers. "
-                f"Got a {type(values).__name__} instead."
-            ))
-            self._filled_squares = {square: index for index, square in enumerate(values)}
+            self._filled_squares = {
+                square: index for index, square in enumerate(values)
+            }
 
         elif not isinstance(values, dict):
             msg = "The filled squares must be a dictionary."
@@ -175,7 +178,7 @@ class Sudoku(GameBoard):
                 for i in self.model.I 
                 for j in self.model.J
                 for k in self.model.K
-                if pyo.value(self.model.x[i, j, k]) == 1
+                if int(pyo.value(self.model.x[i, j, k])) == 1
             }
         )
         
@@ -211,12 +214,12 @@ class Sudoku(GameBoard):
 class MiniSudoku(Sudoku):
     """A 6x6 Sudoku game with 2x3 grid blocks."""
 
-    def __init__(self, filled_squares: dict[tuple[int, int]: int]) -> None:
+    def __init__(self, filled_squares: dict[tuple[int, int]: int]) -> Self:
         super().__init__(size=6, block_dims=(2,3), filled_squares=filled_squares)
 
 
 class ClassicSudoku(Sudoku):
     """A 9x9 Sudoku game with 3x3 grid blocks."""
 
-    def __init__(self, filled_squares: dict[tuple[int, int]: int]) -> None:
+    def __init__(self, filled_squares: dict[tuple[int, int]: int]) -> Self:
         super().__init__(size=9, block_dims=(3,3), filled_squares=filled_squares)

@@ -4,14 +4,10 @@ from ..color import Color
 
 
 class Rectangle:
-    """A Patches rectangle defined by its left, top, width, and height.
+    """A Patches rectangle, used as part of the game's solution."""
 
-    PARAMETERS
-    ----------
-
-    """
-
-    def __init__(self, top_left_square:tuple[int, int], dims:tuple[int, int], color:str|None=None):
+    def __init__(self, top_left_square:tuple[int, int], 
+            dims:tuple[int, int], color:str|None=None) -> Self:
         self.top_left_square = top_left_square
         self.dims = dims
         self.__color = Color(color)
@@ -63,7 +59,7 @@ class Rectangle:
         )
 
 
-    def __ne__(self, other) -> bool:
+    def __ne__(self, other:Self) -> bool:
         return not self.__eq__(other)
 
 
@@ -72,7 +68,7 @@ class Rectangle:
         return (self._width, self._height)
     
     @dims.setter
-    def dims(self, value:tuple[int, int])-> None:
+    def dims(self, value:tuple[int, int]) -> None:
         self.width = value[0]
         self.height = value[1]
 
@@ -82,7 +78,7 @@ class Rectangle:
         return (self._top, self._left)
     
     @top_left_square.setter
-    def top_left_square(self, value:tuple[int, int])-> None:
+    def top_left_square(self, value:tuple[int, int]) -> None:
         self.top = value[0]
         self.left = value[1]
 
@@ -115,11 +111,17 @@ class Rectangle:
     def left(self, value:int) -> None:
 
         if not isinstance(value, int):
-            msg = f"The leftmost column's position must be an integer. Got {value!r} instead."
+            msg = (
+                "The leftmost column's position must be an integer."
+                f" Got {value!r} instead."
+            )
             raise TypeError(msg)
         
         if value < 1:
-            msg = f"The leftmost column's position must be positive. Got {value!r} instead."
+            msg = (
+                "The leftmost column's position must be positive."
+                f" Got {value!r} instead."
+            )
             raise ValueError(msg)
         
         self._left = value
@@ -131,7 +133,7 @@ class Rectangle:
         return self._width
 
     @width.setter
-    def width(self, value: int) -> None:
+    def width(self, value:int) -> None:
 
         if not isinstance(value, int):
             msg = f"The width must be an integer. Got {value!r}"
@@ -158,8 +160,8 @@ class Rectangle:
         return self._height
 
     @height.setter
-    def height(self, value: int) -> None:
-        
+    def height(self, value:int) -> None:
+
         if not isinstance(value, int):
             msg = f"The height must be an integer. Got {value!r} instead."
             raise TypeError(msg)
@@ -182,7 +184,6 @@ class Rectangle:
     @property
     def squares(self) -> tuple[tuple[int, int]]:
         """The squares occupied by the rectangle."""
-
         return tuple(
             (i, j)
             for i in range(self.top, self.top + self.height)

@@ -1,4 +1,5 @@
 from pprint import pprint
+from typing import Self
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -9,19 +10,25 @@ from ..game_board import GameBoard
 
 class Zip(GameBoard):
 
-    def __init__(self, board_dims: tuple[int, int], numbered_squares: dict[tuple[int, int]: int], walls: tuple[tuple[int, int]]|None = None):
+    def __init__(self,
+            board_dims: tuple[int, int], numbered_squares: dict[tuple[int, int]: int],
+            walls: tuple[tuple[int, int]]|None = None) -> Self:
         super().__init__(board_dims)
         self.numbered_squares = numbered_squares
         self.walls = walls
 
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self._board_dims, self._numbered_squares, self._walls))
 
 
     @property
     def numbered_squares(self) -> dict[tuple[int, int]: int]:
-        """Returns the dictionary of numbered squares on the game board, where the keys are (row, column) coordinates and the values are the corresponding numbers assigned to those squares."""
+        """
+        Return the numbered squares on the Zip board,
+        where the keys are (row, column) coordinates
+        and the values are the corresponding numbers assigned to those squares.
+        """
         return self._numbered_squares
     
     @numbered_squares.setter
@@ -29,29 +36,25 @@ class Zip(GameBoard):
 
         if len(values) > len(self):
             msg = (
-                "The number of numbered squares exceeds the amount of board squares! "
-                f"Got {len(values)} numbered squares, while the game board has {len(self)} squares."
+                "The number of numbered squares exceeds the amount of board squares."
+                f" Got {len(values)} squares, while the board has {len(self)} squares."
             )
             raise ValueError(msg)
         
         if len(values) < 2:
             msg = (
-                "The quantity of numbered squares is too small for the game! "
-                f"Got a total of {len(values)} numbered squares."
+                "The quantity of numbered squares is too small for the game."
+                f" Got a total of {len(values)} numbered squares."
             )
             raise ValueError(msg)
 
         if isinstance(values, (list, tuple)):
-            print((
-                "WARNING: The numbered squares should be a dictionary mapping (i,j) coordinates to their respective numbers. "
-                f"Got a {type(values).__name__} instead."
-            ))
-            self._numbered_squares = {square: index for index, square in enumerate(values)}
-
+            self._numbered_squares = {
+                square: index for index, square in enumerate(values)
+            }
         elif not isinstance(values, dict):
             msg = "The numbered squares must be a dictionary."
             raise ValueError(msg)
-        
         else:
             self._numbered_squares = values
 
@@ -75,26 +78,24 @@ class Zip(GameBoard):
 
         if len(values) > len(self.board.edges) / 2:
             msg = (
-                "The number of walls exceeds the amount of board edges! "
-                f"Got {len(values)} numbered squares, while the game board has {len(self.board.edges) / 2} squares."
+                "The number of walls exceeds the amount of board edges."
+                f" Got {len(values)} numbered squares,"
+                f" but the board has {len(self.board.edges) / 2} squares."
             )
             raise ValueError(msg)
 
         if isinstance(values, list):
-            print((
-                "WARNING: The walls should be a tuple of squares. "
-                f"Got a {type(values).__name__} instead."
-            ))
             self._walls = tuple(values)
-
         elif not isinstance(values, tuple):
             msg = "Walls must be a tuple of squares."
             raise ValueError(msg)
-        
         else:
             self._walls = values
 
-        invalid_items = [pair for pair in values if super()._manhattan_distance(*pair) != 1]
+        invalid_items = [
+            pair for pair in values
+            if super()._manhattan_distance(*pair) != 1
+        ]
         if invalid_items:
             msg = (
                 "Squares in a pair must be consecutive ones. "
@@ -107,12 +108,11 @@ class Zip(GameBoard):
 
     @property
     def path(self) -> list[tuple[int, int]]:
-        """Returns the path that solves the game, as a list of (row, column) coordinates."""
+        """Return the path that solves the Zip game."""
         return [(i+1, j+1) for (i, j) in self._path]
 
 
     def _construct_model(self) -> None:
-
         model = self.model
 
         # RANGE SETS
@@ -121,13 +121,16 @@ class Zip(GameBoard):
 
         # COMPOSITE SETS
         S = model.S # Board Squares
-        E = model.E = pyo.Set(initialize=lambda model: [
-            ((i, j), (i+1, j)) for i in I for j in J if i+1 in I] + [
-            ((i, j), (i-1, j)) for i in I for j in J if i-1 in I] + [
-            ((i, j), (i, j+1)) for i in I for j in J if j+1 in J] + [
-            ((i, j), (i, j-1)) for i in I for j in J if j-1 in J]
-        ) # Edges
-        K = model.K = pyo.Set(initialize=self.numbered_squares.keys(), dimen=2)
+        E = model.E = pyo.Set(initialize=lambda model: # Edges
+            [((i, j), (i+1, j)) for i in I for j in J if i+1 in I] +
+            [((i, j), (i-1, j)) for i in I for j in J if i-1 in I] +
+            [((i, j), (i, j+1)) for i in I for j in J if j+1 in J] +
+            [((i, j), (i, j-1)) for i in I for j in J if j-1 in J]
+        )
+        K = model.K = pyo.Set( # Numbered Squares
+            initialize=self.numbered_squares.keys(),
+            dimen=2
+        )
         W = model.W = pyo.Set(initialize=self.walls) # Walls
         
         # DECISION VARIABLES
@@ -135,7 +138,10 @@ class Zip(GameBoard):
         u = model.u = pyo.Var(S, within=pyo.NonNegativeReals)
 
         # PARAMETERS
-        k = model.k = pyo.Param(S, initialize=self.numbered_squares, default=0, within=pyo.NonNegativeIntegers)
+        k = model.k = pyo.Param(
+            S,
+            initialize=self.numbered_squares, default=0, within=pyo.NonNegativeIntegers
+        )
 
         # OBJECTIVE FUNCTION
         model.obj = pyo.Objective(expr=0) # feasibility problem
@@ -143,16 +149,15 @@ class Zip(GameBoard):
         # CONSTRAINTS
         model.outgoing_edges_constraints = pyo.Constraint(
             S,
-            rule=lambda model, i, j: \
-                sum(x[(i,j),w] for w in S if ((i,j),w) in E) == 1 if k[i,j] != len(K) else \
-                sum(x[(i,j),w] for w in S if ((i,j),w) in E) == 0
+            rule=lambda model, i, j:
+                sum(x[(i,j),w] for w in S if ((i,j),w) in E) == 1 if k[i,j] != len(K)
+                else sum(x[(i,j),w] for w in S if ((i,j),w) in E) == 0
         )
-        
         model.incoming_edges_constraints = pyo.Constraint(
             S,
-            rule=lambda model, i, j: \
-                sum(x[s,(i,j)] for s in S if (s,(i,j)) in E) == 1 if k[i,j] != 1 else \
-                sum(x[s,(i,j)] for s in S if (s,(i,j)) in E) == 0
+            rule=lambda model, i, j:
+                sum(x[s,(i,j)] for s in S if (s,(i,j)) in E) == 1 if k[i,j] != 1
+                else sum(x[s,(i,j)] for s in S if (s,(i,j)) in E) == 0
         )
     
         if W is not None:
@@ -166,20 +171,20 @@ class Zip(GameBoard):
             E,
             rule=lambda model, i, j, r, s: u[r,s] >= u[i,j] + 1 - M*(1 - x[i,j,r,s])
         )
-        
         model.first_square_position_constraint = pyo.Constraint(
             K,
-            rule= lambda model, i, j: u[i,j] == 1 if k[i,j] == 1 else pyo.Constraint.Skip
+            rule= lambda model, i, j:
+                u[i,j] == 1 if k[i,j] == 1 else pyo.Constraint.Skip
         )
-        
         model.ordinal_position_constraints = pyo.Constraint(
             K, K,
-            rule= lambda model, i, j, r, s: u[i,j] >= u[r,s] + 1 if k[i,j] == k[r,s] + 1 else pyo.Constraint.Skip
+            rule= lambda model, i, j, r, s:
+                u[i,j] >= u[r,s] + 1 if k[i,j] == k[r,s] + 1 else pyo.Constraint.Skip
         )
-        
         model.last_square_position_constraint = pyo.Constraint(
             K,
-            rule= lambda model, i, j: u[i,j] == M if k[i,j] == len(K) else pyo.Constraint.Skip
+            rule= lambda model, i, j:
+                u[i,j] == M if k[i,j] == len(K) else pyo.Constraint.Skip
         )
 
 
@@ -212,11 +217,8 @@ class Zip(GameBoard):
 
 
     def _show(self) -> None:
-
         plt.figure(figsize=(3.4, 3.4))
-
         path_color:str="#EE5F12"
-        
         nx.draw(
             self.board,
             pos= {(i,j): (j,-i) for i, j in self.board.nodes()},
@@ -234,10 +236,8 @@ class Zip(GameBoard):
             linewidths= 3,
             width= 35,
             edgelist= [
-                ((i-1, j-1), (r-1, s-1)) 
-                for i,j,r,s in self.model.E
-                if int(pyo.value(self.model.x[i,j,r,s])) == 1
+                ((i-1, j-1), (r-1, s-1)) for i,j,r,s in self.model.E
+                if round(pyo.value(self.model.x[i,j,r,s])) == 1
             ]
         )
-
         plt.show()

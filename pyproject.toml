@@ -15,7 +15,7 @@ keywords = [
     "Optimization",
     "Linear Optimization"
 ]
-authors = [{ name = "Rodrigo Celso de Lima Porto", email = "rodrigo.cl.porto@gmail.com" }]
+authors = [{ name = "Rodrigo C. L. Porto", email = "rodrigo.cl.porto@gmail.com" }]
 readme = "README.md"
 license = { file = "LICENSE.md" }
 classifiers = [
@@ -26,7 +26,6 @@ classifiers = [
 ]
 requires-python = ">=3.13"
 dependencies = [
-    "gurobipy>=13.0.1",
     "highspy>=1.14.0",
     "matplotlib>=3.10.8",
     "networkx>=3.6.1",
@@ -44,6 +43,7 @@ dev = [
     "jupyter-book>=2.1.4",
     "jupyterlab>=4.5.6",
     "jupyterlab-myst>=2.6.0",
+    "mkdocs>=1.6.1",
     "poethepoet>=0.48.0",
     "pytest>=9.1.1",
     "ruff>=0.15.22",
@@ -59,11 +59,12 @@ package-dir = {"" = "src"}
 packages = ["linkedin_games"]
 
 [tool.ruff]
-line-length = 79
+line-length = 88
 
 [tool.ruff.lint]
 exclude = ["*.ipynb"]
-ignore = ["E741"] # Ambiguous variable name
+select = ["E", "F", "I", "UP"]
+ignore = ["E741"]
 
 
 [tool.poe.tasks]
@@ -76,12 +77,16 @@ setup = [
     { cmd = "uv sync" }
 ]
 
-book-serve = { cmd = "jupyter-book start", cwd = "book", env = { NODE_TLS_REJECT_UNAUTHORIZED = "0" } }
+serve-book = { cmd = "jupyter-book start", cwd = "book", env = { NODE_TLS_REJECT_UNAUTHORIZED = "0" } }
 
-build = { cmd = "jupyter-book build --html", cwd = "book", env = { NODE_TLS_REJECT_UNAUTHORIZED = "0" } }
+build-book = { cmd = "jupyter-book build --html", cwd = "book", env = { NODE_TLS_REJECT_UNAUTHORIZED = "0" } }
 
 deploy = { cmd = "jupyter-book init --gh-pages", cwd = "book" }
 
 test = "pytest tests --maxfail=1"
 
 lint = "ruff check"
+
+# serve-docs= ""
+
+# dist = ""

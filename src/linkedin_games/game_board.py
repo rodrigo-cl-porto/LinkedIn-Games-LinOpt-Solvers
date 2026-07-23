@@ -1,12 +1,14 @@
 from abc import ABC, abstractmethod
-from pyomo.opt import SolverStatus, TerminationCondition
+from typing import Self
+
 import networkx as nx
 import pyomo.environ as pyo
+from pyomo.opt import SolverStatus, TerminationCondition
 
 
 class GameBoard(ABC): # Abstract Base Class
 
-    def __init__(self, board_dims:tuple[int, int]) -> None:
+    def __init__(self, board_dims:tuple[int, int]) -> Self:
         self.board_dims = board_dims
         GameBoard._build_board(self)
         self._model: pyo.ConcreteModel | None = None
@@ -56,17 +58,13 @@ class GameBoard(ABC): # Abstract Base Class
         
         m, n = value
         if m * n < 2:
-            msg = f"The board is too small for the game! Got board dimensions of {value!r}."
+            msg = (
+                "The board is too small for the game!"
+                f" Got board dimensions of {value!r}."
+            )
             raise ValueError(msg)
-
-        if not isinstance(value, tuple):
-            print((
-                "WARNING: in order to avoid unexpected behaviours, board dimensions should be a tuple."
-                f"Got a {type(value).__name__} instead."
-            ))
-            value = tuple(value)
         
-        self._board_dims = value
+        self._board_dims = tuple(value)
         self._stale = True
 
 
@@ -85,25 +83,28 @@ class GameBoard(ABC): # Abstract Base Class
 
     @property
     def board_squares(self) -> dict[tuple[int, int]: int]:
-        """A dictionary of the board squares and their values."""
-        return {(i+1, j+1): data["value"] for (i, j), data in self.board.nodes(data=True)}
+        """Return the board squares."""
+        return {
+            (i+1, j+1): data["value"]
+            for (i, j), data in self.board.nodes(data=True)
+        }
     
     @property
     def board_edges(self) -> dict[tuple[tuple[int, int], tuple[int, int]]: int]:
-        """A dictionary of the board edges and their values."""
+        """Return the board edges and their values."""
         edges = nx.get_edge_attributes(self.board, "value").items()
         return {((i+1, j+1), (r+1, s+1)): value for ((i, j), (r, s)), value in edges}
 
 
     @property
     def model(self) -> pyo.ConcreteModel | None:
-        """A Pyomo ConcreteModel representing the Linear Optimization Problem for the game."""
+        """Return the linear optimization model of the game's problem."""
         return self._model
 
 
     @property
     def _stale(self) -> bool:
-        """A boolean indicating whether the model is stale and needs to be rebuilt."""
+        """Return True if the model is stale and needs to be rebuilt."""
         return self.__stale
     
     @_stale.setter
@@ -116,13 +117,12 @@ class GameBoard(ABC): # Abstract Base Class
     
     @property
     def is_solved(self) -> bool:
-        """A boolean indicating whether the game has been solved."""
+        """Return a logical value indicating whether the game has been solved."""
         return self.__is_solved
 
 
     def _build_model(self) -> None:
-        """Builds the Pyomo model for the game board."""
-        
+        """Build the linear optimization model for the game board."""
         model = pyo.ConcreteModel()
 
         # BOARD DIMENSIONS
@@ -135,7 +135,9 @@ class GameBoard(ABC): # Abstract Base Class
         J = model.J = pyo.RangeSet(m) # Columns
 
         # COMPOSITE SETS
-        model.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Board Squares
+        model.S = pyo.Set( # Board Squares
+            initialize=lambda model: [(i, j) for i in I for j in J]
+        )
         
         # Attach model
         self._model = model
@@ -144,11 +146,11 @@ class GameBoard(ABC): # Abstract Base Class
 
     @abstractmethod
     def _construct_model(self) -> None:
-        """Constructs the Pyomo model for the game board."""
+        """Construct the linear optimization model for the game."""
         pass
     
     
-    def solve(self, solver:str="gurobi", verbose:bool=False) -> pyo.ConcreteModel:
+    def solve(self, solver:str="highs", verbose:bool=False) -> pyo.ConcreteModel:
         """Solves the game board using the specified solver."""
         
         if self._stale or self.model is None:
@@ -157,10 +159,13 @@ class GameBoard(ABC): # Abstract Base Class
         result = pyo.SolverFactory(solver).solve(self.model)
 
         self.__is_solved = (
-            result.Solver.status == SolverStatus.ok # Checks if solver is finished with normal termination.
-            and (
-                result.Solver.termination_condition == TerminationCondition.optimal # Checks if solver is finished with an optimal solution...
-                or result.Solver.termination_condition == TerminationCondition.feasible # ... or with a feasible one.
+            # Checks if solver is finished with normal termination.
+            result.Solver.status == SolverStatus.ok
+            and(
+                # Checks if solver is finished with an optimal solution...
+                result.Solver.termination_condition == TerminationCondition.optimal
+                # ... or with a feasible one.
+                or result.Solver.termination_condition == TerminationCondition.feasible 
             )
         )
 
@@ -174,13 +179,12 @@ class GameBoard(ABC): # Abstract Base Class
 
     @abstractmethod
     def _set_solution(self, verbose:bool) -> None:
-        """Sets the solution of the game board."""
+        """Set the solution of the game board."""
         pass
 
 
     def show(self) -> None:
-        """Displays the game board."""
-
+        """Display the game board."""
         if self._stale or self._model is None:
             self._build_model()
 
@@ -188,5 +192,5 @@ class GameBoard(ABC): # Abstract Base Class
 
     @abstractmethod
     def _show(self) -> None:
-        """Displays the game board."""
+        """Display the game board."""
         pass
