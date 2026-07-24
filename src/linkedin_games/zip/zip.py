@@ -9,7 +9,24 @@ from ..game_board import GameBoard
 
 
 class Zip(GameBoard):
+    """
+    LikedIn Zip game
 
+    Args:
+        board_dims (tuple[int, int]): Dimensions of the Zip board as a tuple (rows, columns).
+        numbered_squares (dict[tuple[int, int], int]): A dictionary where the keys are
+            tuples representing the coordinates of the numbered squares on the board,
+            and the values are the corresponding numbers assigned to those squares.
+        walls (tuple[tuple[int, int]]|None): Walls on the Zip board.
+            Each pair consists of coordinates of adjacent squares
+            that are separated by a wall. If no walls are present, this
+            argument can be set to None.
+    
+    Raises:
+        ValueError: If the number of numbered squares exceeds the total number of squares
+            on the board, or if the number of walls exceeds the total number of edges on
+            the board, or if any pair of squares in walls are not adjacent.
+    """
     def __init__(self,
             board_dims: tuple[int, int], numbered_squares: dict[tuple[int, int]: int],
             walls: tuple[tuple[int, int]]|None = None) -> Self:
@@ -22,6 +39,10 @@ class Zip(GameBoard):
         return hash((self._board_dims, self._numbered_squares, self._walls))
 
 
+    def number_of_edges(self) -> int:
+        """Total number of edges on game board."""
+        return len(self.board.number_of_edges()) / 2
+
     @property
     def numbered_squares(self) -> dict[tuple[int, int]: int]:
         """
@@ -33,7 +54,6 @@ class Zip(GameBoard):
     
     @numbered_squares.setter
     def numbered_squares(self, values:dict[tuple[int, int]: int]) -> None:
-
         if len(values) > len(self):
             msg = (
                 "The number of numbered squares exceeds the amount of board squares."
@@ -70,17 +90,17 @@ class Zip(GameBoard):
     
     @walls.setter
     def walls(self, values:tuple[tuple[int, int], tuple[int, int]] = None) -> None:
-
         if values is None:
             self._walls = None
             self._stale = True
             return None
 
-        if len(values) > len(self.board.edges) / 2:
+
+        if len(values) > self.number_of_edges:
             msg = (
                 "The number of walls exceeds the amount of board edges."
                 f" Got {len(values)} numbered squares,"
-                f" but the board has {len(self.board.edges) / 2} squares."
+                f" but the board has {self.number_of_edges} squares."
             )
             raise ValueError(msg)
 
@@ -128,8 +148,7 @@ class Zip(GameBoard):
             [((i, j), (i, j-1)) for i in I for j in J if j-1 in J]
         )
         K = model.K = pyo.Set( # Numbered Squares
-            initialize=self.numbered_squares.keys(),
-            dimen=2
+            initialize=self.numbered_squares.keys(), dimen=2
         )
         W = model.W = pyo.Set(initialize=self.walls) # Walls
         
@@ -140,7 +159,7 @@ class Zip(GameBoard):
         # PARAMETERS
         k = model.k = pyo.Param(
             S,
-            initialize=self.numbered_squares, default=0, within=pyo.NonNegativeIntegers
+            initialize=self.numbered_squares, within=pyo.NonNegativeIntegers, default=0
         )
 
         # OBJECTIVE FUNCTION
@@ -148,48 +167,38 @@ class Zip(GameBoard):
     
         # CONSTRAINTS
         model.outgoing_edges_constraints = pyo.Constraint(
-            S,
-            rule=lambda model, i, j:
+            S, rule=lambda model, i, j:
                 sum(x[(i,j),w] for w in S if ((i,j),w) in E) == 1 if k[i,j] != len(K)
                 else sum(x[(i,j),w] for w in S if ((i,j),w) in E) == 0
         )
         model.incoming_edges_constraints = pyo.Constraint(
-            S,
-            rule=lambda model, i, j:
+            S, rule=lambda model, i, j:
                 sum(x[s,(i,j)] for s in S if (s,(i,j)) in E) == 1 if k[i,j] != 1
                 else sum(x[s,(i,j)] for s in S if (s,(i,j)) in E) == 0
         )
-    
-        if W is not None:
-            model.wall_constraints = pyo.Constraint(
-                W,
-                rule=lambda model, i, j, r, s: x[i,j,r,s] + x[r,s,i,j] == 0
-            )
-
+        model.wall_constraints = pyo.Constraint(
+            W, rule=lambda model, i, j, r, s: x[i,j,r,s] + x[r,s,i,j] == 0
+        )
         M = len(self)
         model.subroute_elimination_constraints = pyo.Constraint(
-            E,
-            rule=lambda model, i, j, r, s: u[r,s] >= u[i,j] + 1 - M*(1 - x[i,j,r,s])
+            E, rule=lambda model, i, j, r, s:
+                u[r, s] >= u[i, j] + 1 - M * (1 - x[i, j, r, s])
         )
         model.first_square_position_constraint = pyo.Constraint(
-            K,
-            rule= lambda model, i, j:
+            K, rule= lambda model, i, j:
                 u[i,j] == 1 if k[i,j] == 1 else pyo.Constraint.Skip
         )
         model.ordinal_position_constraints = pyo.Constraint(
-            K, K,
-            rule= lambda model, i, j, r, s:
+            K, K, rule= lambda model, i, j, r, s:
                 u[i,j] >= u[r,s] + 1 if k[i,j] == k[r,s] + 1 else pyo.Constraint.Skip
         )
         model.last_square_position_constraint = pyo.Constraint(
-            K,
-            rule= lambda model, i, j:
+            K, rule= lambda model, i, j:
                 u[i,j] == M if k[i,j] == len(K) else pyo.Constraint.Skip
         )
 
 
     def _set_solution(self, verbose:bool=False) -> None:
-
         nx.set_node_attributes(
             self.board,
             name="value",
@@ -198,7 +207,6 @@ class Zip(GameBoard):
                 for i, j in self.model.S
             }
         )
-
         nx.set_edge_attributes(
             self.board,
             name="value",
@@ -207,10 +215,8 @@ class Zip(GameBoard):
                 for i, j, r, s in self.model.E
             }
         )
-
         path = nx.get_node_attributes(self.board, "value")
         self._path = sorted(path.keys(), key=path.get)
-
         if verbose:
             print("This is the path that solves the games:")
             pprint(self.path)

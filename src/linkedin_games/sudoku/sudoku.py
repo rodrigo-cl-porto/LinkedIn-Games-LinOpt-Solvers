@@ -97,11 +97,9 @@ class Sudoku(GameBoard):
             self._filled_squares = {
                 square: index for index, square in enumerate(values)
             }
-
         elif not isinstance(values, dict):
             msg = "The filled squares must be a dictionary."
             raise ValueError(msg)
-        
         else:
             self._filled_squares = values
 
@@ -142,28 +140,20 @@ class Sudoku(GameBoard):
         
         # CONSTRAINTS
         model.unique_digits_per_row_constraints = pyo.Constraint(
-            J, K,
-            rule=lambda model, j, k: sum(x[i,j,k] for i in I) == 1
+            J, K, rule=lambda model, j, k: sum(x[i, j, k] for i in I) == 1
         )
-
         model.unique_digits_per_column_constraints = pyo.Constraint(
-            I, K,
-            rule=lambda model, i, k: sum(x[i,j,k] for j in J) == 1
+            I, K, rule=lambda model, i, k: sum(x[i, j, k] for j in J) == 1
         )
-
         model.unique_digits_per_block_constraints = pyo.Constraint(
             V, U, K,
-            rule=lambda model, v, u, k: sum(x[i,j,k] for (i, j) in B[v,u]) == 1
+            rule=lambda model, v, u, k: sum(x[i, j, k] for (i, j) in B[v, u]) == 1
         )
-
         model.single_digit_per_square_constraints = pyo.Constraint(
-            I, J,
-            rule=lambda model, i, j: sum(x[i,j,k] for k in K) == 1
+            I, J, rule=lambda model, i, j: sum(x[i, j, k] for k in K) == 1
         )
-
         model.alreadey_filled_squares_constraints = pyo.Constraint(
-            F,
-            rule=lambda model, i, j, k: x[i,j,k] == 1
+            F, rule=lambda model, i, j, k: x[i, j, k] == 1
         )
 
 
@@ -188,9 +178,7 @@ class Sudoku(GameBoard):
 
 
     def _show(self) -> None:
-
         plt.figure(figsize=(3, 3))
-
         nx.draw(
             self.board,
             pos= {(i, j): (j, -i) for (i, j) in self.board.nodes()},
@@ -207,19 +195,16 @@ class Sudoku(GameBoard):
             edgecolors="#999999",
             linewidths= .5,
         )
-
         plt.show()
 
 
 class MiniSudoku(Sudoku):
     """A 6x6 Sudoku game with 2x3 grid blocks."""
-
     def __init__(self, filled_squares: dict[tuple[int, int]: int]) -> Self:
         super().__init__(size=6, block_dims=(2,3), filled_squares=filled_squares)
 
 
 class ClassicSudoku(Sudoku):
     """A 9x9 Sudoku game with 3x3 grid blocks."""
-
     def __init__(self, filled_squares: dict[tuple[int, int]: int]) -> Self:
         super().__init__(size=9, block_dims=(3,3), filled_squares=filled_squares)

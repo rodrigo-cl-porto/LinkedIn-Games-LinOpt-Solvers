@@ -10,7 +10,24 @@ from .region import Region
 
 
 class Queens(GameBoard):
-    """A Queens is board game with colored regions"""
+    """A Queens is board game with colored regions
+    
+    Attributes:
+        board (nx.Graph): The board of the game.
+        board_dims (tuple[int, int]): The dimensions of the board as (rows, columns).
+        board_edges (set[tuple[tuple[int, int], tuple[int, int]]]): The set of all edges on the board.
+        board_squares (set[tuple[int, int]]): The set of all squares on the board.
+        regions (set[Region]): The set of colored regions on the board.
+        crowns (tuple[tuple[int, int]]): The crowned squares of the game.
+        is_solved (bool): Whether the game has been solved or not.
+        model (pyo.ConcreteModel): The linear optimization model for the game.
+        regions (set[Region]): The set of colored regions on the board.
+    
+    Methods:
+        _construct_model (None): Construct the linear optimization model for the game.
+        show (None): Show the game board with the solution.
+        solve (None): Solve the game using linear optimization.
+    """
 
     def __init__(self, board_dims: tuple[int, int], regions: set[Region]) -> Self:
         super().__init__(board_dims)
@@ -21,15 +38,17 @@ class Queens(GameBoard):
 
     @property
     def regions(self) -> set[Region]:
-        """
-        Return the set of colored regions on the board.
+        """All colored regions on the board.
+
         It's assumed that the regions are non-overlapping and cover the entire board.
+        
+        Returns:
+            The set of colored regions on the board.
         """
         return self._regions
 
     @regions.setter
     def regions(self, values: set[Region]) -> None:
-
         if not isinstance(values, set):
             msg = "Regions must be a set of Region classes."
             raise TypeError(msg)
@@ -94,10 +113,15 @@ class Queens(GameBoard):
 
     @property
     def crowns(self) -> tuple[tuple[int, int]]:
-        """The solution of the game, i.e. the squares that contain a crown."""
+        """The solution of the game, i.e. the squares that contain a crown.
+        
+        Returns:
+            A sorted tuple of squares that contain a crown.
+        """
         return sorted(tuple((i + 1, j + 1) for (i, j) in self.__crowns.nodes()))
 
     def _construct_model(self):
+        """Construct the linear optimization model for the Queens game."""
         model = self.model
 
         # RANGE SETS
@@ -130,15 +154,12 @@ class Queens(GameBoard):
         model.single_crown_per_row_constraints = pyo.Constraint(
             I, rule=lambda model, i: sum(x[i, j] for j in J) == 1
         )
-
         model.single_crown_per_column_constraints = pyo.Constraint(
             J, rule=lambda model, j: sum(x[i, j] for i in I) == 1
         )
-
         model.single_crown_per_region_constraints = pyo.Constraint(
             K, rule=lambda model, k: sum(x[i, j] for (i, j) in R[k]) == 1
         )
-
         model.adjacent_squares_by_vertex_constraints = pyo.Constraint(
             D, rule=lambda model, i, j, r, s: x[i, j] + x[r, s] <= 1
         )
@@ -165,9 +186,7 @@ class Queens(GameBoard):
             pprint(self.crowns)
 
     def _show(self) -> None:
-
         plt.figure(figsize=(3.4, 3.4))
-
         nx.draw(
             self.board,
             pos={(i, j): (j, -i) for i, j in self.board.nodes()},
@@ -180,5 +199,4 @@ class Queens(GameBoard):
             node_shape="s", # Squared-shape nodes
             width=0
         )
-
         plt.show()

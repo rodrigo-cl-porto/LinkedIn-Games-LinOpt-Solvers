@@ -1,7 +1,7 @@
 [project]
 name = "linkedin-games"
 version = "0.1.3"
-description = "A Python package for solving LinkedIn mini games like Queens, Tango, Zip, Mini Sudoku and Patches using linear optimization models."
+description = "A Python package for solving LinkedIn board games like Queens, Tango, Zip, Mini Sudoku and Patches using linear optimization models."
 keywords = [
     "LinkedIn Games",
     "LinkedIn",
@@ -33,30 +33,31 @@ dependencies = [
 ]
 
 [project.urls]
-"Source Code" = "https://github.com/rodrigo-cl-porto/Solving-LinkedIn-Games-by-Linear-Optimization"
-"Jupyter Book" = "https://rodrigo-cl-porto.github.io/Solving-LinkedIn-Games-by-Linear-Optimization/"
+"Source Code" = "https://github.com/rodrigo-cl-porto/linkedin-games-solvers"
+"Jupyter Book" = "https://rodrigo-cl-porto.github.io/linkedin-games-solvers/"
 "LinkedIn Profile" = "https://www.linkedin.com/in/rodrigo-cl-porto/"
 
 [dependency-groups]
-dev = [
+book = [
     "ipywidgets>=8.1.8",
-    "jupyter-book>=2.1.4",
-    "jupyterlab>=4.5.6",
-    "jupyterlab-myst>=2.6.0",
-    "mkdocs>=1.6.1",
+    "jupyter-book>=2.1.6",
+    "jupyterlab>=4.6.2",
+    "jupyterlab-myst>=2.7.0",
+]
+dev = [
     "poethepoet>=0.48.0",
     "pytest>=9.1.1",
     "ruff>=0.15.22",
 ]
+doc = [
+    "mkdocs-material>=9.7.7",
+    "mkdocstrings-python>=2.0.5",
+]
 
 [build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
+requires = ["uv_build>=0.10.4,<0.11.0"]
+build-backend = "uv_build"
 
-
-[tool.setuptools]
-package-dir = {"" = "src"}
-packages = ["linkedin_games"]
 
 [tool.ruff]
 line-length = 88
@@ -67,26 +68,50 @@ select = ["E", "F", "I", "UP"]
 ignore = ["E741"]
 
 
-[tool.poe.tasks]
+[tool.poe]
+executor = "uv"
+verbosity = -1
 
-clean = "rm -rf .venv"
+[tool.poe.tasks.clean]
+cmd = "rm -rf .venv"
 
-setup = [
-    { cmd = "uv venv --python 3.13" },
-    { cmd = "uv python pin 3.13" },
-    { cmd = "uv sync" }
-]
+[tool.poe.tasks.start]
+cmd = """
+uv venv --python 3.13
+uv python pin 3.13
+uv sync --all-groups --all-extras
+"""
 
-serve-book = { cmd = "jupyter-book start", cwd = "book", env = { NODE_TLS_REJECT_UNAUTHORIZED = "0" } }
+[tool.poe.tasks.restart]
+sequence = ["clean", "start"]
 
-build-book = { cmd = "jupyter-book build --html", cwd = "book", env = { NODE_TLS_REJECT_UNAUTHORIZED = "0" } }
+[tool.poe.tasks.docs]
+cmd = "mkdocs serve --livereload"
 
-deploy = { cmd = "jupyter-book init --gh-pages", cwd = "book" }
+[tool.poe.tasks.serve-book]
+cmd = "jupyter-book start"
+cwd = "book"
+env = { NODE_TLS_REJECT_UNAUTHORIZED = "0" }
 
-test = "pytest tests --maxfail=1"
+[tool.poe.tasks.build-book]
+cmd = "jupyter-book build --html"
+cwd = "book"
+env = { NODE_TLS_REJECT_UNAUTHORIZED = "0" }
 
-lint = "ruff check"
+[tool.poe.tasks.deploy-book]
+cmd = "jupyter-book init --gh-pages"
+cwd = "book"
 
-# serve-docs= ""
+[tool.poe.tasks.test]
+cmd = "pytest tests --maxfail=1"
 
-# dist = ""
+[tool.poe.tasks.lint]
+cmd = "ruff check"
+
+[tool.poe.tasks.publish]
+cmd = """
+    poe test
+    uv build --no-sources
+    uv publish
+"""
+envfile=".env"

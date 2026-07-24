@@ -1,0 +1,41 @@
+site_name: Linkedin Games Solvers
+repo_url: https://github.com/rodrigo-cl-porto/linkedin-games-solvers
+repo_name: linkedin-games-solvers
+edit_uri: tree/main/docs
+
+theme:
+  name: material
+  logo: assets/logo-dark.svg
+  favicon: assets/logo.svg
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue grey
+      accent: amber
+      toggle:
+        icon: material/weather-night
+        name: Dark Mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue grey
+      accent: amber
+      toggle:
+        icon: material/weather-sunny
+        name: Light Mode
+
+markdown_extensions:
+  - attr_list
+
+plugins:
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          inventories:
+            - https://docs.python.org/3/objects.inv
+          options:
+            docstring_style: google
+            inherited_members: true
+            show_source: true
+            show_signature_annotations: false
+            merge_init_into_class: true

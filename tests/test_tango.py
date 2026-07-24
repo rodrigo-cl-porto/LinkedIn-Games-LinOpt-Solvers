@@ -29,7 +29,7 @@ def test_tango():
         (5, 5): 1,
     }
 
-    tango = Tango(matching_pairs, opposite_pairs, filled_squares)
+    tango = Tango(filled_squares, matching_pairs, opposite_pairs)
     tango.solve()
 
     solution = {

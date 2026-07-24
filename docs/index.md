@@ -1,10 +1,10 @@
 <div align="center">
-    <img src="./docs/assets/logo.svg" alt="logo" width="40%">
+    <img src="./assets/logo.svg" alt="logo" width="40%">
 </div>
 
 # 𖣯 LinkedIn Games Solvers 🐍
 
-LinkedIn Games is a Python library that provides a set of tools to solve LinkedIn board games ([Queens][linkedin-queens], [Tango][linkedin-tango], [Zip][linkedin-zip], [Mini Sudoku][linkedin-mini-sudoku] and [Patches][linkedin-patches] for now) by using Linear Optimization models. This library leverages popular Python libraries such as [Pyomo] for mathematical modeling and [NetworkX] for graph-based representations of game boards. 
+LinkedIn Games is a Python library that provides a set of tools to solve LinkedIn board games ([Queens][linkedin-queens], [Tango][linkedin-tango], [Zip][linkedin-zip], [Mini Sudoku][linkedin-mini-sudoku] and [Patches][linkedin-patches] for now) by using Linear Optimization models. This library leverages popular Python libraries such as [Pyomo] for mathematical modeling and [NetworkX] for graph-based representations of game boards.
 
 This repository also contains a Jupyter Book that serves as a comprehensive guide to understanding and solving LinkedIn games using the LinOptIn Games library. The book covers various topics, including the basics of optimization, the model structure of LinkedIn games, and step-by-step tutorials for solving them by using linear optimization.
 
@@ -35,7 +35,7 @@ uv add linkedin-games
 In order to solve this Patches game:
 
 <div align="center">
-    <img src="./docs/assets/patches-121.jpg" alt="Patches No. 121" width="40%">
+    <img src="./assets/patches-121.jpg" alt="Patches No. 121" width="40%">
 </div>
 
 One can run this simple code snippet.
@@ -62,18 +62,18 @@ patches.show()
 Which will return the following result:
 
 <div align="center">
-    <img src="./docs/assets/patches-121-solved.png" alt="Patches No. 121 solved" width="40%">
+    <img src="./assets/patches-121-solved.png" alt="Patches No. 121 solved" width="40%">
 </div>
 
 Which, by its turn, matches the official solution of this game:
 
 <div align="center">
-    <img src="./docs/assets/patches-121-solution.jpg" alt="Solution of Patches No. 121" width="40%">
+    <img src="./assets/patches-121-solution.jpg" alt="Solution of Patches No. 121" width="40%">
 </div>
 
 # 📙 Jupyter Book
 
-You can read the Jupyter Book to know more about the usage and implementation of this library on this 🔗[website].
+You can read the Jupyter Book to know more about the usage and behind-the-scenes implementation of this library on this 🔗[website].
 
 [website]: https://rodrigo-cl-porto.github.io/linkedin-games-solvers/
 

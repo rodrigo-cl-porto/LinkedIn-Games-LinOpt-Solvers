@@ -4,10 +4,30 @@ from ..color import Color
 
 
 class Rectangle:
-    """A Patches rectangle, used as part of the game's solution."""
+    """A Patches rectangle, used as part of the game's solution.
+    
+    Attributes:
+        top_left_square (tuple[int, int]): The position of the rectangle's top-left square.
+        dims (tuple[int, int]): The dimensions of the rectangle as (width, height).
+        top (int): The position of the rectangle's topmost row.
+        left (int): The position of the rectangle's leftmost column.
+        width (int): The width of the rectangle.
+        height (int): The height of the rectangle.
+        color (str|None): The color of the rectangle.
+    """
 
     def __init__(self, top_left_square:tuple[int, int], 
             dims:tuple[int, int], color:str|None=None) -> Self:
+        """_summary_
+
+        Args:
+            top_left_square (tuple[int, int]): _description_
+            dims (tuple[int, int]): _description_
+            color (str | None, optional): _description_. Defaults to None.
+
+        Returns:
+            Self: _description_
+        """
         self.top_left_square = top_left_square
         self.dims = dims
         self.__color = Color(color)
@@ -90,7 +110,6 @@ class Rectangle:
 
     @top.setter
     def top(self, value:int) -> None:
-
         if not isinstance(value, int):
             msg = f"The top row's position must be an integer. Got {value!r} instead."
             raise TypeError(msg)

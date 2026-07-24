@@ -7,14 +7,28 @@ import pyomo.environ as pyo
 
 from ..game_board import GameBoard
 from .rectangle import Rectangle
-from .rectangle_shapes import RectangleShapes
+from .rectangle_shape import RectangleShape
 from .seed_square import SeedSquare
 
 
 class Patches(GameBoard):
-    """A Patches board game with colorful rectangles."""
+    """A Patches board game with colorful rectangles.
 
+    Attributes:
+        board_dims (tuple[int, int]): The dimensions of the board as (rows, columns).
+        seeds (tuple[SeedSquare]): All the seeds of the game.
+
+    Methods:
+        _construct_model (None): Construct the linear optimization model for the Patches game.
+        _set_solution (None): Set the solution of the Patches game.
+        _show (None): Show the Patches game board with rectangles.
+    """
     def __init__(self, board_dims: tuple[int, int], seeds: tuple[SeedSquare]) -> Self:
+        """
+        Args:
+            board_dims (tuple[int, int]): The dimensions of the board as (rows, columns).
+            seeds (tuple[SeedSquare]): The seeds of the game.
+        """
         super().__init__(board_dims)
         self.seeds = seeds
 
@@ -23,12 +37,11 @@ class Patches(GameBoard):
 
     @property
     def seeds(self) -> tuple[SeedSquare]:
-        """All the seeds of the game. Each seed is a SeedSquare object."""
+        """tuple[SeedSquare]: All the seeds of the game."""
         return self._seeds
 
     @seeds.setter
     def seeds(self, values: tuple[SeedSquare]) -> None:
-
         if len(values) < 1:
             msg = "The seeds cannot be empty!"
             raise ValueError(msg)
@@ -49,7 +62,6 @@ class Patches(GameBoard):
         duplicated_squares = [
             square for square in seed_squares if seed_squares.count(square) > 1
         ]
-
         if duplicated_squares:
             msg = (
                 "The seed squares must not overlap each other."
@@ -65,11 +77,10 @@ class Patches(GameBoard):
 
     @property
     def rectangles(self) -> tuple[Rectangle]:
-        """All the rectangles of the game. Each rectangle is a Rectangle object."""
+        """All the rectangles of the Patches game."""
         return tuple(seed.rectangle for seed in self.seeds)
 
     def _construct_model(self) -> None:
-
         model = self.model
 
         # RANGE SETS
@@ -81,54 +92,43 @@ class Patches(GameBoard):
 
         # COMPOSITE SETS
         S = model.S  # Board squares
-        E = model.E = pyo.Set(  # Seed squares
+        E = model.E = pyo.Set( # Seed squares
             initialize=[(*seed.square, seed.color_code) for seed in self.seeds]
         )
-        V = model.V = pyo.Set(
-            initialize=[  # Vertical rectangles
-                seed.color_code
-                for seed in self.seeds
-                if seed.shape == RectangleShapes.VERTICAL
-            ]
-        )
-        H = model.H = pyo.Set(
-            initialize=[  # Horizontal rectangles
-                seed.color_code
-                for seed in self.seeds
-                if seed.shape == RectangleShapes.HORIZONTAL
-            ]
-        )
-        Q = model.Q = pyo.Set(
-            initialize=[  # Squared rectangles
-                seed.color_code
-                for seed in self.seeds
-                if seed.shape == RectangleShapes.SQUARE
-            ]
-        )
-        A = model.A = pyo.Set(
-            initialize=[  # Required areas
-                seed.color_code for seed in self.seeds if seed.area is not None
-            ]
-        )
+        V = model.V = pyo.Set(initialize=[ # Vertical rectangles
+            seed.color_code for seed in self.seeds
+            if seed.shape == RectangleShape.VERTICAL
+        ])
+        H = model.H = pyo.Set(initialize=[ # Horizontal rectangles
+            seed.color_code for seed in self.seeds
+            if seed.shape == RectangleShape.HORIZONTAL
+        ])
+        Q = model.Q = pyo.Set(initialize=[ # Squared rectangles
+            seed.color_code for seed in self.seeds
+            if seed.shape == RectangleShape.SQUARE
+        ])
+        A = model.A = pyo.Set(initialize=[ # Required areas
+            seed.color_code for seed in self.seeds if seed.area is not None
+        ])
 
         # DECISION VARIABLES
         ## Integer variables
-        l = model.l = pyo.Var(  # Index of the leftmost column of the rectangle k
+        l = model.l = pyo.Var( # Index of the leftmost column of the rectangle k
             K, domain=pyo.PositiveIntegers
         )
-        t = model.t = pyo.Var(  # Index of the top row of the rectangle k
+        t = model.t = pyo.Var( # Index of the top row of the rectangle k
             K, domain=pyo.PositiveIntegers
         )
-        w = model.w = pyo.Var(K, domain=pyo.PositiveIntegers)  # Width of rectangle k
-        h = model.h = pyo.Var(K, domain=pyo.PositiveIntegers)  # Height of rectangle k
+        w = model.w = pyo.Var(K, domain=pyo.PositiveIntegers) # Width of rectangle k
+        h = model.h = pyo.Var(K, domain=pyo.PositiveIntegers) # Height of rectangle k
         ## Binary variables
-        u = model.u = pyo.Var( # Decision about if row i passes through rectangle k
+        u = model.u = pyo.Var( # u_ik = 1 if row i passes through rectangle k
             I, K, domain=pyo.Binary, initialize=0
         )
-        v = model.v = pyo.Var( # Decision about if column j passes through rectangle k
+        v = model.v = pyo.Var( # v_jk = 1 if column j passes through rectangle k
             J, K, domain=pyo.Binary, initialize=0
         )  
-        x = model.x = pyo.Var( # 1 if a square (i,j) is covered by rectangle k
+        x = model.x = pyo.Var( # x_ijk = 1 if a square (i,j) is covered by rectangle k
             I, J, K, domain=pyo.Binary, initialize=0
         )
 
@@ -138,10 +138,9 @@ class Patches(GameBoard):
         a = model.a = pyo.Param(  # Required areas
             K,
             initialize={
-                seed.color_code: seed.area
-                for seed in self.seeds
+                seed.color_code: seed.area for seed in self.seeds
                 if seed.area is not None
-            },
+            }
         )
 
         # OBJECTIVE FUNCTION
@@ -204,13 +203,11 @@ class Patches(GameBoard):
         )
 
     def _set_solution(self, verbose: bool = False) -> None:
-
         for seed in self.seeds:
             top = round(pyo.value(self.model.t[seed.color_code]))
             left = round(pyo.value(self.model.l[seed.color_code]))
             width = round(pyo.value(self.model.w[seed.color_code]))
             height = round(pyo.value(self.model.h[seed.color_code]))
-
             seed._set_rectangle(
                 Rectangle(
                     color=seed.color_code,
@@ -218,7 +215,6 @@ class Patches(GameBoard):
                     dims=(width, height),
                 )
             )
-
         nx.set_node_attributes(
             self.board,
             name="color",
@@ -226,9 +222,8 @@ class Patches(GameBoard):
                 (i - 1, j - 1): seed.color_code
                 for seed in self.seeds
                 for (i, j) in seed.rectangle.squares
-            },
+            }
         )
-
         if verbose:
             print("These are the rectagles that solves the game:")
             pprint(self.rectangles)
@@ -243,6 +238,6 @@ class Patches(GameBoard):
             node_color=[
                 color for color in nx.get_node_attributes(self.board, "color").values()
             ],
-            width=0,
+            width=0
         )
         plt.show()
