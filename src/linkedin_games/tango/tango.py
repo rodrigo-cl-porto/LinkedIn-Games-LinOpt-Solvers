@@ -5,21 +5,22 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-from ..game_board import GameBoard
+from ..core._game_board import GameBoard
+from ._model import TangoModel
 
 
 class Tango(GameBoard):
 
     def __init__(self,
-            filled_squares:dict[tuple[int, int]: int] | None,
+            filled_squares:dict[tuple[int, int]: int] | None = None,
             matching_pairs:set[tuple[tuple[int, int], tuple[int, int]]] | None = None,
             opposite_pairs:set[tuple[tuple[int, int], tuple[int, int]]] | None = None,
             ) -> Self:
-        # It's assumed that Tango board dimensions will always be a 6x6
-        super().__init__(board_dims=(6,6))
-        self.matching_pairs = matching_pairs
-        self.opposite_pairs = opposite_pairs
-        self.filled_squares = filled_squares
+        super().__init__(board_dims=(6,6)) # It's assumed that Tango board dimensions will always be a 6x6
+        self._set_filled_squares(filled_squares)
+        self._set_matching_pairs(matching_pairs)
+        self._set_opposite_pairs(opposite_pairs)
+        self._model = TangoModel(self.filled_squares, self.matching_pairs, self.opposite_pairs)
 
 
     def __hash__(self) -> int:
@@ -39,17 +40,14 @@ class Tango(GameBoard):
         """
         return self._matching_pairs
     
-    @matching_pairs.setter
-    def matching_pairs(self, 
+    def _set_matching_pairs(self, 
             values:tuple[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
         
         if values is None:
             self._matching_pairs = values
             return None
 
-        invalid_items = [
-            pair for pair in values if not isinstance(pair, tuple) or len(pair) != 2
-        ]
+        invalid_items = [pair for pair in values if not isinstance(pair, tuple) or len(pair) != 2]
         if invalid_items:
             msg = (
                 "matching_pairs must be a collection of pairs of tuples."
@@ -58,8 +56,7 @@ class Tango(GameBoard):
             raise TypeError(msg)
         
         invalid_items = [
-            square for pair in values for square in pair
-            if not isinstance(square, tuple)
+            square for pair in values for square in pair if not isinstance(square, tuple)
         ]
         if invalid_items:
             msg = (
@@ -79,9 +76,7 @@ class Tango(GameBoard):
             )
             raise ValueError(msg)
 
-        invalid_items = [
-            pair for pair in values if super()._manhattan_distance(*pair) != 1
-        ]
+        invalid_items = [pair for pair in values if super()._manhattan_distance(*pair) != 1]
         if invalid_items:
             msg = (
                 "Squares in a pair must be consecutive ones. "
@@ -93,9 +88,6 @@ class Tango(GameBoard):
             self._matching_pairs = tuple(values)
         else:
             self._matching_pairs = values
-        
-        self._stale = True
-
 
     @property
     def opposite_pairs(self) -> tuple[tuple[tuple[int, int], tuple[int, int]]] | None:
@@ -105,17 +97,12 @@ class Tango(GameBoard):
         """
         return self._opposite_pairs
     
-    @opposite_pairs.setter
-    def opposite_pairs(self,
-            value:tuple[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
-        
+    def _set_opposite_pairs(self, value:tuple[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
         if value is None:
             self._opposite_pairs = value
             return None
 
-        invalid_items = [
-            pair for pair in value if not isinstance(pair, tuple) or len(pair) != 2
-        ]
+        invalid_items = [pair for pair in value if not isinstance(pair, tuple) or len(pair) != 2]
         if invalid_items:
             msg = (
                 "opposite_pairs must be a collection of pairs of tuples."
@@ -124,8 +111,7 @@ class Tango(GameBoard):
             raise TypeError(msg)
         
         invalid_items = [
-            square for pair in value for square in pair
-            if not isinstance(square, tuple)
+            square for pair in value for square in pair if not isinstance(square, tuple)
         ]
         if invalid_items:
             msg = (
@@ -159,18 +145,13 @@ class Tango(GameBoard):
             self._opposite_pairs = tuple(value)
         else:
             self._opposite_pairs = value
-        
-        self._stale = True
-
 
     @property
     def filled_squares(self) -> dict[tuple[int, int]: int]:
         """Return the squares that are already filled with a symbol."""
         return self._filled_squares
     
-    @filled_squares.setter
-    def filled_squares(self, values:dict[tuple[int, int]: int]) -> None:
-
+    def _set_filled_squares(self, values:dict[tuple[int, int]: int]) -> None:
         if len(values) > len(self):
             msg = (
                 "The number of filled squares exceeds the amount of board squares!"
@@ -197,87 +178,25 @@ class Tango(GameBoard):
             )
             raise TypeError(msg)
         
-        self._filled_squares = {
-            square: (1 if value else 0)
-            for square, value in values.items()
-        }
+        self._filled_squares = {square: (1 if value else 0) for square, value in values.items()}
 
-
-    def _construct_model(self) -> None:
-        model = self.model
-
-        # RANGE SETS
-        I = model.I # Rows
-        J = model.J # Columns
-
-        # COMPOSITE SETS
-        S = model.S # Board Squares
-        K = model.K = pyo.Set(initialize=self.filled_squares.keys(), dimen=2)
-        M = model.M = pyo.Set(initialize=self.matching_pairs)
-        O = model.O = pyo.Set(initialize=self.opposite_pairs)
-
-        # DECISION VARIABLES
-        x = model.x = pyo.Var(S, within=pyo.Binary)
-
-        # PARAMETERS
-        m = model.m # Total number of rows
-        n = model.n # Total number of columns
-        k = model.k = pyo.Param( # Filled values
-            K, initialize=self._filled_squares, within=pyo.Binary
-        )
-
-        # OBJECTIVE FUNCTION
-        model.obj = pyo.Objective(expr=0) # feasibility problem
-
-        # CONSTRAINTS
-        model.equal_moons_suns_per_row_constraints = pyo.Constraint(
-            I, rule=lambda model, i: sum(x[i, j] for j in J) == n / 2
-        )
-        model.equal_moons_suns_per_column_constraints = pyo.Constraint(
-            J, rule=lambda model, j: sum(x[i,j] for i in I) == m / 2
-        )
-        model.no_three_consecutive_moons_per_row_constraints = pyo.Constraint(
-            I, pyo.RangeSet(n-2),
-            rule=lambda model, i, j: x[i, j] + x[i, j+1] + x[i, j+2] <= 2
-        )
-        model.no_three_consecutive_suns_per_row_constraints = pyo.Constraint(
-            I, pyo.RangeSet(n-2),
-            rule=lambda model, i, j: x[i, j] + x[i, j+1] + x[i, j+2] >= 1
-        )
-        model.no_three_consecutive_moons_per_column_constraints = pyo.Constraint(
-            pyo.RangeSet(m-2), J,
-            rule=lambda model, i, j: x[i, j] + x[i+1, j] + x[i+2, j] <= 2
-        )
-        model.no_three_consecutive_suns_per_column_constraints = pyo.Constraint(
-            pyo.RangeSet(m-2), J,
-            rule=lambda model, i, j: x[i, j] + x[i+1, j] + x[i+2, j] >= 1
-        )
-        model.matching_pairs_constraints = pyo.Constraint(
-            M, rule=lambda model, i, j, r, s: x[i, j] - x[r, s] == 0
-        )
-        model.opposite_pairs_constraints = pyo.Constraint(
-            O, rule=lambda model, i, j, r, s: x[i, j] + x[r, s] == 1
-        )
-        model.already_filled_squares_constraints = pyo.Constraint(
-            K, rule=lambda model, i, j: x[i, j] == k[i, j]
-        )
-
+    @property
+    def solution(self) -> dict[tuple[int, int]: bool] | None:
+        if not self.is_solved:
+            return None
+        return self.board_squares
 
     def _set_solution(self, verbose:bool=False):
         nx.set_node_attributes(
             self._board,
             name="value",
-            values={
-                (i-1, j-1): round(pyo.value(self.model.x[i,j]))
-                for i, j in self.model.S
-            }
+            values={(i-1, j-1): round(pyo.value(self.model.x[i,j])) for i, j in self.model.S}
         )
         if verbose:
             print("Tango solution:")
             pprint(self.board_squares)
 
-
-    def _show(self) -> None:
+    def show(self) -> None:
         plt.figure(figsize=(3.4, 3.4))
         pos = {(i, j): (j, -i) for i, j in self.board.nodes()}
         nx.draw(
@@ -292,9 +211,9 @@ class Tango(GameBoard):
             ],
             node_shape="s",
             edgecolors="#EEEAE7",
-            linewidths= 1,
-            width= 0,
-            edgelist = [
+            linewidths=1,
+            width=0,
+            edgelist=[
                 ((i-1, j-1), (r-1,s-1)) for i,j,r,s in self.model.O] + [
                 ((i-1, j-1), (r-1,s-1)) for i,j,r,s in self.model.M
             ]

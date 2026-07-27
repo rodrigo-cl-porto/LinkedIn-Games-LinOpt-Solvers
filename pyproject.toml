@@ -60,7 +60,7 @@ build-backend = "uv_build"
 
 
 [tool.ruff]
-line-length = 88
+line-length = 112
 
 [tool.ruff.lint]
 exclude = ["*.ipynb"]

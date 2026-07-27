@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-from ..game_board import GameBoard
+from ..core._game_board import GameBoard
+from ._model import ZipModel
 
 
 class Zip(GameBoard):
@@ -28,16 +29,16 @@ class Zip(GameBoard):
             the board, or if any pair of squares in walls are not adjacent.
     """
     def __init__(self,
-            board_dims: tuple[int, int], numbered_squares: dict[tuple[int, int]: int],
+            board_dims: tuple[int, int],
+            numbered_squares: dict[tuple[int, int]: int],
             walls: tuple[tuple[int, int]]|None = None) -> Self:
         super().__init__(board_dims)
-        self.numbered_squares = numbered_squares
-        self.walls = walls
-
+        self._set_numbered_squares(numbered_squares)
+        self._set_walls(walls)
+        self._model = ZipModel(self.board_dims, self.numbered_squares, self.walls)
 
     def __hash__(self) -> int:
         return hash((self._board_dims, self._numbered_squares, self._walls))
-
 
     def number_of_edges(self) -> int:
         """Total number of edges on game board."""
@@ -52,8 +53,7 @@ class Zip(GameBoard):
         """
         return self._numbered_squares
     
-    @numbered_squares.setter
-    def numbered_squares(self, values:dict[tuple[int, int]: int]) -> None:
+    def _set_numbered_squares(self, values:dict[tuple[int, int]: int]) -> None:
         if len(values) > len(self):
             msg = (
                 "The number of numbered squares exceeds the amount of board squares."
@@ -69,9 +69,7 @@ class Zip(GameBoard):
             raise ValueError(msg)
 
         if isinstance(values, (list, tuple)):
-            self._numbered_squares = {
-                square: index for index, square in enumerate(values)
-            }
+            self._numbered_squares = {square: index for index, square in enumerate(values)}
         elif not isinstance(values, dict):
             msg = "The numbered squares must be a dictionary."
             raise ValueError(msg)
@@ -80,21 +78,16 @@ class Zip(GameBoard):
 
         nx.set_node_attributes(self.board, name="value", values=None)
         nx.set_node_attributes(self.board, name="value", values=self.numbered_squares)
-        self._stale = True
-
 
     @property
     def walls(self) -> tuple[tuple[int, int], tuple[int, int]]:
         """Returns a tuple of walls (pairs of squares)"""
         return self._walls
     
-    @walls.setter
-    def walls(self, values:tuple[tuple[int, int], tuple[int, int]] = None) -> None:
+    def _set_walls(self, values:tuple[tuple[int, int], tuple[int, int]] | None) -> None:
         if values is None:
             self._walls = None
-            self._stale = True
             return None
-
 
         if len(values) > self.number_of_edges:
             msg = (
@@ -112,10 +105,7 @@ class Zip(GameBoard):
         else:
             self._walls = values
 
-        invalid_items = [
-            pair for pair in values
-            if super()._manhattan_distance(*pair) != 1
-        ]
+        invalid_items = [pair for pair in values if super()._manhattan_distance(*pair) != 1]
         if invalid_items:
             msg = (
                 "Squares in a pair must be consecutive ones. "
@@ -123,80 +113,10 @@ class Zip(GameBoard):
             )
             raise ValueError(msg)
 
-        self._stale = True
-
-
     @property
-    def path(self) -> list[tuple[int, int]]:
+    def solution(self) -> list[tuple[int, int]]:
         """Return the path that solves the Zip game."""
-        return [(i+1, j+1) for (i, j) in self._path]
-
-
-    def _construct_model(self) -> None:
-        model = self.model
-
-        # RANGE SETS
-        I = model.I # Rows
-        J = model.J # Columns
-
-        # COMPOSITE SETS
-        S = model.S # Board Squares
-        E = model.E = pyo.Set(initialize=lambda model: # Edges
-            [((i, j), (i+1, j)) for i in I for j in J if i+1 in I] +
-            [((i, j), (i-1, j)) for i in I for j in J if i-1 in I] +
-            [((i, j), (i, j+1)) for i in I for j in J if j+1 in J] +
-            [((i, j), (i, j-1)) for i in I for j in J if j-1 in J]
-        )
-        K = model.K = pyo.Set( # Numbered Squares
-            initialize=self.numbered_squares.keys(), dimen=2
-        )
-        W = model.W = pyo.Set(initialize=self.walls) # Walls
-        
-        # DECISION VARIABLES
-        x = model.x = pyo.Var(E, within=pyo.Binary, initialize=0)
-        u = model.u = pyo.Var(S, within=pyo.NonNegativeReals)
-
-        # PARAMETERS
-        k = model.k = pyo.Param(
-            S,
-            initialize=self.numbered_squares, within=pyo.NonNegativeIntegers, default=0
-        )
-
-        # OBJECTIVE FUNCTION
-        model.obj = pyo.Objective(expr=0) # feasibility problem
-    
-        # CONSTRAINTS
-        model.outgoing_edges_constraints = pyo.Constraint(
-            S, rule=lambda model, i, j:
-                sum(x[(i,j),w] for w in S if ((i,j),w) in E) == 1 if k[i,j] != len(K)
-                else sum(x[(i,j),w] for w in S if ((i,j),w) in E) == 0
-        )
-        model.incoming_edges_constraints = pyo.Constraint(
-            S, rule=lambda model, i, j:
-                sum(x[s,(i,j)] for s in S if (s,(i,j)) in E) == 1 if k[i,j] != 1
-                else sum(x[s,(i,j)] for s in S if (s,(i,j)) in E) == 0
-        )
-        model.wall_constraints = pyo.Constraint(
-            W, rule=lambda model, i, j, r, s: x[i,j,r,s] + x[r,s,i,j] == 0
-        )
-        M = len(self)
-        model.subroute_elimination_constraints = pyo.Constraint(
-            E, rule=lambda model, i, j, r, s:
-                u[r, s] >= u[i, j] + 1 - M * (1 - x[i, j, r, s])
-        )
-        model.first_square_position_constraint = pyo.Constraint(
-            K, rule= lambda model, i, j:
-                u[i,j] == 1 if k[i,j] == 1 else pyo.Constraint.Skip
-        )
-        model.ordinal_position_constraints = pyo.Constraint(
-            K, K, rule= lambda model, i, j, r, s:
-                u[i,j] >= u[r,s] + 1 if k[i,j] == k[r,s] + 1 else pyo.Constraint.Skip
-        )
-        model.last_square_position_constraint = pyo.Constraint(
-            K, rule= lambda model, i, j:
-                u[i,j] == M if k[i,j] == len(K) else pyo.Constraint.Skip
-        )
-
+        return self.__solution
 
     def _set_solution(self, verbose:bool=False) -> None:
         nx.set_node_attributes(
@@ -216,13 +136,13 @@ class Zip(GameBoard):
             }
         )
         path = nx.get_node_attributes(self.board, "value")
-        self._path = sorted(path.keys(), key=path.get)
+        path = sorted(path.keys(), key=path.get)
+        self.__solution = [(i+1, j+1) for (i, j) in path]
         if verbose:
             print("This is the path that solves the games:")
-            pprint(self.path)
+            pprint(self.solution)
 
-
-    def _show(self) -> None:
+    def show(self) -> None:
         plt.figure(figsize=(3.4, 3.4))
         path_color:str="#EE5F12"
         nx.draw(

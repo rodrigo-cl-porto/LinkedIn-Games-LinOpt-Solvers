@@ -2,7 +2,6 @@ from linkedin_games import MiniSudoku
 
 
 def test_mini_sudoku():
-
     # Solving Mini Sudoku No. 60
 
     filled_squares = {
@@ -17,7 +16,6 @@ def test_mini_sudoku():
         (5,5): 5,
         (6,6): 6
     }
-
     mini_sudoku = MiniSudoku(filled_squares)
     mini_sudoku.solve()
 

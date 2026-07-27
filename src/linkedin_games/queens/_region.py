@@ -1,15 +1,13 @@
 from typing import Self
 
-from ..color import Color
+from ..core._color import Color
 
 
 class Region:
     """A class representing a colored region on a Queens board game."""
-
     def __init__(self, squares:set[tuple[int, int]], color:str|None=None) -> Self:
         self.squares = squares
         self.__color = Color(color)
-
 
     def __repr__(self) -> str:
         return (
@@ -18,29 +16,22 @@ class Region:
             f"squares={self.squares!r}\n)"
         )
 
-
     def __str__(self) -> str:
         return f"A {self.color} Queens Region on squares {self.squares!r}."
-    
 
     def __len__(self) -> int:
         return len(self.squares)
 
-
     def __eq__(self, other: Self) -> bool:
         if not isinstance(other, Region):
             return False
-        
         return self.squares == other.squares
-
 
     def __ne__(self, other: Self) -> bool:
         return not self.__eq__(other)
 
-
     def __hash__(self) -> int:
         return hash((frozenset(self.squares), self.color_code))
-
 
     @property
     def squares(self) -> set[tuple[int, int]]:
@@ -82,7 +73,6 @@ class Region:
 
         self._squares = value
 
-
     @property
     def color(self) -> str:
         return self.__color.name
@@ -90,7 +80,6 @@ class Region:
     @color.setter
     def color(self, value:str) -> None:
         self.__color.color = value
-
 
     @property
     def color_code(self) -> str:

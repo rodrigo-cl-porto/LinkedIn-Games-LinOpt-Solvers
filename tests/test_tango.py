@@ -4,7 +4,6 @@ from linkedin_games import Tango
 def test_tango():
 
     # Solving Tango No. 151
-
     matching_pairs = (
         ((2, 3), (2, 4)),
         ((2, 1), (3, 1)),
@@ -13,7 +12,6 @@ def test_tango():
         ((4, 1), (4, 2)),
         ((6, 3), (6, 4)),
     )
-
     opposite_pairs = (
         ((2, 4), (3, 4)),
         ((3, 1), (4, 1)),
@@ -21,17 +19,14 @@ def test_tango():
         ((3, 6), (4, 6)),
         ((4, 5), (4, 6)),
     )
-
     filled_squares = {
         (1, 2): 1,
         (1, 5): 1,
         (5, 2): 0,
         (5, 5): 1,
     }
-
     tango = Tango(filled_squares, matching_pairs, opposite_pairs)
     tango.solve()
-
     solution = {
         (1, 1): 1,
         (1, 2): 1,
@@ -70,5 +65,4 @@ def test_tango():
         (6, 5): 0,
         (6, 6): 1
     }
-
-    assert tango.board_squares == solution
+    assert tango.solution == solution

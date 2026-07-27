@@ -1,9 +1,9 @@
 from math import sqrt
 from typing import Self
 
-from ..color import Color
-from .rectangle import Rectangle
-from .rectangle_shape import RectangleShape
+from ..core._color import Color
+from ._rectangle import Rectangle
+from ._rectangle_shape import RectangleShape
 
 
 class SeedSquare:
@@ -22,8 +22,7 @@ class SeedSquare:
     """
 
     def __init__(self,
-            square:tuple[int, int], area:int|None=None,
-            shape:str="any", color:str="white") -> Self:
+            square:tuple[int, int], area:int|None=None, shape:str="any", color:str="white") -> Self:
         """
         Args:
             square (tuple[int, int]): The position of the seed on the Zip board.
@@ -31,9 +30,9 @@ class SeedSquare:
             shape (str): The required shape of the seed square.
             color (str): The color of the seed square.
         """
-        self.square = square
-        self.shape = shape
-        self.area = area
+        self._set_square(square)
+        self._set_shape(shape)
+        self._set_area(area)
         self.__color = Color(color)
         self.__rectangle: Rectangle | None = None
 
@@ -97,8 +96,7 @@ class SeedSquare:
         """tuple[int, int]: Position of the rectangle seed on the Zip board as a tuple (row, column)."""
         return self._square
 
-    @square.setter
-    def square(self, value: tuple[int, int]) -> None:
+    def _set_square(self, value: tuple[int, int]) -> None:
         if not isinstance(value, tuple):
             msg = (
                 "Seed square must be a tuple."
@@ -118,10 +116,7 @@ class SeedSquare:
             or isinstance(coord, bool)
             or coord < 1 for coord in value)
         ):
-            msg = (
-                "Seed square coordinates must be positive integers."
-                f" Got {value!r} instead."
-            )
+            msg = f"Seed square coordinates must be positive integers. Got {value!r} instead."
             raise ValueError(msg)
         
         self._square = value
@@ -131,8 +126,7 @@ class SeedSquare:
         """The rectangle shape required by the seed square."""
         return str(self._shape)
 
-    @shape.setter
-    def shape(self, value:str) -> None:
+    def _set_shape(self, value:str) -> None:
         if not isinstance(value, str):
             msg = (
                 "The rectangle shape must be a string."
@@ -156,29 +150,23 @@ class SeedSquare:
         """Required rea of the seed square as a positive integer or None."""
         return self._area
 
-    @area.setter
-    def area(self, value: int | None) -> None:
-        if value is not None and not isinstance(value, int):
-            msg = (
-                "The required area must be an integer or None."
-                f" Got {type(value).__name__} instead."
-            )
+    def _set_area(self, value: int | None) -> None:
+
+        if value is None:
+            self._area = None
+            return None
+
+        if not isinstance(value, int):
+            msg = f"The required area must be an integer or None. Got {type(value).__name__} instead."
             raise TypeError(msg)
 
-        if value is not None:
-            if value < 1:
-                msg = (
-                    "The required area must be a positive integer."
-                    f"Got {value!r} instead."
-                )
-                raise ValueError(msg)
+        if value < 1:
+            msg = f"The required area must be a positive integer. Got {value!r} instead."
+            raise ValueError(msg)
 
-            if (
-                self.shape == RectangleShape.SQUARE
-                and not SeedSquare.__is_perfect_square(value)
-            ):
-                msg = f"The required area ({value!r}) is not a perfect square."
-                raise ValueError(msg)
+        if self.shape == RectangleShape.SQUARE and not SeedSquare.__is_perfect_square(value):
+            msg = f"The required area ({value!r}) is not a perfect square."
+            raise ValueError(msg)
 
         self._area = value
 

@@ -5,10 +5,11 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-from ..game_board import GameBoard
-from .rectangle import Rectangle
-from .rectangle_shape import RectangleShape
-from .seed_square import SeedSquare
+from linkedin_games.patches._model import PatchesModel
+
+from ..core._game_board import GameBoard
+from ._rectangle import Rectangle
+from ._seed_square import SeedSquare
 
 
 class Patches(GameBoard):
@@ -23,184 +24,53 @@ class Patches(GameBoard):
         _set_solution (None): Set the solution of the Patches game.
         _show (None): Show the Patches game board with rectangles.
     """
-    def __init__(self, board_dims: tuple[int, int], seeds: tuple[SeedSquare]) -> Self:
+    def __init__(self, board_dims:tuple[int, int], seeds:dict[tuple[int, int], dict[str, str|int]]) -> Self:
         """
         Args:
             board_dims (tuple[int, int]): The dimensions of the board as (rows, columns).
             seeds (tuple[SeedSquare]): The seeds of the game.
         """
         super().__init__(board_dims)
-        self.seeds = seeds
+        self._set_seeds(seeds)
+        self._model = PatchesModel(self.board_dims, self.seeds)
 
     def __hash__(self) -> int:
         return hash((self.board_dims, self.seeds))
 
     @property
-    def seeds(self) -> tuple[SeedSquare]:
+    def seeds(self) -> set[SeedSquare]:
         """tuple[SeedSquare]: All the seeds of the game."""
         return self._seeds
 
-    @seeds.setter
-    def seeds(self, values: tuple[SeedSquare]) -> None:
-        if len(values) < 1:
-            msg = "The seeds cannot be empty!"
-            raise ValueError(msg)
-
-        invalid_items = [item for item in values if not isinstance(item, SeedSquare)]
-        if invalid_items:
-            msg = (
-                "Seeds must be a tuple of SeedSquare classes."
-                f" Got the following invalid items: {invalid_items!r}."
-            )
+    def _set_seeds(self, seeds:dict[tuple[int, int], dict[str, str|int]]) -> None:
+        if not isinstance(seeds, dict):
+            msg = f"seeds must be a dictionary. Got {type(seeds).__name__} instead."
             raise TypeError(msg)
 
-        if len(values) != len({seed.color_code for seed in values}):
-            msg = "There must not be two seeds with the same color."
+        if len(seeds) < 1:
+            msg = "seeds cannot be empty!"
             raise ValueError(msg)
 
-        seed_squares = [seed.square for seed in values]
-        duplicated_squares = [
-            square for square in seed_squares if seed_squares.count(square) > 1
-        ]
-        if duplicated_squares:
-            msg = (
-                "The seed squares must not overlap each other."
-                f" Duplicated squares: {duplicated_squares}"
-            )
+        colors = [attr["color"] for seed in seeds for attr in seed.values()]
+        if len(colors) != len(set(colors)):
+            msg = "There must not be two or more seeds with the same color."
             raise ValueError(msg)
 
-        if not isinstance(values, tuple):
-            values = tuple(values)
-
-        self._seeds = values
-        self._stale = True
+        self._seeds = {
+            SeedSquare(
+                square=square,
+                area=attr.get("area"),
+                shape=attr.get("shape"),
+                color=attr.get("color")
+            ) for seed in seeds for square, attr in seed.items()
+        }
 
     @property
-    def rectangles(self) -> tuple[Rectangle]:
+    def solution(self) -> list[Rectangle] | None:
         """All the rectangles of the Patches game."""
-        return tuple(seed.rectangle for seed in self.seeds)
-
-    def _construct_model(self) -> None:
-        model = self.model
-
-        # RANGE SETS
-        I = model.I  # Rows
-        J = model.J  # Columns
-        K = model.K = pyo.Set(  # Rectangles
-            initialize=(seed.color_code for seed in self.seeds)
-        )
-
-        # COMPOSITE SETS
-        S = model.S  # Board squares
-        E = model.E = pyo.Set( # Seed squares
-            initialize=[(*seed.square, seed.color_code) for seed in self.seeds]
-        )
-        V = model.V = pyo.Set(initialize=[ # Vertical rectangles
-            seed.color_code for seed in self.seeds
-            if seed.shape == RectangleShape.VERTICAL
-        ])
-        H = model.H = pyo.Set(initialize=[ # Horizontal rectangles
-            seed.color_code for seed in self.seeds
-            if seed.shape == RectangleShape.HORIZONTAL
-        ])
-        Q = model.Q = pyo.Set(initialize=[ # Squared rectangles
-            seed.color_code for seed in self.seeds
-            if seed.shape == RectangleShape.SQUARE
-        ])
-        A = model.A = pyo.Set(initialize=[ # Required areas
-            seed.color_code for seed in self.seeds if seed.area is not None
-        ])
-
-        # DECISION VARIABLES
-        ## Integer variables
-        l = model.l = pyo.Var( # Index of the leftmost column of the rectangle k
-            K, domain=pyo.PositiveIntegers
-        )
-        t = model.t = pyo.Var( # Index of the top row of the rectangle k
-            K, domain=pyo.PositiveIntegers
-        )
-        w = model.w = pyo.Var(K, domain=pyo.PositiveIntegers) # Width of rectangle k
-        h = model.h = pyo.Var(K, domain=pyo.PositiveIntegers) # Height of rectangle k
-        ## Binary variables
-        u = model.u = pyo.Var( # u_ik = 1 if row i passes through rectangle k
-            I, K, domain=pyo.Binary, initialize=0
-        )
-        v = model.v = pyo.Var( # v_jk = 1 if column j passes through rectangle k
-            J, K, domain=pyo.Binary, initialize=0
-        )  
-        x = model.x = pyo.Var( # x_ijk = 1 if a square (i,j) is covered by rectangle k
-            I, J, K, domain=pyo.Binary, initialize=0
-        )
-
-        # PARAMETERS
-        m = model.m  # Total number of rows
-        n = model.n  # Total number of columns
-        a = model.a = pyo.Param(  # Required areas
-            K,
-            initialize={
-                seed.color_code: seed.area for seed in self.seeds
-                if seed.area is not None
-            }
-        )
-
-        # OBJECTIVE FUNCTION
-        model.obj = pyo.Objective(expr=sum(w[k] + h[k] for k in K), sense=pyo.minimize)
-
-        # CONSTRAINTS
-        ## Non overlapping rectangles
-        model.unique_rectangle_per_square_constraints = pyo.Constraint(
-            S, rule=lambda model, i, j: sum(x[i, j, k] for k in K) == 1
-        )
-
-        ## Board-Boundaries Constraints
-        model.top_row_constraints = pyo.Constraint(
-            K, rule=lambda model, k: t[k] + h[k] - 1 <= m
-        )
-        model.leftmost_column_constraints = pyo.Constraint(
-            K, rule=lambda model, k: l[k] + w[k] - 1 <= n
-        )
-
-        ## Boundaries Constraints
-        model.top_boundary_constraints = pyo.Constraint(
-            I, K, rule=lambda model, i, k: t[k] - i <= m * (1 - u[i, k])
-        )
-        model.bottom_boundary_constraints = pyo.Constraint(
-            I, K, rule=lambda model, i, k: i - (t[k] + h[k] - 1) <= m * (1 - u[i, k])
-        )
-        model.left_boundary_constraints = pyo.Constraint(
-            J, K, rule=lambda model, j, k: l[k] - j <= n * (1 - v[j, k])
-        )
-        model.right_boundary_constraints = pyo.Constraint(
-            J, K, rule=lambda model, j, k: j - (l[k] + w[k] - 1) <= n * (1 - v[j, k])
-        )
-
-        ## Linking-Binary-Variables Constraints
-        model.cutout_row_constraints = pyo.Constraint(
-            I, J, K, rule=lambda model, i, j, k: x[i, j, k] <= u[i, k]
-        )
-        model.cutout_column_constraints = pyo.Constraint(
-            I, J, K, rule=lambda model, i, j, k: x[i, j, k] <= v[j, k]
-        )
-        model.square_activator_constraints = pyo.Constraint(
-            I, J, K, rule=lambda model, i, j, k: x[i, j, k] >= u[i, k] + v[j, k] - 1
-        )
-
-        ## Seed Square Constraints
-        model.seed_square_coverage_constraints = pyo.Constraint(
-            E, rule=lambda model, i, j, k: x[i, j, k] == 1
-        )
-        model.area_constraints = pyo.Constraint(  # Required area
-            A, rule=lambda model, k: sum(x[i, j, k] for (i, j) in S) == a[k]
-        )
-        model.vertical_rectangles_constraints = pyo.Constraint(
-            V, rule=lambda model, k: w[k] <= h[k] - 1
-        )
-        model.horizontal_rectangles_constraints = pyo.Constraint(
-            H, rule=lambda model, k: w[k] >= h[k] + 1
-        )
-        model.square_rectangles_constraints = pyo.Constraint(
-            Q, rule=lambda model, k: w[k] == h[k]
-        )
+        if not self.is_solved:
+            return None
+        return [seed.rectangle.to_dict() for seed in self.seeds]
 
     def _set_solution(self, verbose: bool = False) -> None:
         for seed in self.seeds:
@@ -218,17 +88,13 @@ class Patches(GameBoard):
         nx.set_node_attributes(
             self.board,
             name="color",
-            values={
-                (i - 1, j - 1): seed.color_code
-                for seed in self.seeds
-                for (i, j) in seed.rectangle.squares
-            }
+            values={(i - 1, j - 1): seed.color_code for seed in self.seeds for (i, j) in seed.rectangle.squares}
         )
         if verbose:
             print("These are the rectagles that solves the game:")
-            pprint(self.rectangles)
+            pprint(self.solution)
 
-    def _show(self) -> None:
+    def show(self) -> None:
         plt.figure(figsize=(3, 3))
         nx.draw(
             self.board,

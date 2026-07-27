@@ -1,6 +1,6 @@
 from typing import Self
 
-from ..color import Color
+from ..core._color import Color
 
 
 class Rectangle:
@@ -82,6 +82,12 @@ class Rectangle:
     def __ne__(self, other:Self) -> bool:
         return not self.__eq__(other)
 
+    def to_dict(self) -> dict:
+        return {
+            "color": self.color,
+            "top_left_square": (self.top, self.left),
+            "dims": (self.width, self.height)
+        }
 
     @property
     def dims(self) -> tuple[int, int]:
