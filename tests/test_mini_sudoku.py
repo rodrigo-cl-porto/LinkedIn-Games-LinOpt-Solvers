@@ -58,4 +58,4 @@ def test_mini_sudoku():
         (6, 6): 6
     }
 
-    assert mini_sudoku.board_squares == solution
+    assert mini_sudoku.solution == solution

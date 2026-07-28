@@ -16,8 +16,7 @@ class Rectangle:
         color (str|None): The color of the rectangle.
     """
 
-    def __init__(self, top_left_square:tuple[int, int], 
-            dims:tuple[int, int], color:str|None=None) -> Self:
+    def __init__(self, top_left_square:tuple[int, int], dims:tuple[int, int], color:str|None=None) -> None:
         """_summary_
 
         Args:
@@ -50,7 +49,7 @@ class Rectangle:
             f" with top-left square at ({self.top_left_square})"
             f" with dimensions of {self.dims}"
         )
-
+    
 
     def __hash__(self) -> int:
         return hash((
@@ -60,7 +59,6 @@ class Rectangle:
             self.height,
             self.color_code
         ))
-
 
     def __len__(self) -> int:
         return self.width * self.height
@@ -82,12 +80,19 @@ class Rectangle:
     def __ne__(self, other:Self) -> bool:
         return not self.__eq__(other)
 
-    def to_dict(self) -> dict:
+
+    def to_dict(self) -> dict[str, str|tuple[int, int]]:
         return {
-            "color": self.color,
+            "color_code": self.color_code,
             "top_left_square": (self.top, self.left),
             "dims": (self.width, self.height)
         }
+
+
+    @property
+    def area(self) -> int:
+        return len(self)
+
 
     @property
     def dims(self) -> tuple[int, int]:
@@ -136,17 +141,11 @@ class Rectangle:
     def left(self, value:int) -> None:
 
         if not isinstance(value, int):
-            msg = (
-                "The leftmost column's position must be an integer."
-                f" Got {value!r} instead."
-            )
+            msg = f"The leftmost column's position must be an integer. Got {value!r} instead."
             raise TypeError(msg)
         
         if value < 1:
-            msg = (
-                "The leftmost column's position must be positive."
-                f" Got {value!r} instead."
-            )
+            msg = f"The leftmost column's position must be positive. Got {value!r} instead."
             raise ValueError(msg)
         
         self._left = value
@@ -170,11 +169,11 @@ class Rectangle:
         
         if not hasattr(self, "_height"):
             self._width = value
-            return None
+            return
         
         if self.height is None:
             self._width = value
-            return None
+            return
         
         self._width = value
 
@@ -197,11 +196,11 @@ class Rectangle:
         
         if not hasattr(self, "_width"):
             self._height = value
-            return None
+            return
         
         if self.width is not None:
             self._height = value
-            return None
+            return
         
         self._height = value
 

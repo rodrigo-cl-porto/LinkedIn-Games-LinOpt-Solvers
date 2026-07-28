@@ -1,5 +1,4 @@
 from pprint import pprint
-from typing import Self
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -10,161 +9,41 @@ from ._model import TangoModel
 
 
 class Tango(GameBoard):
+    """_summary_
+
+    Attributes:
+        GameBoard (_type_): _description_
+    """
 
     def __init__(self,
             filled_squares:dict[tuple[int, int]: int] | None = None,
             matching_pairs:set[tuple[tuple[int, int], tuple[int, int]]] | None = None,
             opposite_pairs:set[tuple[tuple[int, int], tuple[int, int]]] | None = None,
-            ) -> Self:
+            ) -> None:
         super().__init__(board_dims=(6,6)) # It's assumed that Tango board dimensions will always be a 6x6
-        self._set_filled_squares(filled_squares)
-        self._set_matching_pairs(matching_pairs)
-        self._set_opposite_pairs(opposite_pairs)
-        self._model = TangoModel(self.filled_squares, self.matching_pairs, self.opposite_pairs)
+        self.__set_filled_squares(filled_squares)
+        self.__set_matching_pairs(matching_pairs)
+        self.__set_opposite_pairs(opposite_pairs)
+        self._model = TangoModel(self.board_dims, self.filled_squares, self.matching_pairs, self.opposite_pairs)
 
 
     def __hash__(self) -> int:
-        return hash((
-            self._dims,
-            self._matching_pairs,
-            self._opposite_pairs,
-            self._filled_squares
-        ))
+        return hash((self._board_dims, self.__matching_pairs, self.__opposite_pairs, self.__filled_squares))
 
-
-    @property
-    def matching_pairs(self) -> tuple[tuple[tuple[int, int], tuple[int, int]]] | None:
-        """
-        Return the pairs of squares that are separated by a equal (=) sign, 
-        i.e. the squares that must have the same symbol.
-        """
-        return self._matching_pairs
-    
-    def _set_matching_pairs(self, 
-            values:tuple[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
-        
-        if values is None:
-            self._matching_pairs = values
-            return None
-
-        invalid_items = [pair for pair in values if not isinstance(pair, tuple) or len(pair) != 2]
-        if invalid_items:
-            msg = (
-                "matching_pairs must be a collection of pairs of tuples."
-                f" Got the following invalid pairs: {invalid_items!r}."
-            )
-            raise TypeError(msg)
-        
-        invalid_items = [
-            square for pair in values for square in pair if not isinstance(square, tuple)
-        ]
-        if invalid_items:
-            msg = (
-                "Squares in pair must be tuples of positive integers."
-                f" Got the following invalid squares: {invalid_items!r}."
-            )
-            raise TypeError(msg)
-        
-        invalid_items = [
-            square for pair in values for square in pair for coord in square
-            if not isinstance(coord, int) or coord < 1
-        ]
-        if invalid_items:
-            msg = (
-                "Coordinates must be positive integers."
-                f" Got the following invalid squares: {invalid_items!r}."
-            )
-            raise ValueError(msg)
-
-        invalid_items = [pair for pair in values if super()._manhattan_distance(*pair) != 1]
-        if invalid_items:
-            msg = (
-                "Squares in a pair must be consecutive ones. "
-                f"Got the following invalid pairs: {invalid_items!r}."
-            )
-            raise ValueError(msg)
-        
-        if not isinstance(values, tuple):
-            self._matching_pairs = tuple(values)
-        else:
-            self._matching_pairs = values
-
-    @property
-    def opposite_pairs(self) -> tuple[tuple[tuple[int, int], tuple[int, int]]] | None:
-        """
-        Return the pairs of squares that are separated by a cross (×) sign, i.e.
-        the squares that must have opposite symbols.
-        """
-        return self._opposite_pairs
-    
-    def _set_opposite_pairs(self, value:tuple[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
-        if value is None:
-            self._opposite_pairs = value
-            return None
-
-        invalid_items = [pair for pair in value if not isinstance(pair, tuple) or len(pair) != 2]
-        if invalid_items:
-            msg = (
-                "opposite_pairs must be a collection of pairs of tuples."
-                f" Got the following invalid pairs: {invalid_items!r}."
-            )
-            raise TypeError(msg)
-        
-        invalid_items = [
-            square for pair in value for square in pair if not isinstance(square, tuple)
-        ]
-        if invalid_items:
-            msg = (
-                "Squares in pair must be tuples of positive integers."
-                f" Got the following invalid squares: {invalid_items!r}."
-            )
-            raise TypeError(msg)
-        
-        invalid_items = [
-            square for pair in value for square in pair for coord in square
-            if not isinstance(coord, int) or coord < 1
-        ]
-        if invalid_items:
-            msg = (
-                "Coordinates must be positive integers."
-                f" Got the following invalid squares: {invalid_items!r}."
-            )
-            raise ValueError(msg)
-
-        invalid_items = [
-            pair for pair in value if super()._manhattan_distance(*pair) != 1
-        ]
-        if invalid_items:
-            msg = (
-                "Squares in a pair must be consecutive ones."
-                f" Got the following invalid pairs: {invalid_items!r}."
-            )
-            raise ValueError(msg)
-        
-        if not isinstance(value, tuple):
-            self._opposite_pairs = tuple(value)
-        else:
-            self._opposite_pairs = value
 
     @property
     def filled_squares(self) -> dict[tuple[int, int]: int]:
         """Return the squares that are already filled with a symbol."""
-        return self._filled_squares
+        return self.__filled_squares
     
-    def _set_filled_squares(self, values:dict[tuple[int, int]: int]) -> None:
+    def __set_filled_squares(self, values:dict[tuple[int, int]: int]) -> None:
         if len(values) > len(self):
-            msg = (
-                "The number of filled squares exceeds the amount of board squares!"
-                f" Got {len(values)} filled squares."
-            )
+            msg = f"The number of filled squares exceeds the amount of board squares. Got {len(values)} filled squares."
             raise ValueError(msg)
 
         if not isinstance(values, dict):
-            msg = (
-                "filled_squares must be a dictionary."
-                f" Got a {type(values).__name__} type instead."
-            )
-            raise ValueError(msg)
+            msg = f"filled_squares must be a dictionary. Got a {type(values).__name__} type instead."
+            raise TypeError(msg)
 
         invalid_items = {
             square: value
@@ -178,7 +57,107 @@ class Tango(GameBoard):
             )
             raise TypeError(msg)
         
-        self._filled_squares = {square: (1 if value else 0) for square, value in values.items()}
+        self.__filled_squares = {square: (1 if value else 0) for square, value in values.items()}
+
+
+    @property
+    def matching_pairs(self) -> tuple[tuple[tuple[int, int], tuple[int, int]]] | None:
+        return self.__matching_pairs
+    
+    def __set_matching_pairs(self, values:tuple[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
+        
+        if values is None:
+            self.__matching_pairs = values
+            return
+
+        invalid_items = [pair for pair in values if not isinstance(pair, tuple) or len(pair) != 2]
+        if invalid_items:
+            msg = (
+                "matching_pairs must be a collection of pairs of tuples."
+                f" Got the following invalid pairs: {invalid_items!r}."
+            )
+            raise TypeError(msg)
+        
+        invalid_items = [square for pair in values for square in pair if not isinstance(square, tuple)]
+        if invalid_items:
+            msg = (
+                "Squares in pair must be tuples of positive integers."
+                f" Got the following invalid squares: {invalid_items!r}."
+            )
+            raise TypeError(msg)
+        
+        invalid_items = [
+            square for pair in values for square in pair for coord in square
+            if not isinstance(coord, int) or coord < 1
+        ]
+        if invalid_items:
+            msg = f"Coordinates must be positive integers. Got the following invalid squares: {invalid_items!r}."
+            raise ValueError(msg)
+
+        invalid_items = [pair for pair in values if super()._manhattan_distance(*pair) != 1]
+        if invalid_items:
+            msg = (
+                "Squares in a pair must be consecutive ones. "
+                f"Got the following invalid pairs: {invalid_items!r}."
+            )
+            raise ValueError(msg)
+        
+        if not isinstance(values, tuple):
+            self.__matching_pairs = tuple(values)
+        else:
+            self.__matching_pairs = values
+
+
+    @property
+    def opposite_pairs(self) -> tuple[tuple[tuple[int, int], tuple[int, int]]] | None:
+        """
+        Return the pairs of squares that are separated by a cross (×) sign, i.e.
+        the squares that must have opposite symbols.
+        """
+        return self.__opposite_pairs
+    
+    def __set_opposite_pairs(self, value:tuple[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
+        if value is None:
+            self.__opposite_pairs = value
+            return
+
+        invalid_items = [pair for pair in value if not isinstance(pair, tuple) or len(pair) != 2]
+        if invalid_items:
+            msg = (
+                "opposite_pairs must be a collection of pairs of tuples."
+                f" Got the following invalid pairs: {invalid_items!r}."
+            )
+            raise TypeError(msg)
+        
+        invalid_items = [square for pair in value for square in pair if not isinstance(square, tuple)]
+        if invalid_items:
+            msg = (
+                "Squares in pair must be tuples of positive integers."
+                f" Got the following invalid squares: {invalid_items!r}."
+            )
+            raise TypeError(msg)
+        
+        invalid_items = [
+            square for pair in value for square in pair for coord in square
+            if not isinstance(coord, int) or coord < 1
+        ]
+        if invalid_items:
+            msg = "Coordinates must be positive integers. Got the following invalid squares: {invalid_items!r}."
+            raise ValueError(msg)
+
+        invalid_items = [pair for pair in value if super()._manhattan_distance(*pair) != 1]
+        if invalid_items:
+            msg = (
+                "Squares in a pair must be consecutive ones."
+                f" Got the following invalid pairs: {invalid_items!r}."
+            )
+            raise ValueError(msg)
+        
+        if not isinstance(value, tuple):
+            self.__opposite_pairs = tuple(value)
+        else:
+            self.__opposite_pairs = value
+
 
     @property
     def solution(self) -> dict[tuple[int, int]: bool] | None:
@@ -195,6 +174,7 @@ class Tango(GameBoard):
         if verbose:
             print("Tango solution:")
             pprint(self.board_squares)
+
 
     def show(self) -> None:
         plt.figure(figsize=(3.4, 3.4))

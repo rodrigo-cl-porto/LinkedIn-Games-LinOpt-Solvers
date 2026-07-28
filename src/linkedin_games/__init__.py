@@ -6,4 +6,4 @@ from .sudoku.sudoku import Sudoku
 from .tango.tango import Tango
 from .zip.zip import Zip
 
-__all__ = ["ClassicSudoku", "Patches", "MiniSudoku", "Queens", "Sudoku", "Tango", "Zip"]
+__all__ = ["ClassicSudoku", "MiniSudoku", "Patches", "Queens", "Sudoku", "Tango", "Zip"]

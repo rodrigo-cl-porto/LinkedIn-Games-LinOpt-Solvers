@@ -4,9 +4,9 @@
 
 # 𖣯 LinkedIn Games Solvers 🐍
 
-LinkedIn Games is a Python library that provides a set of tools to solve LinkedIn board games ([Queens][linkedin-queens], [Tango][linkedin-tango], [Zip][linkedin-zip], [Mini Sudoku][linkedin-mini-sudoku] and [Patches][linkedin-patches] for now) by using Linear Optimization models. This library leverages popular Python libraries such as [Pyomo] for mathematical modeling and [NetworkX] for graph-based representations of game boards. 
+LinkedIn Games is a Python package that provides a simple set of components to solve LinkedIn board games ([Queens][linkedin-queens], [Tango][linkedin-tango], [Zip][linkedin-zip], [Mini Sudoku][linkedin-mini-sudoku] and [Patches][linkedin-patches] for now) using Linear Optimization models. This library leverages popular Python libraries such as [Pyomo] for mathematical modeling and [NetworkX] for graph-based representations of game boards.
 
-This repository also contains a Jupyter Book that serves as a comprehensive guide to understanding and solving LinkedIn games using the LinOptIn Games library. The book covers various topics, including the basics of optimization, the model structure of LinkedIn games, and step-by-step tutorials for solving them by using linear optimization.
+This repository also contains a Jupyter Book that serves as a comprehensive guide to understanding and solving LinkedIn games using the LinkedIn Games library. The book covers topics about the basics of mathematical optimization, the model structure of LinkedIn board games, and step-by-step tutorials for solving them by using linear optimization.
 
 [linkedin-queens]: https://www.linkedin.com/games/queens/
 [linkedin-tango]: https://www.linkedin.com/games/tango/
@@ -42,18 +42,16 @@ One can run this simple code snippet.
 
 ```python
 from linkedin_games import Patches
-from linkedin_games.patches import SeedSquare
 
 
-seeds = [
-    SeedSquare(color="yellow", square=(1, 1), area=8),
-    SeedSquare(color="green",  square=(2, 5), area=8),
-    SeedSquare(color="purple", square=(3, 3)),
-    SeedSquare(color="orange", square=(4, 4)),
-    SeedSquare(color="teal",   square=(5, 2), area=8),
-    SeedSquare(color="red",    square=(6, 6), area=6, shape="vertical")
-]
-
+seeds = {
+    (1,1): {"color": "yellow", "area"=8},
+    (2,5): {"color": "green",  "area"=8},
+    (3,3): {"color": "purple"},
+    (4,4): {"color": "orange"},
+    (5,2): {"color": "teal",   "area"=8},
+    (6,6): {"color": "red",    "area"=6, "shape"="vertical"}
+}
 patches = Patches((6, 6), seeds)
 patches.solve()
 patches.show()

@@ -4,7 +4,7 @@ from ._region import Region
 
 
 class QueensModel(pyo.ConcreteModel):
-    """The linear optimization model for the Queens game"""
+    """The Linear Optimization model for the Queens game"""
     def __init__(self, board_dims:tuple[int, int], regions:set[Region]):
         super().__init__()
 
@@ -16,14 +16,10 @@ class QueensModel(pyo.ConcreteModel):
         # RANGE SETS
         I = self.I = pyo.RangeSet(n) # Rows
         J = self.J = pyo.RangeSet(m) # Columns
-        K = self.K = pyo.Set( # Colored Regions
-            initialize=[region.color for region in regions]
-        )
+        K = self.K = pyo.Set(initialize=[region.color for region in regions]) # Colored Regions
 
         # COMPOSITE SETS
-        S = self.S = pyo.Set( # Board Squares
-            initialize=lambda model: [(i, j) for i in I for j in J]
-        )
+        S = self.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Board Squares
         R = self.R = pyo.Set(  # Region Squares
             K,
             initialize={region.color: region.squares for region in regions},

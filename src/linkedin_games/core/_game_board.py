@@ -48,6 +48,10 @@ class GameBoard(ABC): # Abstract Base Class
     def __abs__(self) -> int:
         return len(self)
 
+    @property
+    def area(self) -> int:
+        return len(self)
+
     @staticmethod
     def _manhattan_distance(square1:tuple[int, int], square2:tuple[int, int]) -> int:
         """Calculates the Manhattan distance between two squares."""
@@ -152,7 +156,6 @@ class GameBoard(ABC): # Abstract Base Class
             solver (str): The solver's name to use.
             verbose (bool): Whether to print solver output.
         """
-
         result = pyo.SolverFactory(solver).solve(self.model)
         self.__is_solved = (
             # Checks if solver is finished with normal termination.

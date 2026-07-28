@@ -1,5 +1,4 @@
 from pprint import pprint
-from typing import Self
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -24,25 +23,27 @@ class Patches(GameBoard):
         _set_solution (None): Set the solution of the Patches game.
         _show (None): Show the Patches game board with rectangles.
     """
-    def __init__(self, board_dims:tuple[int, int], seeds:dict[tuple[int, int], dict[str, str|int]]) -> Self:
+    def __init__(self, board_dims:tuple[int, int], seeds:dict[tuple[int, int], dict[str, str|int]]) -> None:
         """
         Args:
             board_dims (tuple[int, int]): The dimensions of the board as (rows, columns).
             seeds (tuple[SeedSquare]): The seeds of the game.
         """
         super().__init__(board_dims)
-        self._set_seeds(seeds)
+        self.__set_seeds(seeds)
         self._model = PatchesModel(self.board_dims, self.seeds)
+
 
     def __hash__(self) -> int:
         return hash((self.board_dims, self.seeds))
 
+
     @property
     def seeds(self) -> set[SeedSquare]:
         """tuple[SeedSquare]: All the seeds of the game."""
-        return self._seeds
+        return self.__seeds
 
-    def _set_seeds(self, seeds:dict[tuple[int, int], dict[str, str|int]]) -> None:
+    def __set_seeds(self, seeds:dict[tuple[int, int], dict[str, str|int]]) -> None:
         if not isinstance(seeds, dict):
             msg = f"seeds must be a dictionary. Got {type(seeds).__name__} instead."
             raise TypeError(msg)
@@ -51,28 +52,33 @@ class Patches(GameBoard):
             msg = "seeds cannot be empty!"
             raise ValueError(msg)
 
-        colors = [attr["color"] for seed in seeds for attr in seed.values()]
+        colors = [seed["color"] for seed in seeds.values()]
         if len(colors) != len(set(colors)):
             msg = "There must not be two or more seeds with the same color."
             raise ValueError(msg)
 
-        self._seeds = {
+        self.__seeds = {
             SeedSquare(
                 square=square,
-                area=attr.get("area"),
-                shape=attr.get("shape"),
-                color=attr.get("color")
-            ) for seed in seeds for square, attr in seed.items()
+                area=seed.get("area"),
+                shape=seed.get("shape"),
+                color=seed.get("color")
+            ) for square, seed in seeds.items()
         }
+
+
+    @property
+    def rectangles(self) -> list[Rectangle] | None:
+        return self.solution
 
     @property
     def solution(self) -> list[Rectangle] | None:
         """All the rectangles of the Patches game."""
         if not self.is_solved:
             return None
-        return [seed.rectangle.to_dict() for seed in self.seeds]
+        return sorted([seed.rectangle.to_dict() for seed in self.seeds], key=lambda x: x["top_left_square"])
 
-    def _set_solution(self, verbose: bool = False) -> None:
+    def _set_solution(self, verbose:bool = False) -> None:
         for seed in self.seeds:
             top = round(pyo.value(self.model.t[seed.color_code]))
             left = round(pyo.value(self.model.l[seed.color_code]))
@@ -93,6 +99,7 @@ class Patches(GameBoard):
         if verbose:
             print("These are the rectagles that solves the game:")
             pprint(self.solution)
+
 
     def show(self) -> None:
         plt.figure(figsize=(3, 3))

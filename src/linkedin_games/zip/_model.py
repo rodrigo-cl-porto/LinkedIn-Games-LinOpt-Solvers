@@ -19,18 +19,14 @@ class ZipModel(pyo.ConcreteModel):
         J = self.J = pyo.RangeSet(m) # Columns
 
         # COMPOSITE SETS
-        S = self.S = pyo.Set( # Board Squares
-            initialize=lambda model: [(i, j) for i in I for j in J]
-        ) 
+        S = self.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Board Squares
         E = self.E = pyo.Set(initialize=lambda model: # Edges
             [((i, j), (i+1, j)) for i in I for j in J if i+1 in I] +
             [((i, j), (i-1, j)) for i in I for j in J if i-1 in I] +
             [((i, j), (i, j+1)) for i in I for j in J if j+1 in J] +
             [((i, j), (i, j-1)) for i in I for j in J if j-1 in J]
         )
-        K = self.K = pyo.Set( # Numbered Squares
-            initialize=numbered_squares.keys(), dimen=2
-        )
+        K = self.K = pyo.Set(initialize=numbered_squares.keys(), dimen=2) # Numbered Squares
         W = self.W = pyo.Set(initialize=walls) # Walls
         
         # DECISION VARIABLES
@@ -38,9 +34,7 @@ class ZipModel(pyo.ConcreteModel):
         u = self.u = pyo.Var(S, within=pyo.NonNegativeReals)
 
         # PARAMETERS
-        k = self.k = pyo.Param(
-            S, initialize=self.numbered_squares, within=pyo.NonNegativeIntegers, default=0
-        )
+        k = self.k = pyo.Param(S, initialize=numbered_squares, within=pyo.NonNegativeIntegers, default=0)
 
         # OBJECTIVE FUNCTION
         self.obj = pyo.Objective(expr=0) # feasibility problem
@@ -59,7 +53,7 @@ class ZipModel(pyo.ConcreteModel):
         self.wall_constraints = pyo.Constraint(
             W, rule=lambda model, i, j, r, s: x[i,j,r,s] + x[r,s,i,j] == 0
         )
-        M = len(self)
+        M = m * n # Big M
         self.subroute_elimination_constraints = pyo.Constraint(
             E, rule=lambda model, i, j, r, s:
                 u[r, s] >= u[i, j] + 1 - M * (1 - x[i, j, r, s])

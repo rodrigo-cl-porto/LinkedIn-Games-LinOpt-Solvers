@@ -6,7 +6,7 @@ from ._seed_square import SeedSquare
 
 class PatchesModel(pyo.ConcreteModel):
     """A Linear optimization model for the Patches game"""
-    def __init__(self, board_dims:tuple[int, int], seeds:set[SeedSquare]):
+    def __init__(self, board_dims:tuple[int, int], seeds:set[SeedSquare]) -> None:
         super().__init__()
 
         # BOARD DIMENSIONS
@@ -22,16 +22,12 @@ class PatchesModel(pyo.ConcreteModel):
         )
 
         # COMPOSITE SETS
-        S = self.S = pyo.Set( # Board Squares
-            initialize=lambda model: [(i, j) for i in I for j in J]
-        )
-        E = self.E = pyo.Set( # Seed squares
-            initialize=[(*seed.square, seed.color_code) for seed in seeds]
-        )
-        V = self.V = pyo.Set(initialize=[ # Vertical rectangles
+        S = self.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Board Squares
+        E = self.E = pyo.Set(initialize=[(*seed.square, seed.color_code) for seed in seeds]) # Seed squares
+        V = self.V = pyo.Set(initialize=[
             seed.color_code for seed in seeds
             if seed.shape == RectangleShape.VERTICAL
-        ])
+        ]) # Vertical rectangles
         H = self.H = pyo.Set(initialize=[ # Horizontal rectangles
             seed.color_code for seed in seeds
             if seed.shape == RectangleShape.HORIZONTAL
@@ -46,36 +42,22 @@ class PatchesModel(pyo.ConcreteModel):
 
         # DECISION VARIABLES
         ## Integer variables
-        l = self.l = pyo.Var( # Index of the leftmost column of the rectangle k
-            K, domain=pyo.PositiveIntegers
-        )
-        t = self.t = pyo.Var( # Index of the top row of the rectangle k
-            K, domain=pyo.PositiveIntegers
-        )
+        l = self.l = pyo.Var(K, domain=pyo.PositiveIntegers) # Index of the leftmost column of the rectangle k
+        t = self.t = pyo.Var(K, domain=pyo.PositiveIntegers) # Index of the top row of the rectangle k
         w = self.w = pyo.Var(K, domain=pyo.PositiveIntegers) # Width of rectangle k
         h = self.h = pyo.Var(K, domain=pyo.PositiveIntegers) # Height of rectangle k
+
         ## Binary variables
-        u = self.u = pyo.Var( # u_ik = 1 if row i passes through rectangle k
-            I, K,
-            domain=pyo.Binary, initialize=0
-        )
-        v = self.v = pyo.Var( # v_jk = 1 if column j passes through rectangle k
-            J, K,
-            domain=pyo.Binary, initialize=0
-        )  
-        x = self.x = pyo.Var( # x_ijk = 1 if a square (i,j) is covered by rectangle k
-            I, J, K,
-            domain=pyo.Binary, initialize=0
-        )
+        u = self.u = pyo.Var(I, K, domain=pyo.Binary, initialize=0) # u_ik = 1 if row i passes through rectangle k
+        v = self.v = pyo.Var(J, K, domain=pyo.Binary, initialize=0) # v_jk = 1 if column j passes through rect k
+        x = self.x = pyo.Var(I, J, K, domain=pyo.Binary, initialize=0) # x_ijk = 1 if square (i,j) is covered by rect k
 
         # PARAMETERS
         m = self.m # Total number of rows
         n = self.n # Total number of columns
-        a = self.a = pyo.Param( # Required areas
-            K, initialize={
-                seed.color_code: seed.area for seed in seeds if seed.area is not None
-            }
-        )
+        a = self.a = pyo.Param(
+            K, initialize={seed.color_code: seed.area for seed in seeds if seed.area is not None}
+        ) # Required areas
 
         # OBJECTIVE FUNCTION
         self.obj = pyo.Objective(expr=sum(w[k] + h[k] for k in K), sense=pyo.minimize)

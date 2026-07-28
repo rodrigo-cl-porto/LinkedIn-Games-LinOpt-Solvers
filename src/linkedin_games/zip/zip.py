@@ -1,5 +1,4 @@
 from pprint import pprint
-from typing import Self
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -31,18 +30,21 @@ class Zip(GameBoard):
     def __init__(self,
             board_dims: tuple[int, int],
             numbered_squares: dict[tuple[int, int]: int],
-            walls: tuple[tuple[int, int]]|None = None) -> Self:
+            walls: tuple[tuple[int, int]]|None = None) -> None:
         super().__init__(board_dims)
-        self._set_numbered_squares(numbered_squares)
-        self._set_walls(walls)
+        self.__set_numbered_squares(numbered_squares)
+        self.__set_walls(walls)
         self._model = ZipModel(self.board_dims, self.numbered_squares, self.walls)
 
+
     def __hash__(self) -> int:
-        return hash((self._board_dims, self._numbered_squares, self._walls))
+        return hash((self._board_dims, self.__numbered_squares, self.__walls))
+
 
     def number_of_edges(self) -> int:
         """Total number of edges on game board."""
         return len(self.board.number_of_edges()) / 2
+
 
     @property
     def numbered_squares(self) -> dict[tuple[int, int]: int]:
@@ -51,9 +53,9 @@ class Zip(GameBoard):
         where the keys are (row, column) coordinates
         and the values are the corresponding numbers assigned to those squares.
         """
-        return self._numbered_squares
+        return self.__numbered_squares
     
-    def _set_numbered_squares(self, values:dict[tuple[int, int]: int]) -> None:
+    def __set_numbered_squares(self, values:dict[tuple[int, int]: int]) -> None:
         if len(values) > len(self):
             msg = (
                 "The number of numbered squares exceeds the amount of board squares."
@@ -69,25 +71,26 @@ class Zip(GameBoard):
             raise ValueError(msg)
 
         if isinstance(values, (list, tuple)):
-            self._numbered_squares = {square: index for index, square in enumerate(values)}
+            self.__numbered_squares = {square: index for index, square in enumerate(values)}
         elif not isinstance(values, dict):
             msg = "The numbered squares must be a dictionary."
-            raise ValueError(msg)
+            raise TypeError(msg)
         else:
-            self._numbered_squares = values
+            self.__numbered_squares = values
 
         nx.set_node_attributes(self.board, name="value", values=None)
         nx.set_node_attributes(self.board, name="value", values=self.numbered_squares)
 
+
     @property
     def walls(self) -> tuple[tuple[int, int], tuple[int, int]]:
         """Returns a tuple of walls (pairs of squares)"""
-        return self._walls
+        return self.__walls
     
-    def _set_walls(self, values:tuple[tuple[int, int], tuple[int, int]] | None) -> None:
+    def __set_walls(self, values:tuple[tuple[int, int], tuple[int, int]] | None) -> None:
         if values is None:
-            self._walls = None
-            return None
+            self.__walls = None
+            return
 
         if len(values) > self.number_of_edges:
             msg = (
@@ -98,12 +101,12 @@ class Zip(GameBoard):
             raise ValueError(msg)
 
         if isinstance(values, list):
-            self._walls = tuple(values)
+            self.__walls = tuple(values)
         elif not isinstance(values, tuple):
             msg = "Walls must be a tuple of squares."
-            raise ValueError(msg)
+            raise TypeError(msg)
         else:
-            self._walls = values
+            self.__walls = values
 
         invalid_items = [pair for pair in values if super()._manhattan_distance(*pair) != 1]
         if invalid_items:
@@ -113,27 +116,29 @@ class Zip(GameBoard):
             )
             raise ValueError(msg)
 
+
     @property
-    def solution(self) -> list[tuple[int, int]]:
+    def path(self) -> list[tuple[int, int]] | None:
         """Return the path that solves the Zip game."""
+        return self.solution
+
+    @property
+    def solution(self) -> list[tuple[int, int]] | None:
+        """Return the path that solves the Zip game."""
+        if not self.is_solved:
+            return None
         return self.__solution
 
     def _set_solution(self, verbose:bool=False) -> None:
         nx.set_node_attributes(
             self.board,
             name="value",
-            values={
-                (i-1, j-1): round(pyo.value(self.model.u[i,j]))
-                for i, j in self.model.S
-            }
+            values={(i-1, j-1): round(pyo.value(self.model.u[i,j])) for i, j in self.model.S}
         )
         nx.set_edge_attributes(
             self.board,
             name="value",
-            values={
-                ((i-1, j-1), (r-1, s-1)): round(pyo.value(self.model.x[i,j,r,s]))
-                for i, j, r, s in self.model.E
-            }
+            values={((i-1, j-1), (r-1, s-1)): round(pyo.value(self.model.x[i,j,r,s])) for i, j, r, s in self.model.E}
         )
         path = nx.get_node_attributes(self.board, "value")
         path = sorted(path.keys(), key=path.get)
@@ -141,6 +146,7 @@ class Zip(GameBoard):
         if verbose:
             print("This is the path that solves the games:")
             pprint(self.solution)
+
 
     def show(self) -> None:
         plt.figure(figsize=(3.4, 3.4))

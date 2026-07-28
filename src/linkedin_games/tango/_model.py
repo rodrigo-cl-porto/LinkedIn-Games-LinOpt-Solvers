@@ -5,9 +5,9 @@ class TangoModel(pyo.ConcreteModel):
     """A Linear Optimization Model for Tango game."""
     def __init__(self,
             board_dims:tuple[int, int],
-            filled_squares:dict[tuple[int, int]: int] | None,
-            matching_pairs: set[tuple[tuple[int, int], tuple[int, int]]] | None,
-            opposite_pairs: set[tuple[tuple[int, int], tuple[int, int]]] | None):
+            filled_squares:dict[tuple[int, int]: int] | None = None,
+            matching_pairs: set[tuple[tuple[int, int], tuple[int, int]]] | None = None,
+            opposite_pairs: set[tuple[tuple[int, int], tuple[int, int]]] | None = None) -> None:
         super().__init__()
 
         # BOARD DIMENSIONS
@@ -20,9 +20,7 @@ class TangoModel(pyo.ConcreteModel):
         J = self.J = pyo.RangeSet(m) # Columns
 
         # COMPOSITE SETS
-        S = self.S = pyo.Set( # Board Squares
-            initialize=lambda model: [(i, j) for i in I for j in J]
-        ) 
+        S = self.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Board Squares
         K = self.K = pyo.Set(initialize=filled_squares.keys(), dimen=2)
         M = self.M = pyo.Set(initialize=matching_pairs)
         O = self.O = pyo.Set(initialize=opposite_pairs)
@@ -33,9 +31,7 @@ class TangoModel(pyo.ConcreteModel):
         # PARAMETERS
         m = self.m # Total number of rows
         n = self.n # Total number of columns
-        k = self.k = pyo.Param( # Filled values
-            K, initialize=self._filled_squares, within=pyo.Binary
-        )
+        k = self.k = pyo.Param(K, initialize=filled_squares, within=pyo.Binary) # Filled values
 
         # OBJECTIVE FUNCTION
         self.obj = pyo.Objective(expr=0) # feasibility problem
