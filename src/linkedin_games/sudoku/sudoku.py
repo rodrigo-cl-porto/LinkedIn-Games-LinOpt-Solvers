@@ -53,7 +53,7 @@ class Sudoku(GameBoard):
             )
             raise ValueError(msg)
         
-        elif p * q != self.size:
+        if p * q != self.size:
             msg = (
                 "The dimensions of grid blocks must match"
                 f"with the sudoku's size of {self.size}."

@@ -1,1 +1,0 @@
-::: linkedin_games.patches.rectangle.Rectangle

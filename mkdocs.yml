@@ -4,7 +4,7 @@ repo_name: linkedin-games-solvers
 edit_uri: tree/main/docs
 
 theme:
-  name: material
+  name: readthedocs
   logo: assets/logo-dark.svg
   favicon: assets/logo.svg
   palette:

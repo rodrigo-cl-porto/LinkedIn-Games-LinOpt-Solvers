@@ -49,8 +49,8 @@ dev = [
     "pytest>=9.1.1",
     "ruff>=0.15.22",
 ]
-doc = [
-    "mkdocs-material>=9.7.7",
+docs = [
+    "mkdocs>=1.6.1",
     "mkdocstrings-python>=2.0.5",
 ]
 
@@ -123,15 +123,8 @@ verbosity = -1
 [tool.poe.tasks.clean]
 cmd = "rm -rf .venv"
 
-[tool.poe.tasks.start]
-cmd = """
-uv venv --python 3.13
-uv python pin 3.13
-uv sync --all-groups --all-extras
-"""
-
-[tool.poe.tasks.restart]
-sequence = ["clean", "start"]
+[tool.poe.tasks.sync]
+cmd = "uv sync --all-groups"
 
 [tool.poe.tasks.docs]
 cmd = "mkdocs serve --livereload"
