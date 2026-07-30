@@ -6,24 +6,15 @@ from ._rectangle import Rectangle
 from ._rectangle_shape import RectangleShape
 
 
-class SeedSquare:
-    """A seed square that creates a rectangle in the Patches game
-
-    Attributes:
-        square (tuple[int, int]): The position of the rectangle seed on the Zip board.
-        shape (str): The required shape of the seed square.
-        area (int|None): The required area of the seed square.
-        color (str): The color of the rectangle created by the seed.
-        color_code (str): The hexadecimal color code of the rectangle created by the seed.
-        rectangle (Rectangle): The rectangle object created by the seed.
-    """
+class RectangleSeed:
+    """A seed that creates a rectangle in the Patches game."""
     def __init__(self, square:tuple[int, int], area:int|None=None, shape:str="any", color:str="white") -> None:
         """
         Args:
-            square (tuple[int, int]): The position of the seed on the Zip board.
-            area (int | None): The required area of the seed square.
-            shape (str): The required shape of the seed square.
-            color (str): The color of the seed square.
+            square: The board position of the seed as a `(row, column)` tuple.
+            area: The required area of the rectangle to be built.
+            shape: The rectagangle's required shape.
+            color: The seed's color name or its hex code as a `#RRGGBB` string.
         """
         self.__set_square(square)
         self.__set_shape(shape)
@@ -54,7 +45,7 @@ class SeedSquare:
 
 
     def __hash__(self) -> int:
-        return hash((self.square, self.shape, self.area, self.color_code))
+        return hash((self.color_code, self.square, self.shape, self.area))
 
 
     def __len__(self) -> int:
@@ -65,13 +56,18 @@ class SeedSquare:
         return 1
 
 
-    def __eq__(self, other:Self) -> bool:
-        if not isinstance(other, SeedSquare):
+    def __eq__(self, other: Self) -> bool:
+        if not isinstance(other, Self):
             return False
-        return (self.square == other.square and self.area == other.area and self.shape == other.shape)
+        return (
+            self.color_code == other.self.color_code
+            and self.square == other.square
+            and self.area == other.area
+            and self.shape == other.shape
+        )
 
 
-    def __ne__(self, other:Self) -> bool:
+    def __ne__(self, other: Self) -> bool:
         return not self.__eq__(other)
 
 
@@ -80,17 +76,32 @@ class SeedSquare:
         """Check if a number is a perfect square.
         
         Args:
-            n (int): The number to check.
+            n: The number to check.
 
         Returns:
-            bool: True if `n` is a perfect square, False otherwise.
+            `True` if `n` is a perfect square, `False` otherwise.
         """
         return sqrt(n) % 1 == 0
 
 
+    def to_dict(self) -> dict[str, str|int|tuple[int, int] | None]:
+        return {
+            "color": self.color,
+            "color_code": self.color_code,
+            "square": self.square,
+            "shape": self.shape,
+            "area": self.area
+        }
+
+
     @property
     def square(self) -> tuple[int, int]:
-        """tuple[int, int]: Position of the rectangle seed on the Zip board as a tuple (row, column)."""
+        """
+        Board square where the seed lies.
+        
+        Returns:
+            Board square of the rectangle seed as a `(row, column)` tuple.
+        """
         return self.__square
 
     def __set_square(self, value: tuple[int, int]) -> None:
@@ -119,7 +130,12 @@ class SeedSquare:
 
     @property
     def shape(self) -> str:
-        """The rectangle shape required by the seed square."""
+        """
+        The rectangle's required shape.
+
+        Returns:
+            The rectangle shape's name required by the seed square.
+        """
         return str(self.__shape)
 
     def __set_shape(self, value:str) -> None:
@@ -135,14 +151,19 @@ class SeedSquare:
         try:
             self.__shape = RectangleShape(value.strip().lower())
         except ValueError as exc:
-            valid__shapes = f"'{"', '".join(str(shape) for shape in RectangleShape)}'"
-            msg = f"'{value}' is not a valid rectangle shape. Please, input one of theses shapes: {valid__shapes}"
+            valid_shapes = f"'{"', '".join(str(shape) for shape in RectangleShape)}'"
+            msg = f"'{value}' is not a valid rectangle shape. Please, input one of theses shapes: {valid_shapes}"
             raise ValueError(msg) from exc
 
 
     @property
     def area(self) -> int | None:
-        """Required rea of the seed square as a positive integer or None."""
+        """
+        The required rectangle's area.
+        
+        Returns:
+            The rectangle's area required by the seed or `None` if the seed doesn't claim it.
+        """
         return self.__area
 
     def __set_area(self, value: int | None) -> None:
@@ -159,7 +180,7 @@ class SeedSquare:
             msg = f"The required area must be a positive integer. Got {value!r} instead."
             raise ValueError(msg)
 
-        if self.shape == RectangleShape.SQUARE and not SeedSquare.__is_perfect_square(value):
+        if self.shape == RectangleShape.SQUARE and not RectangleSeed.__is_perfect_square(value):
             msg = f"The required area ({value!r}) is not a perfect square."
             raise ValueError(msg)
 
@@ -168,7 +189,12 @@ class SeedSquare:
 
     @property
     def color(self) -> str:
-        """The color name of the seed square."""
+        """
+        The name of the rectangle seed's color.
+
+        Returns:
+            The color's name of the rectangle.
+        """
         return self.__color.name
     
     @color.setter
@@ -178,7 +204,12 @@ class SeedSquare:
 
     @property
     def color_code(self) -> str:
-        """The hexadecimal color code of the seed square."""
+        """
+        The code of rectangle seed's color.
+
+        Returns:
+            Hex code color as a `"#RRGGBB"` string.
+        """
         return self.__color.hex
     
     @color_code.setter
@@ -188,40 +219,50 @@ class SeedSquare:
 
     @property
     def rectangle(self) -> Rectangle:
-        """The rectangle created by the seed square."""
-        return self.__rectangle
+        """
+        The seed's rectangle.
+        
+        Returns:
+            The rectangle created by the seed square after solving Patches game.
+        """
+        return self.__rectangle.to_dict()
 
-    def _set_rectangle(self, value:Rectangle) -> None:
-        """Set the rectangle object created by the rectangle seed."""
-        if self.area is not None:
-            if value.area != self.area:
-                msg = f"The rectangle's area ({value.area}) doesn't attend to the required area ({self.area})."
-                raise ValueError(msg)
+    @rectangle.setter
+    def rectangle(self, value:dict[str, str|int]) -> None:
 
+        if self.area is not None and value["area"] != self.area:
+            msg = f"The rectangle's area ({value["area"]}) doesn't attend to the required area ({self.area})."
+            raise ValueError(msg)
+        
         match self.shape:
-            
             case RectangleShape.VERTICAL:
-                if value.height <= value.width:
+                if value["height"] <= value["width"]:
                     msg = (
                         f"The rectangle doesn't have {self.shape.lower} shape."
-                        f" Its height ({value.height!r}) should be greater than its width ({value.width!r})."
+                        f" Its height ({value["height"]!r}) should be greater than its width ({value["width"]!r})."
                     )
                     raise ValueError(msg)
             
             case RectangleShape.HORIZONTAL:
-                if value.height >= value.width:
+                if value["height"] >= value["width"]:
                     msg = (
                         f"The rectangle doesn't have {self.shape.lower} shape."
-                        f" Its width ({value.width!r}) should be greater than its height ({value.height!r})."
+                        f" Its width ({value["width"]!r}) should be greater than its height ({value["height"]!r})."
                     )
                     raise ValueError(msg)
             
             case RectangleShape.SQUARE:
-                if value.height != value.width:
+                if value["height"] != value["width"]:
                     msg = (
                         f"The rectangle doesn't have {self.shape.lower} shape."
-                        f" Its height ({value.height!r}) should be equal to its width ({value.width!r})."
+                        f" Its height ({value["height"]!r}) should be equal to its width ({value["width"]!r})."
                     )
                     raise ValueError(msg)
 
-        self.__rectangle = value
+        self.__rectangle = Rectangle(
+            color=value["color"],
+            top=value["top"],
+            left=value["left"],
+            width=value["width"],
+            height=value["height"]
+        )

@@ -1,11 +1,15 @@
 import pyomo.environ as pyo
 
-from ._region import Region
-
 
 class QueensModel(pyo.ConcreteModel):
-    """The Linear Optimization model for the Queens game"""
-    def __init__(self, board_dims:tuple[int, int], regions:set[Region]):
+    """The Linear Optimization model for the Queens game."""
+
+    def __init__(self, board_dims: tuple[int, int], regions: dict[str, set[tuple[int, int]]]) -> None:
+        """
+        Args:
+            board_dims: Board dimensionas as a `(rows, columns)` tuple.
+            regions: All colored regions on Queens board as a dictionary of `color: {(row, column), ...}`.
+        """
         super().__init__()
 
         # BOARD DIMENSIONS
@@ -16,22 +20,18 @@ class QueensModel(pyo.ConcreteModel):
         # RANGE SETS
         I = self.I = pyo.RangeSet(n) # Rows
         J = self.J = pyo.RangeSet(m) # Columns
-        K = self.K = pyo.Set(initialize=[region.color for region in regions]) # Colored Regions
+        K = self.K = pyo.Set(initialize=regions.keys()) # Colored Regions
 
         # COMPOSITE SETS
         S = self.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Board Squares
-        R = self.R = pyo.Set(  # Region Squares
-            K,
-            initialize={region.color: region.squares for region in regions},
-            dimen=2,
-        )
+        R = self.R = pyo.Set(K, initialize=regions, dimen=2) # Region Squares
         D = self.D = pyo.Set(initialize=lambda model: # Diagonals
             [((i, j), (i + 1, j + 1)) for (i, j) in S if (i + 1, j + 1) in S] +
             [((i, j), (i + 1, j - 1)) for (i, j) in S if (i + 1, j - 1) in S]
         )
 
         # OBJECTIVE FUNCTION
-        self.obj = pyo.Objective(expr=0)  # feasibility problem
+        self.obj = pyo.Objective(expr=0) # feasibility problem
 
         # DECISION VARIABLES
         x = self.x = pyo.Var(S, within=pyo.Binary, initialize=0)

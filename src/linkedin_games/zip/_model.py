@@ -2,11 +2,18 @@ import pyomo.environ as pyo
 
 
 class ZipModel(pyo.ConcreteModel):
-    """Linear Optimization Model for Zip game"""
+    """The Linear Optimization Model for LinkedIn Zip game."""
+
     def __init__(self,
-            board_dims:tuple[int, int],
-            numbered_squares:dict[tuple[int, int]: int],
-            walls:tuple[tuple[int, int], tuple[int, int]] | None):
+            board_dims: tuple[int, int],
+            numbered_squares: dict[tuple[int, int]: int],
+            walls: tuple[tuple[int, int], tuple[int, int]] | None):
+        """
+        Args:
+            board_dims: Board dimensions as a `(row, column)` tuple.
+            numbered_squares: Squares with a assigned number as a dictionary of `(row, column): number` values.
+            walls: Pairs of squares separated by a walls as a tuple of `((row1, column1), (row2, column2))`.
+        """
         super().__init__()
 
         # BOARD DIMENSIONS

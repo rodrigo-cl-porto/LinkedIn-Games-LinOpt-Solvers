@@ -34,8 +34,13 @@ plugins:
           inventories:
             - https://docs.python.org/3/objects.inv
           options:
+            summary: true
             docstring_style: google
+            group_by_category: true
             inherited_members: true
-            show_source: true
-            show_signature_annotations: false
+            show_source: false
+            show_signature_annotations: true
+            separate_signature: true
             merge_init_into_class: true
+            docstring_options:
+              ignore_init_summary: false

@@ -9,17 +9,20 @@ from ._model import TangoModel
 
 
 class Tango(GameBoard):
-    """_summary_
-
-    Attributes:
-        GameBoard (_type_): _description_
-    """
-
+    """The LinkedIn Tango game."""
     def __init__(self,
             filled_squares:dict[tuple[int, int]: int] | None = None,
             matching_pairs:set[tuple[tuple[int, int], tuple[int, int]]] | None = None,
             opposite_pairs:set[tuple[tuple[int, int], tuple[int, int]]] | None = None,
             ) -> None:
+        """
+        Args:
+            filled_squares: Starting filled squares as a dictionary of `(row, column): 0 | 1`.
+            matching_pairs: Pairs of matching squares (separated by a `=` sign)
+                as a set of `((row1, column1), (row2, column2))`.
+            opposite_pairs: Pairs of opposite squares (separated by a `×` sign)
+                as a set of `((row1, column1), (row2, column2))`.
+        """
         super().__init__(board_dims=(6,6)) # It's assumed that Tango board dimensions will always be a 6x6
         self.__set_filled_squares(filled_squares)
         self.__set_matching_pairs(matching_pairs)
@@ -33,7 +36,7 @@ class Tango(GameBoard):
 
     @property
     def filled_squares(self) -> dict[tuple[int, int]: int]:
-        """Return the squares that are already filled with a symbol."""
+        """Squares that are already filled with a symbol."""
         return self.__filled_squares
     
     def __set_filled_squares(self, values:dict[tuple[int, int]: int]) -> None:
@@ -62,28 +65,29 @@ class Tango(GameBoard):
 
     @property
     def matching_pairs(self) -> tuple[tuple[tuple[int, int], tuple[int, int]]] | None:
+        """
+        Pairs of matching squares.
+
+        Pairs of squares that are separated by a `=` sign, i.e., that must have the same symbols.
+
+        Returns:
+            Pairs of matching squares as a set of `((row1, column1), (row2, column2))`.
+        """
         return self.__matching_pairs
     
     def __set_matching_pairs(self, values:tuple[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
-        
         if values is None:
             self.__matching_pairs = values
             return
 
         invalid_items = [pair for pair in values if not isinstance(pair, tuple) or len(pair) != 2]
         if invalid_items:
-            msg = (
-                "matching_pairs must be a collection of pairs of tuples."
-                f" Got the following invalid pairs: {invalid_items!r}."
-            )
+            msg = f"matching_pairs must be a collection of pairs of tuples. Invalid pairs: {invalid_items!r}."
             raise TypeError(msg)
         
         invalid_items = [square for pair in values for square in pair if not isinstance(square, tuple)]
         if invalid_items:
-            msg = (
-                "Squares in pair must be tuples of positive integers."
-                f" Got the following invalid squares: {invalid_items!r}."
-            )
+            msg = f"Squares in pair must be tuples of positive integers. Invalid squares: {invalid_items!r}."
             raise TypeError(msg)
         
         invalid_items = [
@@ -91,15 +95,12 @@ class Tango(GameBoard):
             if not isinstance(coord, int) or coord < 1
         ]
         if invalid_items:
-            msg = f"Coordinates must be positive integers. Got the following invalid squares: {invalid_items!r}."
+            msg = f"Coordinates must be positive integers. Invalid squares: {invalid_items!r}."
             raise ValueError(msg)
 
         invalid_items = [pair for pair in values if super()._manhattan_distance(*pair) != 1]
         if invalid_items:
-            msg = (
-                "Squares in a pair must be consecutive ones. "
-                f"Got the following invalid pairs: {invalid_items!r}."
-            )
+            msg = f"Squares in a pair must be consecutive ones. Invalid pairs: {invalid_items!r}."
             raise ValueError(msg)
         
         if not isinstance(values, tuple):
@@ -111,8 +112,12 @@ class Tango(GameBoard):
     @property
     def opposite_pairs(self) -> tuple[tuple[tuple[int, int], tuple[int, int]]] | None:
         """
-        Return the pairs of squares that are separated by a cross (×) sign, i.e.
-        the squares that must have opposite symbols.
+        Pairs of opposite squares.
+
+        Pairs of squares that are separated by a `×` sign, i.e., that must have opposite symbols.
+
+        Returns:
+            Pairs of opposite squares as a set of `((row1, column1), (row2, column2))`.
         """
         return self.__opposite_pairs
     
@@ -131,10 +136,7 @@ class Tango(GameBoard):
         
         invalid_items = [square for pair in value for square in pair if not isinstance(square, tuple)]
         if invalid_items:
-            msg = (
-                "Squares in pair must be tuples of positive integers."
-                f" Got the following invalid squares: {invalid_items!r}."
-            )
+            msg = f"Squares in pair must be tuples of positive integers. Invalid squares: {invalid_items!r}."
             raise TypeError(msg)
         
         invalid_items = [
@@ -142,15 +144,12 @@ class Tango(GameBoard):
             if not isinstance(coord, int) or coord < 1
         ]
         if invalid_items:
-            msg = "Coordinates must be positive integers. Got the following invalid squares: {invalid_items!r}."
+            msg = f"Coordinates must be positive integers. Invalid squares: {invalid_items!r}."
             raise ValueError(msg)
 
         invalid_items = [pair for pair in value if super()._manhattan_distance(*pair) != 1]
         if invalid_items:
-            msg = (
-                "Squares in a pair must be consecutive ones."
-                f" Got the following invalid pairs: {invalid_items!r}."
-            )
+            msg = f"Squares in a pair must be consecutive ones. Invalid pairs: {invalid_items!r}."
             raise ValueError(msg)
         
         if not isinstance(value, tuple):
@@ -158,12 +157,6 @@ class Tango(GameBoard):
         else:
             self.__opposite_pairs = value
 
-
-    @property
-    def solution(self) -> dict[tuple[int, int]: bool] | None:
-        if not self.is_solved:
-            return None
-        return self.board_squares
 
     def _set_solution(self, verbose:bool=False):
         nx.set_node_attributes(
@@ -177,6 +170,7 @@ class Tango(GameBoard):
 
 
     def show(self) -> None:
+        """Show Tango's board."""
         plt.figure(figsize=(3.4, 3.4))
         pos = {(i, j): (j, -i) for i, j in self.board.nodes()}
         nx.draw(

@@ -2,12 +2,22 @@ import pyomo.environ as pyo
 
 
 class TangoModel(pyo.ConcreteModel):
-    """A Linear Optimization Model for Tango game."""
+    """The Linear Optimization Model for Tango game."""
+
     def __init__(self,
-            board_dims:tuple[int, int],
-            filled_squares:dict[tuple[int, int]: int] | None = None,
+            board_dims: tuple[int, int],
+            filled_squares: dict[tuple[int, int]: int] | None = None,
             matching_pairs: set[tuple[tuple[int, int], tuple[int, int]]] | None = None,
             opposite_pairs: set[tuple[tuple[int, int], tuple[int, int]]] | None = None) -> None:
+        """
+        Args:
+            board_dims: Board dimensions as a `(row, column)` tuple.
+            filled_squares: Starting filled squares as a dictionary of `(row, column): 0 | 1`.
+            matching_pairs: Pairs of matching squares (separated by a `=` sign)
+                as a set of `((row1, column1), (row2, column2))`.
+            opposite_pairs: Pairs of opposite squares (separated by a `×` sign)
+                as a set of `((row1, column1), (row2, column2))`.
+        """
         super().__init__()
 
         # BOARD DIMENSIONS

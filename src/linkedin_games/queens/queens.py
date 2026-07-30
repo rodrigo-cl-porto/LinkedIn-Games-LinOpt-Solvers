@@ -10,24 +10,13 @@ from ._region import Region
 
 
 class Queens(GameBoard):
-    """A Queens is board game with colored regions
-
-    Attributes:
-        board (nx.Graph): The board of the game.
-        board_dims (tuple[int, int]): The dimensions of the board as (rows, columns).
-        board_edges (set[tuple[tuple[int, int], tuple[int, int]]]): The set of all edges on the board.
-        board_squares (set[tuple[int, int]]): The set of all squares on the board.
-        regions (set[Region]): The set of colored regions on the board.
-        crowns (tuple[tuple[int, int]]): The crowned squares of the game.
-        is_solved (bool): Whether the game has been solved or not.
-        model (pyo.ConcreteModel): The linear optimization model for the game.
-        regions (set[Region]): The set of colored regions on the board.
-
-    Methods:
-        show (None): Show the game board with the solution.
-        solve (None): Solve the game using linear optimization.
-    """
-    def __init__(self, board_dims:tuple[int, int], regions:dict[str, set[tuple[int, int]]]) -> None:
+    """The LinkedIn Queens game, with colored regions."""
+    def __init__(self, board_dims: tuple[int, int], regions: dict[str, set[tuple[int, int]]]) -> None:
+        """
+        Args:
+            board_dims: Board dimensions as a `(rows, columns)` tuple.
+            regions: Regions as a dictionary of `color: {(row, column), ...}`.
+        """
         super().__init__(board_dims)
         self.__set_regions(regions)
         self._model = QueensModel(self.board_dims, self.regions)
@@ -38,15 +27,15 @@ class Queens(GameBoard):
 
 
     @property
-    def regions(self) -> set[Region]:
+    def regions(self) -> dict[str, set[tuple[int, int]]]:
         """All colored regions on the board.
 
         It's assumed that the regions are non-overlapping and cover the entire board.
 
         Returns:
-            The set of colored regions on the board.
+            The set of all colored regions on the board.
         """
-        return self.__regions
+        return {region.color_code: region.squares for region in self.__regions}
 
     def __set_regions(self, regions:dict[str, set[tuple[int, int]]]) -> None:
 
@@ -95,24 +84,22 @@ class Queens(GameBoard):
         nx.set_node_attributes( # Adding a color for each square on the board
             self._board,
             name="color",
-            values={(i-1, j-1): region.color for region in self.regions for (i, j) in region.squares}
+            values={(i-1, j-1): region.color for region in self.__regions for (i, j) in region.squares}
         )
 
 
     @property
     def crowns(self) -> list[tuple[int, int]] | None:
-        return self.solution
+        """
+        The crowned squares of Queens game.
 
-    @property
-    def solution(self) -> list[tuple[int, int]] | None:
-        """List of squares that contain a crown.
-        
         Returns:
-            A sorted tuple of squares that contain a crown.
+            Locations of all crowns as a list of squares as `(row, column)` or `None` if the game is not solved yet.
         """
         if not self.is_solved:
             return None
         return sorted((i+1, j+1) for (i, j) in self.__crowns.nodes())
+
 
     def _set_solution(self, verbose:bool = False) -> None:
         nx.set_node_attributes(
@@ -120,23 +107,22 @@ class Queens(GameBoard):
             name="value",
             values={(i-1, j-1): round(pyo.value(self.model.x[i, j])) for (i, j) in self.model.S}
         )
-        crowns = [
-            square for square, value in nx.get_node_attributes(self.board, "value").items()
-            if value == 1
-        ]
+
+        crowns = [square for square, value in nx.get_node_attributes(self.board, "value").items() if value == 1]
         self.__crowns = self.board.subgraph(crowns)
         if verbose:
             print("These are the squares that contain a crown:")
-            pprint(self.solution)
+            pprint(self.crowns)
 
 
     def show(self) -> None:
+        """Show the Queens' board."""
         plt.figure(figsize=(3.4, 3.4))
         nx.draw(
             self.board,
             pos={(i, j): (j, -i) for i, j in self.board.nodes()},
             with_labels=True,
-            labels=dict.fromkeys(self.__crowns.nodes(), "O"), #{square: "O" for square in self.__crowns.nodes()},
+            labels=dict.fromkeys(self.__crowns.nodes(), "O"),
             node_size=1000,
             node_color=list(nx.get_node_attributes(self.board, "color").values()),
             node_shape="s", # Squared-shape nodes

@@ -1,12 +1,16 @@
 import pyomo.environ as pyo
 
-from ._rectangle_shape import RectangleShape
-from ._seed_square import SeedSquare
-
 
 class PatchesModel(pyo.ConcreteModel):
-    """A Linear optimization model for the Patches game"""
-    def __init__(self, board_dims:tuple[int, int], seeds:set[SeedSquare]) -> None:
+    """The Linear Optimization model for the Patches game."""
+
+    def __init__(self, board_dims: tuple[int, int], seeds: dict[tuple[int, int], dict[str, str|int]]) -> None:
+        """
+        Args:
+            board_dims: Board dimensionas as `(rows, columns)` tuple.
+            seeds: Rectangle seeds on board as a dictionary of
+                `(row, column): {"color": color, "area": area, "shape": shape}`.
+        """
         super().__init__()
 
         # BOARD DIMENSIONS
@@ -17,27 +21,22 @@ class PatchesModel(pyo.ConcreteModel):
         # RANGE SETS
         I = self.I = pyo.RangeSet(n) # Rows
         J = self.J = pyo.RangeSet(m) # Columns
-        K = self.K = pyo.Set(  # Rectangles
-            initialize=(seed.color_code for seed in seeds)
-        )
+        K = self.K = pyo.Set(initialize=(seed["color"] for seed in seeds.values())) # Rectangles
 
         # COMPOSITE SETS
         S = self.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Board Squares
-        E = self.E = pyo.Set(initialize=[(*seed.square, seed.color_code) for seed in seeds]) # Seed squares
-        V = self.V = pyo.Set(initialize=[
-            seed.color_code for seed in seeds
-            if seed.shape == RectangleShape.VERTICAL
-        ]) # Vertical rectangles
+        E = self.E = pyo.Set(initialize=[(*square, seed["color"]) for square, seed in seeds.items()]) # Rectangle Seeds
+        V = self.V = pyo.Set(initialize=[ # Vertical rectangles
+            seed["color"] for seed in seeds.values() if seed["shape"] == "vertical"
+        ])
         H = self.H = pyo.Set(initialize=[ # Horizontal rectangles
-            seed.color_code for seed in seeds
-            if seed.shape == RectangleShape.HORIZONTAL
+            seed["color"] for seed in seeds.values() if seed["shape"] == "horizontal"
         ])
         Q = self.Q = pyo.Set(initialize=[ # Squared rectangles
-            seed.color_code for seed in seeds
-            if seed.shape == RectangleShape.SQUARE
+            seed["color"] for seed in seeds.values() if seed["shape"] == "square"
         ])
-        A = self.A = pyo.Set(initialize=[ # Required areas
-            seed.color_code for seed in seeds if seed.area is not None
+        A = self.A = pyo.Set(initialize=[ # Rectangles with required area
+            seed["color"] for seed in seeds.values() if seed["area"] is not None
         ])
 
         # DECISION VARIABLES
@@ -55,9 +54,9 @@ class PatchesModel(pyo.ConcreteModel):
         # PARAMETERS
         m = self.m # Total number of rows
         n = self.n # Total number of columns
-        a = self.a = pyo.Param(
-            K, initialize={seed.color_code: seed.area for seed in seeds if seed.area is not None}
-        ) # Required areas
+        a = self.a = pyo.Param( # Required areas
+            K, initialize={seed["color"]: seed["area"] for seed in seeds.values() if seed["area"] is not None}
+        )
 
         # OBJECTIVE FUNCTION
         self.obj = pyo.Objective(expr=sum(w[k] + h[k] for k in K), sense=pyo.minimize)

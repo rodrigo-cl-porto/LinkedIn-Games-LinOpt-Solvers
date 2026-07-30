@@ -1,7 +1,7 @@
 from linkedin_games import Zip
 
 
-def test_zip():
+def test_zip_166():
 
     # Solving Zip No. 166
 

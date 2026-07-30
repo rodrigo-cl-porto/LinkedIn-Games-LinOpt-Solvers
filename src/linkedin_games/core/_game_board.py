@@ -1,70 +1,75 @@
 from abc import ABC, abstractmethod
-from typing import Self
 
 import networkx as nx
 import pyomo.environ as pyo
 from pyomo.opt import SolverStatus, TerminationCondition
 
 
-class GameBoard(ABC): # Abstract Base Class
-    """An abstract base class for any LinkedIn game board.
-    
-    Attributes:
-        board (nx.DiGraph): A graph of the game board.
-        board_dims (tuple[int, int]): The dimensions of the board as (rows, columns).
-        board_squares (dict[tuple[int, int], int]): The board squares and their values.
-        board_edges (dict[tuple[tuple[int, int], tuple[int, int]], int]):
-            The board edges and their values.
-        is_solved (bool): A logical value indicating whether the game has been solved.
-        model (pyo.ConcreteModel | None):
-            The linear optimization model of the game's problem.
-    
-    Methods:
-        show (None): Show the game board with the solution.
-        solve (None): Solve the game using linear optimization.
-    """
-    def __init__(self, board_dims:tuple[int, int]) -> Self:
-        """The game board for a linear optimization game.
-        
+class GameBoard(ABC):
+    """An Abstract Base Class for any LinkedIn game board."""
+
+    def __init__(self, board_dims:tuple[int, int]) -> None:
+        """
         Args:
-            board_dims (tuple[int, int]):
-                The dimensions of the board as (rows, columns).
+            `board_dims`: Board dimensions as a `(rows, columns)` tuple.
         
         Raises:
-            TypeError: If board_dims is not a tuple of two integers.
-            ValueError: If board_dims is not a tuple of two positive integers.
+            `TypeError`: If `board_dims` is not a tuple of two integers.
+            `ValueError`: If `board_dims` is not a tuple of two positive integers.
         """
         self._set_board_dims(board_dims)
-        GameBoard._set_board(self)
+        self._set_board()
         self._model: pyo.ConcreteModel | None = None
+
 
     def __hash__(self) -> int:
         return hash(self._board_dims)
+
 
     def __len__(self) -> int:
         m, n = self._board_dims
         return m * n
 
+
     def __abs__(self) -> int:
         return len(self)
 
-    @property
-    def area(self) -> int:
-        return len(self)
 
     @staticmethod
     def _manhattan_distance(square1:tuple[int, int], square2:tuple[int, int]) -> int:
-        """Calculates the Manhattan distance between two squares."""
+        """
+        Calculates the Manhattan distance between two squares.
+        
+        Args:
+            square1: The first square as a `(row, column)` tuple.
+            square2: The second square as a `(row, column)` tuple.
+        
+        Returns:
+            The Manhattan distance ($L_1$) between `square1` and `square2`.
+        """
         x1, y1 = square1
         x2, y2 = square2
         return abs(x1 - x2) + abs(y1 - y2)
 
+
+    @property
+    def area(self) -> int:
+        """
+        The game board's area
+
+        Returns:
+            The total number of squares on the board.
+        """
+        return len(self)
+
+
     @property
     def board_dims(self) -> tuple[int, int]:
-        """The board dimensions.
+        """
+        The board dimensions.
         
         Returns:
-            A tuple of dimensions of the board as (rows, columns).
+            Dimensions of the board as a `(rows, columns)` tuple.
         """
         return self._board_dims
 
@@ -91,15 +96,16 @@ class GameBoard(ABC): # Abstract Base Class
         
         self._board_dims = tuple(value)
 
+
     @property
     def board(self) -> nx.DiGraph:
-        """The game board as a graph.
+        """
+        The game's board.
         
-        The nodes of the graph represent the squares,
-        and the edges represent the possible moves between squares.
+        The nodes of the graph represent the squares, and its edges represent the possible paths between squares.
 
         Returns:
-            A directed graph representing the game board.
+            A directed graph representing the game's board.
         """
         return self._board
 
@@ -109,62 +115,77 @@ class GameBoard(ABC): # Abstract Base Class
         nx.set_edge_attributes(board, name="value", values=None)
         self._board = board
 
+
     @property
     def board_squares(self) -> dict[tuple[int, int], int]:
-        """Return the board squares.
+        """
+        All the board squares and their respective assigned values (if any).
         
         Returns:
-            A dictionary where the keys are the squares (row, column),
-            and the values are the square values.
+            A dictionary of board squares as "(`row`, `column`): `value`" format
         """
         return {(i+1, j+1): data["value"] for (i, j), data in self.board.nodes(data=True)}
     
     @property
     def board_edges(self) -> dict[tuple[tuple[int, int], tuple[int, int]], int]:
-        """Return the board edges and their respective values.
+        """
+        All the board edges and their respective assigned values (if any).
         
         Returns:
-            A dictionary where the keys are tuples of two squares (start, end),
-            and the values are the edge values.
+            A dictionary of edges as ((`row1`, `column1`), (`row2`, `column2`)): `value` format
         """
         edges = nx.get_edge_attributes(self.board, "value").items()
         return {((i+1, j+1), (r+1, s+1)): value for ((i, j), (r, s)), value in edges}
 
+
     @property
     def model(self) -> pyo.ConcreteModel:
-        """The mathematical model of the game.
+        """
+        The game's mathematical model.
         
         Returns:
-            The linear optimization model of the game's problem.
+            The Linear Optimization model of the game's problem.
         """
         return self._model
+
     
     @property
     def is_solved(self) -> bool:
         """Check if the game has been solved.
         
         Returns:
-            `True` if the game has been solved, `False` otherwise.
+            `True` if the game has been solved. `False` otherwise.
         """
         return self.__is_solved
 
-    
+
+    @property
+    def solution(self) -> dict[tuple[int, int], int | str] | None:
+        """
+        The solved game board.
+        
+        Returns:
+            A dictionary of squares as `(row, column): value` or `None` if game's not solved yet.
+        """
+        if not self.is_solved:
+            return None
+        return self.board_squares
+
+
     def solve(self, solver:str="highs", verbose:bool=False) -> None:
-        """Solves the game board using the specified solver.
+        """
+        Solve the game board using the specified solver.
         
         Args:
-            solver (str): The solver's name to use.
-            verbose (bool): Whether to print solver output.
+            solver: The solver's name to be used to solve the game.
+            verbose: If `True`, prints the solver output.
         """
         result = pyo.SolverFactory(solver).solve(self.model)
         self.__is_solved = (
-            # Checks if solver is finished with normal termination.
-            result.Solver.status == SolverStatus.ok
+            result.Solver.status == SolverStatus.ok # Checks if solver is finished with normal termination and if...
             and(
-                # Checks if solver is finished with an optimal solution...
-                result.Solver.termination_condition == TerminationCondition.optimal
-                # ... or with a feasible one.
-                or result.Solver.termination_condition == TerminationCondition.feasible 
+                result.Solver.termination_condition == TerminationCondition.optimal # ended with an optimal solution...
+                or result.Solver.termination_condition == TerminationCondition.feasible # or with a feasible one.
             )
         )
         if self.__is_solved:
@@ -175,12 +196,13 @@ class GameBoard(ABC): # Abstract Base Class
             if verbose:
                 print(result.Solver)
 
+
     @abstractmethod
     def _set_solution(self, verbose:bool) -> None:
         """Set the solution of the game board."""
-        pass
+        ...
 
     @abstractmethod
     def show(self) -> None:
-        """Display the game board as a NetworkX graph."""
-        pass
+        """Display the game board as a graph chart."""
+        ...
