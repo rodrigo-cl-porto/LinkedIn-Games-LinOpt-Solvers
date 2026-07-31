@@ -9,19 +9,30 @@ from ._model import ZipModel
 
 
 class Zip(GameBoard):
-    """The LinkedIn Zip game."""
+    """
+    The [LinkedIn Zip](https://www.linkedin.com/games/zip/) game.
     
+    A game board with some numbered squares and walls (walls are optional).
+    
+    Objective:
+        To trace a single path that runs through all the board squares.
+
+    Rule:
+        The path must move through numbered squares in ascending order,
+        starting from square number 1 to the one with the highest number.
+    """
     def __init__(self,
             board_dims: tuple[int, int],
-            numbered_squares: dict[tuple[int, int]: int],
-            walls: set[tuple[tuple[int, int], tuple[int, int]]] | None = None) -> None:
+            numbered_squares: list[tuple[int, int]],
+            walls: list[tuple[tuple[int, int], tuple[int, int]]] | None = None) -> None:
         """
         Args:
             board_dims: Board dimensions as a `(rows, columns)` tuple.
-            numbered_squares: Squares with a assigned number as a dictionary of `(row, column): number` values.
+            numbered_squares: Squares with a assigned number as a dictionary of `(row, column): number` items.
             walls: Pairs of squares separated by a walls as a set of `((row1, column1), (row2, column2))`.
         
         Raises:
+            TypeError: If the types of the arguments don't match their required types.
             ValueError: If the quantity of numbered squares exceeds the total number of squares on the board,
                 or if the number of walls exceeds the total number of edges on the board,
                 or if any pair of squares in walls are not adjacent.
@@ -36,6 +47,7 @@ class Zip(GameBoard):
         return hash((self._board_dims, self.__numbered_squares, self.__walls))
 
 
+    @property
     def number_of_edges(self) -> int:
         """
         The number of edges on board.
@@ -43,23 +55,23 @@ class Zip(GameBoard):
         Returns:
             The total number of edges on game board.
         """
-        return len(self.board.number_of_edges()) / 2
+        return self.board.number_of_edges() / 2
 
 
     @property
-    def numbered_squares(self) -> dict[tuple[int, int]: int]:
+    def numbered_squares(self) -> list[tuple[int, int]]:
         """
         The squares with a assigned number.
 
         Returns:
-            The numbered squares as a dictionary of `(row, column): number`.
+            The numbered squares as a dictionary of `(row, column): number` items.
         """
         return self.__numbered_squares
     
-    def __set_numbered_squares(self, values:dict[tuple[int, int]: int]) -> None:
+    def __set_numbered_squares(self, values:list[tuple[int, int]]) -> None:
         if len(values) > len(self):
             msg = (
-                "The number of numbered squares exceeds the amount of board squares."
+                "The quantity of numbered squares exceeds the amount of board squares."
                 f" Got {len(values)} squares, while the board has {len(self)} squares."
             )
             raise ValueError(msg)
@@ -71,20 +83,20 @@ class Zip(GameBoard):
             )
             raise ValueError(msg)
 
-        if isinstance(values, (list, tuple)):
-            self.__numbered_squares = {square: index for index, square in enumerate(values)}
-        elif not isinstance(values, dict):
-            msg = "The numbered squares must be a dictionary."
+        if not isinstance(values, list):
+            msg = f"The numbered squares must be a list of tuples. Got a {type(values).__name__} instead."
             raise TypeError(msg)
-        else:
-            self.__numbered_squares = values
 
-        nx.set_node_attributes(self.board, name="value", values=None)
-        nx.set_node_attributes(self.board, name="value", values=self.numbered_squares)
+        self.__numbered_squares = values
+        nx.set_node_attributes(
+            self.board,
+            name="value",
+            values= {square: index for index, square in enumerate(values)}
+        )
 
 
     @property
-    def walls(self) -> tuple[tuple[int, int], tuple[int, int]]:
+    def walls(self) -> list[tuple[tuple[int, int], tuple[int, int]]]:
         """
         The pairs of squares separated by a wall.
         
@@ -93,7 +105,7 @@ class Zip(GameBoard):
         """
         return self.__walls
     
-    def __set_walls(self, values:tuple[tuple[int, int], tuple[int, int]] | None) -> None:
+    def __set_walls(self, values: list[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
         if values is None:
             self.__walls = None
             return
@@ -106,21 +118,16 @@ class Zip(GameBoard):
             )
             raise ValueError(msg)
 
-        if isinstance(values, list):
-            self.__walls = tuple(values)
-        elif not isinstance(values, tuple):
-            msg = "Walls must be a tuple of squares."
+        if not isinstance(values, (list, tuple, set)):
+            msg = f"Walls must be a tuple, list or set of squares. Got a {type(values).__name__} instead."
             raise TypeError(msg)
-        else:
-            self.__walls = values
 
-        invalid_items = [pair for pair in values if super()._manhattan_distance(*pair) != 1]
+        invalid_items = [pair for pair in values if self._manhattan_distance(*pair) != 1]
         if invalid_items:
-            msg = (
-                "Squares in a pair must be consecutive ones. "
-                f"Got the following invalid pairs: {invalid_items!r}."
-            )
+            msg = f"Squares in a pair must be consecutive ones. Invalid pairs: {invalid_items!r}."
             raise ValueError(msg)
+
+        self.__walls = list(values)
 
 
     @property
@@ -138,7 +145,6 @@ class Zip(GameBoard):
         return self.__path
 
     def _set_solution(self, verbose:bool=False) -> None:
-
         nx.set_node_attributes(
             self.board,
             name="value",
@@ -147,7 +153,10 @@ class Zip(GameBoard):
         nx.set_edge_attributes(
             self.board,
             name="value",
-            values={((i-1, j-1), (r-1, s-1)): round(pyo.value(self.model.x[i,j,r,s])) for i, j, r, s in self.model.E}
+            values={
+                ((i-1, j-1), (r-1, s-1)): round(pyo.value(self.model.x[i,j,r,s]))
+                for i, j, r, s in self.model.E
+            }
         )
         path = nx.get_node_attributes(self.board, "value")
         path = sorted(path.keys(), key=path.get)
@@ -161,11 +170,13 @@ class Zip(GameBoard):
         """Show Zip's board."""
         plt.figure(figsize=(3.4, 3.4))
         path_color:str="#EE5F12"
+        labels = {self.model.N.at(k): k for k in self.model.K}
+        labels = {(i-1, j-1): k for (i,j), k in labels.items()}
         nx.draw(
             self.board,
             pos= {(i,j): (j,-i) for i, j in self.board.nodes()},
             with_labels= True,
-            labels= {(i-1, j-1): self.model.k[i,j] for (i, j) in self.model.K},
+            labels=labels,
             arrows=False,
             node_shape="o", # round nodes
             node_size= 1000,

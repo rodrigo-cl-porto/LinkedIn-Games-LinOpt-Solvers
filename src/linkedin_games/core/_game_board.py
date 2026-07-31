@@ -15,7 +15,8 @@ class GameBoard(ABC):
         
         Raises:
             `TypeError`: If `board_dims` is not a tuple of two integers.
-            `ValueError`: If `board_dims` is not a tuple of two positive integers.
+            `ValueError`: If `board_dims` is not a tuple of two positive integers
+                or if the board's area is smaller than 2 squares.
         """
         self._set_board_dims(board_dims)
         self._set_board()
@@ -38,14 +39,14 @@ class GameBoard(ABC):
     @staticmethod
     def _manhattan_distance(square1:tuple[int, int], square2:tuple[int, int]) -> int:
         """
-        Calculates the Manhattan distance between two squares.
+        Calculate the Manhattan distance between two board squares.
         
         Args:
             square1: The first square as a `(row, column)` tuple.
             square2: The second square as a `(row, column)` tuple.
         
         Returns:
-            The Manhattan distance ($L_1$) between `square1` and `square2`.
+            The Manhattan distance (Normal-1) between two board squares.
         """
         x1, y1 = square1
         x2, y2 = square2
@@ -88,10 +89,7 @@ class GameBoard(ABC):
         
         m, n = value
         if m * n < 2:
-            msg = (
-                "The board is too small for the game!"
-                f" Got board dimensions of {value!r}."
-            )
+            msg = f"The board is too small for the game. Got board dimensions of {value!r}."
             raise ValueError(msg)
         
         self._board_dims = tuple(value)
@@ -122,7 +120,7 @@ class GameBoard(ABC):
         All the board squares and their respective assigned values (if any).
         
         Returns:
-            A dictionary of board squares as "(`row`, `column`): `value`" format
+            Board squares as a dictionary of `(row, column): value` items.
         """
         return {(i+1, j+1): data["value"] for (i, j), data in self.board.nodes(data=True)}
     
@@ -132,7 +130,7 @@ class GameBoard(ABC):
         All the board edges and their respective assigned values (if any).
         
         Returns:
-            A dictionary of edges as ((`row1`, `column1`), (`row2`, `column2`)): `value` format
+            All edges as a dictionary of `((row1, column1), (row2, column2)): value` items.
         """
         edges = nx.get_edge_attributes(self.board, "value").items()
         return {((i+1, j+1), (r+1, s+1)): value for ((i, j), (r, s)), value in edges}

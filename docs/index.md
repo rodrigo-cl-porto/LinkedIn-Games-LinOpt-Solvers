@@ -2,7 +2,7 @@
     <img src="./assets/logo.svg" alt="logo" width="40%">
 </div>
 
-# 𖣯 LinkedIn Games Solvers 🐍
+# 🐍𖣯 LinkedIn Games Solvers
 
 LinkedIn Games is a Python library that provides a set of tools to solve LinkedIn board games ([Queens][linkedin-queens], [Tango][linkedin-tango], [Zip][linkedin-zip], [Mini Sudoku][linkedin-mini-sudoku] and [Patches][linkedin-patches] for now) by using Linear Optimization models. This library leverages popular Python libraries such as [Pyomo] for mathematical modeling and [NetworkX] for graph-based representations of game boards.
 
@@ -42,18 +42,16 @@ One can run this simple code snippet.
 
 ```python
 from linkedin_games import Patches
-from linkedin_games.patches import SeedSquare
 
 
-seeds = [
-    SeedSquare(color="yellow", square=(1, 1), area=8),
-    SeedSquare(color="green",  square=(2, 5), area=8),
-    SeedSquare(color="purple", square=(3, 3)),
-    SeedSquare(color="orange", square=(4, 4)),
-    SeedSquare(color="teal",   square=(5, 2), area=8),
-    SeedSquare(color="red",    square=(6, 6), area=6, shape="vertical")
-]
-
+seeds = {
+    (1,1): {"color": "yellow", "area"=8},
+    (2,5): {"color": "green",  "area"=8},
+    (3,3): {"color": "purple"},
+    (4,4): {"color": "orange"},
+    (5,2): {"color": "teal",   "area"=8},
+    (6,6): {"color": "red",    "area"=6, "shape"="vertical"}
+}
 patches = Patches((6, 6), seeds)
 patches.solve()
 patches.show()
@@ -99,9 +97,3 @@ You can read the Jupyter Book to know more about the usage and behind-the-scenes
 [how-to-solve-zip]: https://rodrigo-cl-porto.github.io/linkedin-games-solvers/how-to-solve/zip/
 [how-to-solve-mini-sudoku]: https://rodrigo-cl-porto.github.io/linkedin-games-solvers/how-to-solve/mini-sudoku/
 [how-to-solve-patches]: https://rodrigo-cl-porto.github.io/linkedin-games-solvers/how-to-solve/patches/
-
-# ❤️ Donate
-
-If you find this library useful and would like to support its development, please consider making a [donation]. Your contributions will help me maintain my work, as well as fund future projects.
-
-[donation]: https://github.com/sponsors/rodrigo-cl-porto

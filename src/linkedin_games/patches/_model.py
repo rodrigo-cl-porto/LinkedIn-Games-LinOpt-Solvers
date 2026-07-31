@@ -52,8 +52,6 @@ class PatchesModel(pyo.ConcreteModel):
         x = self.x = pyo.Var(I, J, K, domain=pyo.Binary, initialize=0) # x_ijk = 1 if square (i,j) is covered by rect k
 
         # PARAMETERS
-        m = self.m # Total number of rows
-        n = self.n # Total number of columns
         a = self.a = pyo.Param( # Required areas
             K, initialize={seed["color"]: seed["area"] for seed in seeds.values() if seed["area"] is not None}
         )
@@ -77,34 +75,27 @@ class PatchesModel(pyo.ConcreteModel):
 
         ## Boundaries Constraints
         self.top_boundary_constraints = pyo.Constraint(
-            I, K,
-            rule=lambda model, i, k: t[k] - i <= m * (1 - u[i, k])
+            I, K, rule=lambda model, i, k: t[k] - i <= m * (1 - u[i, k])
         )
         self.bottom_boundary_constraints = pyo.Constraint(
-            I, K,
-            rule=lambda model, i, k: i - (t[k] + h[k] - 1) <= m * (1 - u[i, k])
+            I, K, rule=lambda model, i, k: i - (t[k] + h[k] - 1) <= m * (1 - u[i, k])
         )
         self.left_boundary_constraints = pyo.Constraint(
-            J, K,
-            rule=lambda model, j, k: l[k] - j <= n * (1 - v[j, k])
+            J, K, rule=lambda model, j, k: l[k] - j <= n * (1 - v[j, k])
         )
         self.right_boundary_constraints = pyo.Constraint(
-            J, K,
-            rule=lambda model, j, k: j - (l[k] + w[k] - 1) <= n * (1 - v[j, k])
+            J, K, rule=lambda model, j, k: j - (l[k] + w[k] - 1) <= n * (1 - v[j, k])
         )
 
         ## Linking-Binary-Variables Constraints
         self.cutout_row_constraints = pyo.Constraint(
-            I, J, K,
-            rule=lambda model, i, j, k: x[i, j, k] <= u[i, k]
+            I, J, K, rule=lambda model, i, j, k: x[i, j, k] <= u[i, k]
         )
         self.cutout_column_constraints = pyo.Constraint(
-            I, J, K,
-            rule=lambda model, i, j, k: x[i, j, k] <= v[j, k]
+            I, J, K, rule=lambda model, i, j, k: x[i, j, k] <= v[j, k]
         )
         self.square_activator_constraints = pyo.Constraint(
-            I, J, K,
-            rule=lambda model, i, j, k: x[i, j, k] >= u[i, k] + v[j, k] - 1
+            I, J, K, rule=lambda model, i, j, k: x[i, j, k] >= u[i, k] + v[j, k] - 1
         )
 
         ## Seed Square Constraints

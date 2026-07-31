@@ -12,7 +12,7 @@ class SudokuModel(pyo.ConcreteModel):
         Args:
             board_dims: Board dimensions as a `(rows, columns)` tuple.
             block_dims: Grid block dimensions as a `(rows, columns)` tuple.
-            filled_squares: Starting filled squares as a dictionary of `(row, column): digit` values.
+            filled_squares: The starting filled squares as a dictionary of `(row, column): digit` items.
         """
         super().__init__()
 
@@ -34,8 +34,8 @@ class SudokuModel(pyo.ConcreteModel):
         # COMPOSITE SETS
         S = self.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Board Squares
         B = self.B = pyo.Set( # Grid blocks
-            V, U,
-            initialize= lambda model, v, u: [(i, j) for i in range(p*(v-1)+1, p*v+1) for j in range(q*(u-1)+1, q*u+1)]
+            V, U, initialize= lambda model, v, u:
+                [(i, j) for i in range(p*(v-1)+1, p*v+1) for j in range(q*(u-1)+1, q*u+1)]
         )
         F = self.F = pyo.Set(initialize=((i, j, k) for (i,j), k in filled_squares.items()), dimen=3) # Filled values
         
@@ -47,22 +47,17 @@ class SudokuModel(pyo.ConcreteModel):
         
         # CONSTRAINTS
         self.unique_digits_per_row_constraints = pyo.Constraint(
-            J, K,
-            rule=lambda model, j, k: sum(x[i, j, k] for i in I) == 1
+            J, K, rule=lambda model, j, k: sum(x[i, j, k] for i in I) == 1
         )
         self.unique_digits_per_column_constraints = pyo.Constraint(
-            I, K,
-            rule=lambda model, i, k: sum(x[i, j, k] for j in J) == 1
+            I, K, rule=lambda model, i, k: sum(x[i, j, k] for j in J) == 1
         )
         self.unique_digits_per_block_constraints = pyo.Constraint(
-            V, U, K,
-            rule=lambda model, v, u, k: sum(x[i, j, k] for (i, j) in B[v, u]) == 1
+            V, U, K, rule=lambda model, v, u, k: sum(x[i, j, k] for (i, j) in B[v, u]) == 1
         )
         self.single_digit_per_square_constraints = pyo.Constraint(
-            S,
-            rule=lambda model, i, j: sum(x[i, j, k] for k in K) == 1
+            S, rule=lambda model, i, j: sum(x[i, j, k] for k in K) == 1
         )
         self.alreadey_filled_squares_constraints = pyo.Constraint(
-            F,
-            rule=lambda model, i, j, k: x[i, j, k] == 1
+            F, rule=lambda model, i, j, k: x[i, j, k] == 1
         )

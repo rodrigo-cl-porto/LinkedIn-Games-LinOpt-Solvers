@@ -12,11 +12,11 @@ class TangoModel(pyo.ConcreteModel):
         """
         Args:
             board_dims: Board dimensions as a `(row, column)` tuple.
-            filled_squares: Starting filled squares as a dictionary of `(row, column): 0 | 1`.
+            filled_squares: Starting filled squares as a dictionary of `(row, column): 0 | 1` items.
             matching_pairs: Pairs of matching squares (separated by a `=` sign)
-                as a set of `((row1, column1), (row2, column2))`.
+                as a set of `((row1, column1), (row2, column2))` edges.
             opposite_pairs: Pairs of opposite squares (separated by a `×` sign)
-                as a set of `((row1, column1), (row2, column2))`.
+                as a set of `((row1, column1), (row2, column2))` edges.
         """
         super().__init__()
 

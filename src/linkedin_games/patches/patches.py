@@ -10,14 +10,32 @@ from ._rectangle_seed import RectangleSeed
 
 
 class Patches(GameBoard):
-    """The LinkedIn Patches game, with colorful rectangles."""
+    """
+    The [LinkedIn Patches](https://www.linkedin.com/games/patches/) game.
     
+    A game board with some colored rectangle seeds that may state some features about the rectangles
+        to be built on the board, such as a required area (optional) or a required shape
+        (which can be a `vertical` rectangle, a `horizontal` rectangle, a `square` or any shape).
+
+    Objective:
+        Partition the board into non-overlapping rectangular patches so that each patch meets
+        the prescriptions on their respective seeds.
+    
+    Rules:
+        - Each seed must be covered by only one rectangle that attends its prescriptions;
+        - A rectangle must cover only one seed;
+        - The area of all rectangles must be greater than 1 square on the board.
+    """
     def __init__(self, board_dims:tuple[int, int], seeds: dict[tuple[int, int], dict[str, str|int]]) -> None:
         """
         Args:
             board_dims: Board dimensions as a `(rows, columns)` tuple.
             seeds: Rectangle seeds on board as a dictionary of
-                `(row, column): {"color": color, "area": area, "shape": shape}`.
+                `(row, column): {"color": color, "area": area, "shape": shape}` items.
+        
+        Raises:
+            TypeError: if type inputs are not respected.
+            ValueError: If there are some seeds with the same color.
         """
         super().__init__(board_dims)
         self.__set_seeds(seeds)
@@ -35,13 +53,13 @@ class Patches(GameBoard):
         
         Returns:
             All the information about the seeds as a dictionary of
-                `(row, column): {"color": color, "area": area, "shape": shape}`.
+                `(row, column): {"color": color, "area": area, "shape": shape}` items.
         """
         return {
             seed.square : {
-                "color": self.color_code,
-                "shape": self.shape,
-                "area": self.area
+                "color": seed.color_code,
+                "shape": seed.shape,
+                "area": seed.area
             } for seed in self.__seeds
         }
 
@@ -69,19 +87,21 @@ class Patches(GameBoard):
             ) for square, seed in seeds.items()
         }
 
-
     @property
-    def rectangles(self) -> dict[str, str | tuple[int, int]] | None:
+    def rectangles(self) -> dict[str, str|tuple[int, int]] | None:
         """
         All rectangles that solves the Patches game.
 
         Returns:
-            The solving rectangles as a list of dictionaries as
+            The solving rectangles as a list of dictionaries in the format
                 `{"color_code": color_code, "top_left": (top, left), "dims": (width, height)}`.
         """
         if not self.is_solved:
             return None
-        return sorted([seed.rectangle for seed in self.__seeds], key=lambda x: x["top_left"])
+        return sorted(
+            [seed.rectangle.to_dict() for seed in self.__seeds],
+            key=lambda x: x["top_left"]
+        )
 
     def _set_solution(self, verbose:bool = False) -> None:
 
@@ -90,13 +110,12 @@ class Patches(GameBoard):
             left = round(pyo.value(self.model.l[seed.color_code]))
             width = round(pyo.value(self.model.w[seed.color_code]))
             height = round(pyo.value(self.model.h[seed.color_code]))
-            seed.rectangle({
-                "color": seed.color_code,
+            seed.rectangle = {
                 "top": top,
                 "left": left,
                 "width": width,
                 "height": height
-            })
+            }
         
         nx.set_node_attributes(
             self.board,

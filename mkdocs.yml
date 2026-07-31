@@ -39,8 +39,6 @@ plugins:
             group_by_category: true
             inherited_members: true
             show_source: false
-            show_signature_annotations: true
-            separate_signature: true
             merge_init_into_class: true
             docstring_options:
               ignore_init_summary: false

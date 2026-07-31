@@ -2,7 +2,7 @@
     <img src="./docs/assets/logo.svg" alt="logo" width="40%">
 </div>
 
-# 𖣯 LinkedIn Games Solvers 🐍
+# 🐍𖣯 LinkedIn Games Solvers 
 
 LinkedIn Games is a Python package that provides a simple set of components to solve LinkedIn board games ([Queens][linkedin-queens], [Tango][linkedin-tango], [Zip][linkedin-zip], [Mini Sudoku][linkedin-mini-sudoku] and [Patches][linkedin-patches] for now) using Linear Optimization models. This library leverages popular Python libraries such as [Pyomo] for mathematical modeling and [NetworkX] for graph-based representations of game boards.
 

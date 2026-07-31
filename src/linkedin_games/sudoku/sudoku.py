@@ -9,16 +9,33 @@ from ._model import SudokuModel
 
 
 class Sudoku(GameBoard):
-    """A general Sudoku game."""
+    """
+    A general Sudoku game.
+
+    A `n`x`n` Sudoku board with `p`x`q` grid block (where is expected that `p * q = n`).
+    
+    Objective:
+        Fill all the empty spaces in the game grid with digits from 1 to `n`.
+    
+    Rules:
+        Each row, column, and block must be filled with a digit from 1 to `n`,
+        without repetition in each row, column, or `p`x`q` block.
+    """
     
     def __init__(self, size: int, block_dims: tuple[int, int], filled_squares: dict[tuple[int, int], int]) -> None:
         """
         Args:
             size: The Sudoku's number of rows (or columns).
             block_dims: Board dimensions as a `(rows, columns)` tuple.
-            filled_squares: Starting filled squares as a dictionary of `(row, column): digit`.
+            filled_squares: The starting filled squares as a dictionary of `(row, column): digit` items.
+
+        Raises:
+            TypeError: if the input types are not respected.
+            ValueError: if `p * q = n` is not respected
+                or if the quantity of `filled_squares` is smaller than 2
+                or greater than the number of board squares.
         """
-        super().__init__((size, size)) # Always a square board.
+        super().__init__((size, size))
         self.__set_block_dims(block_dims)
         self.__set_filled_squares(filled_squares)
         self._model = SudokuModel(self.board_dims, self.block_dims, self.filled_squares)
@@ -32,12 +49,9 @@ class Sudoku(GameBoard):
     def size(self) -> int:
         """
         The size of Sudoku game.
-        
-        Since Sudoku has always a squared board,
-        the size corresponds to the number of rows (or columns) of Sudoku board.
 
         Returns:
-            The game's size as a single number (of rows or columns).
+            The number of rows (or columns) on the board.
         """
         return self.board_dims[0]
 
@@ -48,7 +62,7 @@ class Sudoku(GameBoard):
         The dimensions of the grid blocks in the Sudoku board
         
         Returns:
-            The block dimensions as `(rows, columns)` format.
+            The block dimensions as `(rows, columns)` tuple.
         """
         return self.__block_dims
 
@@ -67,17 +81,11 @@ class Sudoku(GameBoard):
         
         p, q = value
         if p * q < 2:
-            msg = (
-                "The grid blocks is too small for the game."
-                f" Got block dimensions of {value!r}."
-            )
+            msg = f"The grid blocks is too small for the game. Got block dimensions of {value!r}."
             raise ValueError(msg)
         
         if p * q != self.size:
-            msg = (
-                "The dimensions of grid blocks must match"
-                f"with the sudoku's size of {self.size}."
-            )
+            msg = f"The dimensions of grid blocks must match with the sudoku's size of {self.size}."
             raise ValueError(msg)
         
         self.__block_dims = tuple(value)
@@ -88,7 +96,7 @@ class Sudoku(GameBoard):
         """The starting filled squares in the Sudoku game.
         
         Returns:
-            A dictionary of filled squares as `(row, column): digit` format.
+            The starting filled squares as a dictionary of `(row, column): digit` items.
         """
         return self.__filled_squares
     

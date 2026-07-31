@@ -8,7 +8,7 @@ class QueensModel(pyo.ConcreteModel):
         """
         Args:
             board_dims: Board dimensionas as a `(rows, columns)` tuple.
-            regions: All colored regions on Queens board as a dictionary of `color: {(row, column), ...}`.
+            regions: All colored regions on board as a dictionary of `color: {(row, column), ...}` items.
         """
         super().__init__()
 

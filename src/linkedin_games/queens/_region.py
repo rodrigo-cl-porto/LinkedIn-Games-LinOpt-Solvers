@@ -5,6 +5,7 @@ from ..core._color import Color
 
 class Region:
     """A colored region on a Queens board."""
+    
     def __init__(self, squares:set[tuple[int, int]], color:str="white") -> None:
         """
         Args:

@@ -5,16 +5,16 @@ from ..core._color import Color
 
 class Rectangle:
     """A Patches rectangle, used as part of the game's solution."""
-    def __init__(self, top_left:tuple[int, int], dims:tuple[int, int], color:str|None=None) -> None:
+    
+    def __init__(self, top_left:tuple[int, int], dims:tuple[int, int]) -> None:
         """
         Args:
-            top_left: Board position of the rectangle's top-left square as `(row, column)`.
-            dims: Rectangle dimensions as `(width, height)`.
+            top_left: Board position of the rectangle's top-left square as a `(row, column)` tuple.
+            dims: Rectangle dimensions as a `(width, height)` tuple.
             color: A color name or a hex code as `#RRGGBB` string.
         """
         self.top_left = top_left
         self.dims = dims
-        self.__color = Color(color)
 
 
     def __repr__(self) -> str:
@@ -45,10 +45,8 @@ class Rectangle:
 
 
     def __eq__(self, other:Self) -> bool:
-
         if not isinstance(other, Rectangle):
             return False
-        
         return self.top_left == other.top_left and self.dims == other.dims
 
 
@@ -56,20 +54,11 @@ class Rectangle:
         return not self.__eq__(other)
 
 
-    def to_dict(self) -> dict[str, str|tuple[int, int]]:
-        return {
-            "color": self.color,
-            "color_code": self.color_code,
-            "top_left": (self.top, self.left),
-            "dims": (self.width, self.height)
-        }
-
-
     @property
     def area(self) -> int:
         """
         The rectangle's area.
-
+        
         Returns:
             Total quantity of squares in the rectangle.
         """
@@ -218,6 +207,10 @@ class Rectangle:
         self.__height = value
 
 
+    def to_dict(self) -> dict[str, str|tuple[int, int]]:
+        return {"top_left": (self.top, self.left), "dims": (self.width, self.height)}
+
+
     @property
     def squares(self) -> tuple[tuple[int, int]]:
         """
@@ -231,33 +224,3 @@ class Rectangle:
             for i in range(self.top, self.top + self.height)
             for j in range(self.left, self.left + self.width)
         )
-
-
-    @property
-    def color(self) -> str:
-        """
-        The name of the rectangle's color.
-
-        Returns:
-            The color's name of the rectangle.
-        """
-        return self.__color.name
-    
-    @color.setter
-    def color(self, value:str) -> None:
-        self.__color.color = value
-
-
-    @property
-    def color_code(self) -> str:
-        """
-        The code of rectangle's color.
-
-        Returns:
-            Hex code color as a `"#RRGGBB"` string.
-        """
-        return self.__color.hex
-    
-    @color_code.setter
-    def color_code(self, value:str) -> None:
-        self.__color.hex = value

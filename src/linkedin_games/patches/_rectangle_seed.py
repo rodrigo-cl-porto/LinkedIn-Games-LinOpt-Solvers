@@ -111,10 +111,7 @@ class RectangleSeed:
             raise TypeError(msg)
         
         if len(value) != 2:
-            msg = (
-                "Seed square must be a pair (m,n)."
-                f" Got a tuple with length {len(value)}."
-            )
+            msg = f"Seed square must be a pair (m,n). Got a tuple with length {len(value)}."
             raise ValueError(msg)
         
         if (
@@ -218,20 +215,21 @@ class RectangleSeed:
 
 
     @property
-    def rectangle(self) -> Rectangle:
+    def rectangle(self) -> Rectangle | None:
         """
         The seed's rectangle.
         
         Returns:
             The rectangle created by the seed square after solving Patches game.
         """
-        return self.__rectangle.to_dict()
+        return self.__rectangle
 
     @rectangle.setter
     def rectangle(self, value:dict[str, str|int]) -> None:
 
-        if self.area is not None and value["area"] != self.area:
-            msg = f"The rectangle's area ({value["area"]}) doesn't attend to the required area ({self.area})."
+        rectangle_area = value["width"] * value["height"]
+        if self.area is not None and rectangle_area != self.area:
+            msg = f"The rectangle's area ({rectangle_area}) doesn't attend to the required area ({self.area})."
             raise ValueError(msg)
         
         match self.shape:
@@ -260,9 +258,6 @@ class RectangleSeed:
                     raise ValueError(msg)
 
         self.__rectangle = Rectangle(
-            color=value["color"],
-            top=value["top"],
-            left=value["left"],
-            width=value["width"],
-            height=value["height"]
+            top_left=(value["top"], value["left"]),
+            dims=(value["width"], value["height"])
         )

@@ -1,7 +1,7 @@
 from linkedin_games import MiniSudoku
 
 
-def test_mini_sudoku():
+def test_mini_sudoku_60():
     # Solving Mini Sudoku No. 60
 
     filled_squares = {
@@ -18,7 +18,6 @@ def test_mini_sudoku():
     }
     mini_sudoku = MiniSudoku(filled_squares)
     mini_sudoku.solve()
-
     solution = {
         (1, 1): 1,
         (1, 2): 3,
@@ -57,5 +56,4 @@ def test_mini_sudoku():
         (6, 5): 4,
         (6, 6): 6
     }
-
     assert mini_sudoku.solution == solution

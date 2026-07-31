@@ -6,12 +6,12 @@ class ZipModel(pyo.ConcreteModel):
 
     def __init__(self,
             board_dims: tuple[int, int],
-            numbered_squares: dict[tuple[int, int]: int],
-            walls: tuple[tuple[int, int], tuple[int, int]] | None):
+            numbered_squares: list[tuple[int, int]],
+            walls: tuple[tuple[int, int], tuple[int, int]] | None) -> None:
         """
         Args:
             board_dims: Board dimensions as a `(row, column)` tuple.
-            numbered_squares: Squares with a assigned number as a dictionary of `(row, column): number` values.
+            numbered_squares: Squares with a assigned number as a dictionary of `(row, column): number` items.
             walls: Pairs of squares separated by a walls as a tuple of `((row1, column1), (row2, column2))`.
         """
         super().__init__()
@@ -24,24 +24,22 @@ class ZipModel(pyo.ConcreteModel):
         # RANGE SETS
         I = self.I = pyo.RangeSet(n) # Rows
         J = self.J = pyo.RangeSet(m) # Columns
+        K = self.K = pyo.RangeSet(len(numbered_squares))
 
         # COMPOSITE SETS
         S = self.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Board Squares
         E = self.E = pyo.Set(initialize=lambda model: # Edges
-            [((i, j), (i+1, j)) for i in I for j in J if i+1 in I] +
-            [((i, j), (i-1, j)) for i in I for j in J if i-1 in I] +
-            [((i, j), (i, j+1)) for i in I for j in J if j+1 in J] +
-            [((i, j), (i, j-1)) for i in I for j in J if j-1 in J]
+            [((i,j), (i+1, j)) for i in I for j in J if i+1 in I] +
+            [((i,j), (i-1, j)) for i in I for j in J if i-1 in I] +
+            [((i,j), (i, j+1)) for i in I for j in J if j+1 in J] +
+            [((i,j), (i, j-1)) for i in I for j in J if j-1 in J]
         )
-        K = self.K = pyo.Set(initialize=numbered_squares.keys(), dimen=2) # Numbered Squares
         W = self.W = pyo.Set(initialize=walls) # Walls
-        
+        N = self.N = pyo.Set(initialize=numbered_squares)
+
         # DECISION VARIABLES
         x = self.x = pyo.Var(E, within=pyo.Binary, initialize=0)
         u = self.u = pyo.Var(S, within=pyo.NonNegativeReals)
-
-        # PARAMETERS
-        k = self.k = pyo.Param(S, initialize=numbered_squares, within=pyo.NonNegativeIntegers, default=0)
 
         # OBJECTIVE FUNCTION
         self.obj = pyo.Objective(expr=0) # feasibility problem
@@ -49,30 +47,24 @@ class ZipModel(pyo.ConcreteModel):
         # CONSTRAINTS
         self.outgoing_edges_constraints = pyo.Constraint(
             S, rule=lambda model, i, j:
-                sum(x[(i,j),w] for w in S if ((i,j),w) in E) == 1 if k[i,j] != len(K)
-                else sum(x[(i,j),w] for w in S if ((i,j),w) in E) == 0
+                sum(x[(i,j), w] for w in S if ((i,j), w) in E) == 0 if N.at(len(K)) == (i,j) else
+                sum(x[(i,j), w] for w in S if ((i,j), w) in E) == 1
         )
         self.incoming_edges_constraints = pyo.Constraint(
             S, rule=lambda model, i, j:
-                sum(x[s,(i,j)] for s in S if (s,(i,j)) in E) == 1 if k[i,j] != 1
-                else sum(x[s,(i,j)] for s in S if (s,(i,j)) in E) == 0
+                sum(x[s, (i,j)] for s in S if (s, (i,j)) in E) == 0 if N.at(1) == (i,j) else
+                sum(x[s, (i,j)] for s in S if (s, (i,j)) in E) == 1
         )
         self.wall_constraints = pyo.Constraint(
             W, rule=lambda model, i, j, r, s: x[i,j,r,s] + x[r,s,i,j] == 0
         )
         M = m * n # Big M
         self.subroute_elimination_constraints = pyo.Constraint(
-            E, rule=lambda model, i, j, r, s:
-                u[r, s] >= u[i, j] + 1 - M * (1 - x[i, j, r, s])
-        )
-        self.first_square_position_constraint = pyo.Constraint(
-            K, rule= lambda model, i, j:
-                u[i,j] == 1 if k[i,j] == 1 else pyo.Constraint.Skip
+            E, rule=lambda model, i, j, r, s: u[r,s] >= u[i,j] + 1 - M * (1 - x[i,j,r,s])
         )
         self.ordinal_position_constraints = pyo.Constraint(
-            K, K, rule= lambda model, i, j, r, s:
-                u[i,j] >= u[r,s] + 1 if k[i,j] == k[r,s] + 1 else pyo.Constraint.Skip
-        )
-        self.last_square_position_constraint = pyo.Constraint(
-            K, rule= lambda model, i, j: u[i,j] == M if k[i,j] == len(K) else pyo.Constraint.Skip
+            K, rule= lambda model, k:
+                u[N.at(k)] == 1 if k == 1 else
+                u[N.at(k)] == M if k == len(N) else
+                u[N.at(k)] >= u[N.at(k-1)] + 1
         )

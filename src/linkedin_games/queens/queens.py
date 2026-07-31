@@ -10,12 +10,24 @@ from ._region import Region
 
 
 class Queens(GameBoard):
-    """The LinkedIn Queens game, with colored regions."""
+    """
+    The [LinkedIn Queens](https://www.linkedin.com/games/queens/) game.
+    
+    A game board with colored regions intended to put crowns on it.
+
+    Objective:
+        To place a crown in each row, column, and colored region on the board.
+
+    Rules:
+        - There can only be one crown in each row, column and colored region;
+        - There cannot be adjacent crowns, not even along adjacent diagonals.
+    """
+
     def __init__(self, board_dims: tuple[int, int], regions: dict[str, set[tuple[int, int]]]) -> None:
         """
         Args:
             board_dims: Board dimensions as a `(rows, columns)` tuple.
-            regions: Regions as a dictionary of `color: {(row, column), ...}`.
+            regions: Regions as a dictionary of `color: {(row, column), ...}` items.
         """
         super().__init__(board_dims)
         self.__set_regions(regions)

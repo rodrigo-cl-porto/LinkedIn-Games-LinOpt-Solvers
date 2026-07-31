@@ -9,7 +9,19 @@ from ._model import TangoModel
 
 
 class Tango(GameBoard):
-    """The LinkedIn Tango game."""
+    """
+    The [LinkedIn Tango](https://www.linkedin.com/games/tango/) game.
+    
+    Objective:
+        To fill all the squares on the board with moons 🌙 and suns ☀️.
+
+    Rules:
+        - The number of moons and suns in each row and column must be the same;
+        - There cannot be more than 2 moons or 2 suns in a row, either in a row or column;
+        - Squares separated by the `=` sign must contain the same symbol;
+        - Squares separated by the `×` sign must contain opposite symbols.
+    """
+    
     def __init__(self,
             filled_squares:dict[tuple[int, int]: int] | None = None,
             matching_pairs:set[tuple[tuple[int, int], tuple[int, int]]] | None = None,
@@ -17,11 +29,17 @@ class Tango(GameBoard):
             ) -> None:
         """
         Args:
-            filled_squares: Starting filled squares as a dictionary of `(row, column): 0 | 1`.
+            filled_squares: Starting filled squares as a dictionary of `(row, column): 0 | 1` items.
             matching_pairs: Pairs of matching squares (separated by a `=` sign)
                 as a set of `((row1, column1), (row2, column2))`.
             opposite_pairs: Pairs of opposite squares (separated by a `×` sign)
                 as a set of `((row1, column1), (row2, column2))`.
+
+        Raises:
+            TypeError: If the types of the arguments don't match their required types.
+            ValueError: If the quantity of numbered squares exceeds the total number of squares on the board,
+                or if the number of walls exceeds the total number of edges on the board,
+                or if any pair of squares in walls are not adjacent.
         """
         super().__init__(board_dims=(6,6)) # It's assumed that Tango board dimensions will always be a 6x6
         self.__set_filled_squares(filled_squares)
@@ -36,10 +54,16 @@ class Tango(GameBoard):
 
     @property
     def filled_squares(self) -> dict[tuple[int, int]: int]:
-        """Squares that are already filled with a symbol."""
+        """
+        Squares that are already filled with a symbol.
+        
+        Returns:
+            Starting filled squares as a dictionary of `(row, column): 0 | 1` items.
+        """
         return self.__filled_squares
     
     def __set_filled_squares(self, values:dict[tuple[int, int]: int]) -> None:
+    
         if len(values) > len(self):
             msg = f"The number of filled squares exceeds the amount of board squares. Got {len(values)} filled squares."
             raise ValueError(msg)
@@ -48,18 +72,11 @@ class Tango(GameBoard):
             msg = f"filled_squares must be a dictionary. Got a {type(values).__name__} type instead."
             raise TypeError(msg)
 
-        invalid_items = {
-            square: value
-            for square, value in values.items()
-            if value != 1 and value != 0
-        }
+        invalid_items = {square: value for square, value in values.items() if value != 1 and value != 0}
         if invalid_items:
-            msg = (
-                "The square values must be of binary type. "
-                f"Got the following invalid values: {invalid_items!r}."
-            )
+            msg = f"The square values must be of binary type. Invalid values: {invalid_items!r}."
             raise TypeError(msg)
-        
+
         self.__filled_squares = {square: (1 if value else 0) for square, value in values.items()}
 
 
@@ -117,7 +134,7 @@ class Tango(GameBoard):
         Pairs of squares that are separated by a `×` sign, i.e., that must have opposite symbols.
 
         Returns:
-            Pairs of opposite squares as a set of `((row1, column1), (row2, column2))`.
+            Pairs of opposite squares as a set of `((row1, column1), (row2, column2))` items.
         """
         return self.__opposite_pairs
     
@@ -128,10 +145,7 @@ class Tango(GameBoard):
 
         invalid_items = [pair for pair in value if not isinstance(pair, tuple) or len(pair) != 2]
         if invalid_items:
-            msg = (
-                "opposite_pairs must be a collection of pairs of tuples."
-                f" Got the following invalid pairs: {invalid_items!r}."
-            )
+            msg = f"opposite_pairs must be a collection of pairs of tuples. Invalid pairs: {invalid_items!r}."
             raise TypeError(msg)
         
         invalid_items = [square for pair in value for square in pair if not isinstance(square, tuple)]

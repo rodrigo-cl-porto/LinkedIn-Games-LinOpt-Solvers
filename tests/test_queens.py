@@ -4,8 +4,8 @@ from linkedin_games import Queens
 def test_queens_307() -> None: # Solving Queens No. 307
     regions = {
         "#BBA3E1": { # Purple
-            (1,1), (1,2), (1,3), (1,4), (1,5), (1,6), (1,7),
-            (2,6), (2,7), (3,6), (3,7), (4,6), (4,7), (5,7), (6,7), (7,7)
+            (1,1), (1,2), (1,3), (1,4), (1,5), (1,6), (1,7), (2,6),
+            (2,7), (3,6), (3,7), (4,6), (4,7), (5,7), (6,7), (7,7)
         },
         "#FFC794": { # Orange
             (2,1), (2,2), (2,3), (2,4), (3,1), (4,1), (4,2),
@@ -20,5 +20,5 @@ def test_queens_307() -> None: # Solving Queens No. 307
     }
     queens = Queens((7,7), regions)
     queens.solve()
-    solution = [(1, 7), (2, 5), (3, 2), (4, 4), (5, 6), (6, 3), (7, 1)]
+    solution = [(1,7), (2,5), (3,2), (4,4), (5,6), (6,3), (7,1)]
     assert queens.crowns == solution
