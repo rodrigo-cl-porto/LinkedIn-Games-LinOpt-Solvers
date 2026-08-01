@@ -71,9 +71,9 @@ Which, by its turn, matches the official solution of this game:
 
 # 📙 Jupyter Book
 
-You can read the Jupyter Book to know more about the usage and implementation of this library on this 🔗[website].
+You can read more about the usage and implementation of this library on this [Jupyter Book].
 
-[website]: https://rodrigo-cl-porto.github.io/linkedin-games-solvers/
+[Jupyter Book]: https://rodrigo-cl-porto.github.io/linkedin-games-solvers/
 
 ## Table of Contents
 

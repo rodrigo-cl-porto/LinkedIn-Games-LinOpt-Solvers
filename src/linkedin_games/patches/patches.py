@@ -104,7 +104,6 @@ class Patches(GameBoard):
         )
 
     def _set_solution(self, verbose:bool = False) -> None:
-
         for seed in self.__seeds:
             top = round(pyo.value(self.model.t[seed.color_code]))
             left = round(pyo.value(self.model.l[seed.color_code]))
@@ -116,13 +115,11 @@ class Patches(GameBoard):
                 "width": width,
                 "height": height
             }
-        
         nx.set_node_attributes(
             self.board,
             name="color",
             values={(i-1, j-1): seed.color_code for seed in self.__seeds for (i,j) in seed.rectangle.squares}
         )
-
         if verbose:
             print("These are the rectagles that solves the game:")
             pprint(self.solution)

@@ -32,6 +32,9 @@ dependencies = [
     "pyomo>=6.10.0",
 ]
 
+[project.markdown_extensions]
+mkdocstrings = { handler = "python" }
+
 [project.urls]
 "Source Code" = "https://github.com/rodrigo-cl-porto/linkedin-games-solvers"
 "Jupyter Book" = "https://rodrigo-cl-porto.github.io/linkedin-games-solvers/"
@@ -50,8 +53,8 @@ dev = [
     "ruff>=0.15.22",
 ]
 docs = [
-    "mkdocs>=1.6.1",
     "mkdocstrings-python>=2.0.5",
+    "zensical>=0.0.52",
 ]
 
 [build-system]
@@ -127,21 +130,12 @@ cmd = "rm -rf .venv"
 cmd = "uv sync --all-groups"
 
 [tool.poe.tasks.docs]
-cmd = "mkdocs serve --livereload"
+cmd = "zensical serve"
 
-[tool.poe.tasks.serve-book]
+[tool.poe.tasks.book]
 cmd = "jupyter-book start"
 cwd = "book"
 env = { NODE_TLS_REJECT_UNAUTHORIZED = "0" }
-
-[tool.poe.tasks.build-book]
-cmd = "jupyter-book build --html"
-cwd = "book"
-env = { NODE_TLS_REJECT_UNAUTHORIZED = "0" }
-
-[tool.poe.tasks.deploy-book]
-cmd = "jupyter-book init --gh-pages"
-cwd = "book"
 
 [tool.poe.tasks.test]
 cmd = "pytest tests --maxfail=1"

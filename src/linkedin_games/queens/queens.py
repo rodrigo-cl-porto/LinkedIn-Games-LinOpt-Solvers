@@ -60,10 +60,7 @@ class Queens(GameBoard):
             raise ValueError(msg)
 
         all_region_squares = [square for squares in regions.values() for square in squares]
-        overlapping_squares = {
-            square for square in all_region_squares
-            if all_region_squares.count(square) > 1
-        }
+        overlapping_squares = {square for square in all_region_squares if all_region_squares.count(square) > 1}
         if overlapping_squares:
             msg = (
                 "The regions must not overlap each other."
@@ -106,7 +103,8 @@ class Queens(GameBoard):
         The crowned squares of Queens game.
 
         Returns:
-            Locations of all crowns as a list of squares as `(row, column)` or `None` if the game is not solved yet.
+            Locations of all crowns as a list of squares as `(row, column)`
+            or `None` if the game is not solved yet.
         """
         if not self.is_solved:
             return None
@@ -119,7 +117,6 @@ class Queens(GameBoard):
             name="value",
             values={(i-1, j-1): round(pyo.value(self.model.x[i, j])) for (i, j) in self.model.S}
         )
-
         crowns = [square for square, value in nx.get_node_attributes(self.board, "value").items() if value == 1]
         self.__crowns = self.board.subgraph(crowns)
         if verbose:

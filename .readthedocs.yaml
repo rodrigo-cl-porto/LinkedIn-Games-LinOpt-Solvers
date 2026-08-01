@@ -1,10 +1,17 @@
 version: 2
 
-# Set the OS, Python version, and other tools you might need
 build:
   os: ubuntu-24.04
   tools:
     python: "3.13"
+
+  jobs:
+    build:
+      html:
+        - zensical build
+    post_build:
+      - mkdir -p $READTHEDOCS_OUTPUT/html/
+      - cp --recursive site/* $READTHEDOCS_OUTPUT/html/
 
 python:
   install:
@@ -12,7 +19,3 @@ python:
       command: sync
       groups:
         - docs
-
-# Build documentation with Mkdocs
-mkdocs:
-  configuration: mkdocs.yml

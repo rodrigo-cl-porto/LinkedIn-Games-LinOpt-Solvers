@@ -7,7 +7,7 @@ class ZipModel(pyo.ConcreteModel):
     def __init__(self,
             board_dims: tuple[int, int],
             numbered_squares: list[tuple[int, int]],
-            walls: tuple[tuple[int, int], tuple[int, int]] | None) -> None:
+            walls: list[tuple[int, int], tuple[int, int]] | None) -> None:
         """
         Args:
             board_dims: Board dimensions as a `(row, column)` tuple.
@@ -43,7 +43,7 @@ class ZipModel(pyo.ConcreteModel):
 
         # OBJECTIVE FUNCTION
         self.obj = pyo.Objective(expr=0) # feasibility problem
-    
+
         # CONSTRAINTS
         self.outgoing_edges_constraints = pyo.Constraint(
             S, rule=lambda model, i, j:

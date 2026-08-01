@@ -7,8 +7,8 @@ class TangoModel(pyo.ConcreteModel):
     def __init__(self,
             board_dims: tuple[int, int],
             filled_squares: dict[tuple[int, int]: int] | None = None,
-            matching_pairs: set[tuple[tuple[int, int], tuple[int, int]]] | None = None,
-            opposite_pairs: set[tuple[tuple[int, int], tuple[int, int]]] | None = None) -> None:
+            matching_pairs: list[tuple[tuple[int, int], tuple[int, int]]] | None = None,
+            opposite_pairs: list[tuple[tuple[int, int], tuple[int, int]]] | None = None) -> None:
         """
         Args:
             board_dims: Board dimensions as a `(row, column)` tuple.

@@ -4,12 +4,7 @@ project:
   id: 8d6282a6-4c6d-4f83-b6c6-ee5a591f8a02
   title: Solving LinkedIn Games by Linear Optimization
   subtitle: Solving LinkedIn Games by Linear Optimization with Pyomo and NetworkX libraries
-  description: This Jupyter Book presents examples on how to solve LinkedIn minigames by using Python libraries, such as Pyomo, for mathematical modeling, and NetworkX, for graph modeling.
-  parts:
-    abstract: |
-      This Jupyter Book presents examples on how to solve LinkedIn minigames by using Python libraries, such as Pyomo, for mathematical modeling, and NetworkX, for graph modeling.
-      The minigames are solved by formulating them as Linear Optimization Problems (LOPs) and solving them with the Gurobi and Highs solvers.
-      This book also provides a brief introduction to Linear Optimization (LO) and its applications in solving real-world problems.
+  description: This Jupyter Book presents how `linkedin-games` library implements Linear Optimization models to solve LinkedIn board games.
   keywords:
     - LinkedIn
     - Games
@@ -30,7 +25,7 @@ project:
       corresponding: true
       github: rodrigo-cl-porto
       linkedin: https://www.linkedin.com/in/rodrigo-cl-porto
-  github: https://github.com/rodrigo-cl-porto/Solving-LinkedIn-Games-by-Linear-Optimization
+  github: https://github.com/rodrigo-cl-porto/linkedin-games-solvers
   social:
     linkedin: https://www.linkedin.com/in/rodrigo-cl-porto
     github: rodrigo-cl-porto

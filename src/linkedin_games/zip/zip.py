@@ -69,6 +69,7 @@ class Zip(GameBoard):
         return self.__numbered_squares
     
     def __set_numbered_squares(self, values:list[tuple[int, int]]) -> None:
+
         if len(values) > len(self):
             msg = (
                 "The quantity of numbered squares exceeds the amount of board squares."
@@ -105,7 +106,8 @@ class Zip(GameBoard):
         """
         return self.__walls
     
-    def __set_walls(self, values: list[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
+    def __set_walls(self, values: set|tuple|list[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
+        
         if values is None:
             self.__walls = None
             return
@@ -127,7 +129,7 @@ class Zip(GameBoard):
             msg = f"Squares in a pair must be consecutive ones. Invalid pairs: {invalid_items!r}."
             raise ValueError(msg)
 
-        self.__walls = list(values)
+        self.__walls = list(set(values))
 
 
     @property

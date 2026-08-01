@@ -21,7 +21,6 @@ class Sudoku(GameBoard):
         Each row, column, and block must be filled with a digit from 1 to `n`,
         without repetition in each row, column, or `p`x`q` block.
     """
-    
     def __init__(self, size: int, block_dims: tuple[int, int], filled_squares: dict[tuple[int, int], int]) -> None:
         """
         Args:
@@ -67,6 +66,7 @@ class Sudoku(GameBoard):
         return self.__block_dims
 
     def __set_block_dims(self, value:tuple[int, int] = (2, 2)) -> None:
+        
         if len(value) != 2:
             msg = f"Board dimensions must be a pair (m,n). Got {value!r} instead."
             raise TypeError(msg)
@@ -101,6 +101,27 @@ class Sudoku(GameBoard):
         return self.__filled_squares
     
     def __set_filled_squares(self, values: dict[tuple[int, int]: int]) -> None:
+
+        if not isinstance(values, dict):
+            msg = f"The filled squares must be a dictionary. Got a {type(values).__name__} instead."
+            raise TypeError(msg)
+
+        invalid_items = {
+            square: digit for square, digit in values.items()
+            if not isinstance(square, tuple) or not isinstance(digit, int)
+        }
+        if invalid_items:
+            msg = (
+                "filled_squares must be a dictionary of `(row, column): digit` items."
+                f" Invalid items: {invalid_items}"
+            )
+            raise TypeError(msg)
+
+        invalid_items = {square: digit for square, digit in values.items() if digit < 0 or digit > self.size}
+        if invalid_items:
+            msg = f"Digits must be positive and not greater than Sudoku's size. Invalid items: {invalid_items}"
+            raise ValueError(msg)
+
         if len(values) > len(self):
             msg = (
                 "The number of filled squares exceeds the amount of board squares."
@@ -115,15 +136,7 @@ class Sudoku(GameBoard):
             )
             raise ValueError(msg)
 
-        if isinstance(values, (list, tuple)):
-            self.__filled_squares = {square: index for index, square in enumerate(values)}
-        elif not isinstance(values, dict):
-            msg = "The filled squares must be a dictionary."
-            raise TypeError(msg)
-        else:
-            self.__filled_squares = values
-
-        nx.set_node_attributes(self.board, name="value", values=None)
+        self.__filled_squares = values
         nx.set_node_attributes(self.board, name="value", values=self.filled_squares)
 
 
@@ -133,9 +146,7 @@ class Sudoku(GameBoard):
             name="value",
             values= {
                 (i-1, j-1): k
-                for i in self.model.I
-                for j in self.model.J
-                for k in self.model.K
+                for i in self.model.I for j in self.model.J for k in self.model.K
                 if int(pyo.value(self.model.x[i, j, k])) == 1
             }
         )
