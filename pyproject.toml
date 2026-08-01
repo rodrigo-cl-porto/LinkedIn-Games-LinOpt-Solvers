@@ -138,15 +138,16 @@ cwd = "book"
 env = { NODE_TLS_REJECT_UNAUTHORIZED = "0" }
 
 [tool.poe.tasks.test]
-cmd = "pytest tests --maxfail=1"
+cmd = "pytest --maxfail=1"
+cwd = "tests"
 
 [tool.poe.tasks.lint]
 cmd = "ruff check"
 
 [tool.poe.tasks.publish]
-cmd = """
-    poe test
-    uv build --no-sources
-    uv publish
+shell = """
+poe test &&
+uv build --no-sources &&
+uv publish --token UV_PUBLISH_TOKEN
 """
 envfile=".env"
