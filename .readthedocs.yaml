@@ -8,7 +8,7 @@ build:
   jobs:
     build:
       html:
-        - uv run zensical build
+        - uv run --no-sync zensical build
     post_build:
       - mkdir -p $READTHEDOCS_OUTPUT/html/
       - cp --recursive site/* $READTHEDOCS_OUTPUT/html/
