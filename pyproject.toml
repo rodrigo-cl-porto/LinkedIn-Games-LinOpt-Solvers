@@ -144,10 +144,9 @@ cwd = "tests"
 [tool.poe.tasks.lint]
 cmd = "ruff check"
 
+[tool.poe.tasks.build]
+cmd = "uv build --no-sources"
+
 [tool.poe.tasks.publish]
-shell = """
-poe test &&
-uv build --no-sources &&
-uv publish --token UV_PUBLISH_TOKEN
-"""
+cmd = "uv publish --token $UV_PUBLISH_TOKEN"
 envfile=".env"
