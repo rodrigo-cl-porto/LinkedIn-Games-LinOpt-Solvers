@@ -1,5 +1,15 @@
 <div align="center">
-    <img src="./assets/logo.svg" alt="logo" width="40%">
+    <img src="./assets/logo.svg" alt="logo" width="20%">
+</div>
+
+<div align="center">
+    
+[![PyPI - Package Version](https://img.shields.io/pypi/v/linkedin-games?logo=pypi&style=flat&color=blue&logoColor=gold)](https://pypi.org/project/linkedin-games/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/linkedin-games?logo=pypi&style=flat&color=blue&logoColor=gold)](https://pypi.org/project/linkedin-games/)
+[![PyPI - Installs](https://img.shields.io/pypi/dm/linkedin-games?logo=pypi&style=flat&color=blue&logoColor=gold)](https://pypi.org/project/linkedin-games/)
+[![Documentation Status](https://readthedocs.org/projects/linkedin-games-linopt-solvers/badge/?version=latest&style=flat)](https://linkedin-games-linopt-solvers.readthedocs.io/)
+[![License - MIT](https://img.shields.io/badge/license-MIT-9400d3.svg?style=flat&color=orange)](https://spdx.org/licenses/)
+
 </div>
 
 # 𖣯 LinkedIn Games Python Library

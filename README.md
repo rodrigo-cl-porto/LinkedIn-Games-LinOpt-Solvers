@@ -8,7 +8,15 @@
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/linkedin-games?logo=pypi&style=flat&color=blue&logoColor=gold)](https://pypi.org/project/linkedin-games/)
 [![PyPI - Installs](https://img.shields.io/pypi/dm/linkedin-games?logo=pypi&style=flat&color=blue&logoColor=gold)](https://pypi.org/project/linkedin-games/)
 [![Documentation Status](https://readthedocs.org/projects/linkedin-games-linopt-solvers/badge/?version=latest&style=flat)](https://linkedin-games-linopt-solvers.readthedocs.io/)
-[![License - MIT](https://img.shields.io/badge/license-MIT-9400d3.svg?style=flat)](https://spdx.org/licenses/)
+[![License - MIT](https://img.shields.io/badge/license-MIT-9400d3.svg?style=flat&color=orange)](https://spdx.org/licenses/)
+
+</div>
+
+<div align="center">
+
+[![Last Commit](https://img.shields.io/github/last-commit/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers/main?style=social&logo=github)](https://github.com/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers)
+[![GitHub Stars](https://img.shields.io/github/stars/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers)](https://github.com/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers)
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/rodrigo-cl-porto?logo=GitHub%20Sponsors&style=social)](https://github.com/sponsors/rodrigo-cl-porto)
 
 </div>
 
@@ -23,9 +31,8 @@
 
 <div align="center">
 
-[![Last Commit](https://img.shields.io/github/last-commit/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers/main?style=social&logo=github)](https://github.com/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers)
-[![GitHub Stars](https://img.shields.io/github/stars/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers)](https://github.com/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers)
-[![GitHub Sponsors](https://img.shields.io/github/sponsors/rodrigo-cl-porto?logo=GitHub%20Sponsors&style=social)](https://github.com/sponsors/rodrigo-cl-porto)
+[![book - Jupyter Book](https://raw.githubusercontent.com/jupyter-book/jupyter-book/next/docs/media/images/badge.svg)](https://jupyterbook.org)
+[![documentation - Zensical](https://img.shields.io/badge/docs-zensical-orange?logo=zensical&style=flat)](https://github.com/zensical/zensical)
 
 </div>
 
