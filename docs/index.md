@@ -69,7 +69,7 @@ Which, by its turn, matches the official solution of this game:
 
 You can read more about the usage and implementation of this library on this [Jupyter Book].
 
-[Jupyter Book]: https://rodrigo-cl-porto.github.io/linkedin-games-linopt-solvers/
+[Jupyter Book]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/
 
 ## Table of Contents
 
@@ -85,11 +85,11 @@ You can read more about the usage and implementation of this library on this [Ju
     - [Mini Sudoku][how-to-solve-mini-sudoku]
     - [Patches][how-to-solve-patches]
 
-[home]: https://rodrigo-cl-porto.github.io/linkedin-games-linopt-solvers/
-[what-is-optimization]: https://rodrigo-cl-porto.github.io/linkedin-games-linopt-solvers/getting-started/what-is-optimization/
-[linkedin-games-library]: https://rodrigo-cl-porto.github.io/linkedin-games-linopt-solvers/getting-started/linkedin-games-library/
-[how-to-solve-queens]: https://rodrigo-cl-porto.github.io/linkedin-games-linopt-solvers/how-to-solve/queens/
-[how-to-solve-tango]: https://rodrigo-cl-porto.github.io/linkedin-games-linopt-solvers/how-to-solve/tango/
-[how-to-solve-zip]: https://rodrigo-cl-porto.github.io/linkedin-games-linopt-solvers/how-to-solve/zip/
-[how-to-solve-mini-sudoku]: https://rodrigo-cl-porto.github.io/linkedin-games-linopt-solvers/how-to-solve/mini-sudoku/
-[how-to-solve-patches]: https://rodrigo-cl-porto.github.io/linkedin-games-linopt-solvers/how-to-solve/patches/
+[home]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/
+[what-is-optimization]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/getting-started/what-is-optimization/
+[linkedin-games-library]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/getting-started/linkedin-games-library/
+[how-to-solve-queens]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/how-to-solve/queens/
+[how-to-solve-tango]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/how-to-solve/tango/
+[how-to-solve-zip]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/how-to-solve/zip/
+[how-to-solve-mini-sudoku]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/how-to-solve/mini-sudoku/
+[how-to-solve-patches]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/how-to-solve/patches/

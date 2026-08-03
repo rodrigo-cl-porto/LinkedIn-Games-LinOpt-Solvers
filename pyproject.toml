@@ -1,6 +1,6 @@
 [project]
 name = "linkedin-games"
-version = "0.1.4"
+version = "0.1.5"
 description = "A Python package for solving LinkedIn board games like Queens, Tango, Zip, Mini Sudoku and Patches using Linear Optimization models."
 keywords = [
     "LinkedIn Games",
@@ -36,9 +36,9 @@ dependencies = [
 mkdocstrings = { handler = "python" }
 
 [project.urls]
-"Source Code" = "https://github.com/rodrigo-cl-porto/linkedin-games-solvers"
-"Jupyter Book" = "https://rodrigo-cl-porto.github.io/linkedin-games-solvers/"
-"Documentation" = "https://linkedin-games-solvers.readthedocs.io/en/latest/"
+"Source Code" = "https://github.com/rodrigo-cl-porto/Linkedin-Games-LinOpt-Solvers"
+"Jupyter Book" = "https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/"
+"Documentation" = "https://Linkedin-Games-LinOpt-Solvers.readthedocs.io/"
 "LinkedIn Profile" = "https://www.linkedin.com/in/rodrigo-cl-porto/"
 "GitHub Profile" = "https://github.com/rodrigo-cl-porto"
 
