@@ -1,6 +1,6 @@
 [project] # https://zensical.org/docs/get-started/
 site_name = "Linear Optimization Solvers for LinkedIn Games"
-site_url = "https://LinkedIn-Games-LinOpt-Solvers.readthedocs.io/"
+site_url = "https://linkedin-games-linopt-solvers.readthedocs.io/"
 site_description = "Documentation site for LinkedIn Games Python package."
 site_author = "Rodrigo Celso de Lima Porto"
 copyright = "Copyright &copy; <span id='year-copyright'></span> Rodrigo Porto"

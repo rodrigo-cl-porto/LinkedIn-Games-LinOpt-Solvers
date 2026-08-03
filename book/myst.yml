@@ -91,7 +91,7 @@ site:
     logo_dark: ./assets/site/logo_dark.svg
   nav:
     - title: Documentation
-      url: https://LinkedIn-Games-LinOpt-Solvers.readthedocs.io/en/latest
+      url: https://linkedin-games-linopt-solvers.readthedocs.io/
     - title: Useful Pythonic Concepts
       children:
       - title: Chained and Multiple Assigments
