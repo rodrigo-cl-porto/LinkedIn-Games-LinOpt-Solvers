@@ -1,6 +1,6 @@
 [project]
 name = "linkedin-games"
-version = "0.1.7"
+version = "0.1.8"
 description = "A Python package for solving LinkedIn board games like Queens, Tango, Zip, Mini Sudoku and Patches using Linear Optimization models."
 keywords = [
     "LinkedIn Games",
@@ -20,9 +20,10 @@ readme = "README.md"
 license = { file = "LICENSE.md" }
 classifiers = [
     "Development Status :: 5 - Production/Stable",
-    "Natural Language :: English",
     "Intended Audience :: Education",
-    "Topic :: Games/Entertainment"
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Games/Entertainment :: Puzzle Games"
 ]
 requires-python = ">=3.13"
 dependencies = [
@@ -50,9 +51,9 @@ book = [
     "jupyterlab-myst>=2.7.0",
 ]
 dev = [
-    "poethepoet>=0.48.0",
-    "pytest>=9.1.1",
-    "ruff>=0.15.22",
+    "poethepoet>=0.48.0", # Task runner
+    "pytest>=9.1.1",      # Automatic tests
+    "ruff>=0.15.22",      # Linting
 ]
 docs = [
     "mkdocstrings-python>=2.0.5",
@@ -60,7 +61,7 @@ docs = [
 ]
 
 [build-system]
-requires = ["uv_build>=0.10.4,<0.11.0"]
+requires = ["uv_build>=0.12.1,<0.13.0"]
 build-backend = "uv_build"
 
 
