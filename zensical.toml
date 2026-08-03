@@ -1,13 +1,13 @@
 [project] # https://zensical.org/docs/get-started/
-site_name = "LinkedIn Games Solvers"
-site_url = "https://linkedin-games-solvers.readthedocs.io/"
+site_name = "Linear Optimization Solvers for LinkedIn Games"
+site_url = "https://linkedin-games-linopt-solvers.readthedocs.io/"
 site_description = "Documentation site for LinkedIn Games Solvers Python package."
-site_author = "Rodrigo Porto"
+site_author = "Rodrigo Celso de Lima Porto"
 copyright = "Copyright &copy; <span id='year-copyright'></span> Rodrigo Porto"
 docs_dir = "docs"
 site_dir = "docs/_build"
 dev_addr = "localhost:3000"
-repo_url = "https://github.com/rodrigo-cl-porto/linkedin-games-solvers"
+repo_url = "https://github.com/rodrigo-cl-porto/linkedin-games-linopt-solvers"
 nav = [
     {"Home" = "index.md"},
     {"API" = [
@@ -21,7 +21,7 @@ nav = [
         "api/tango.md",
         "api/zip.md"
     ]},
-    {"Jupyter Book" = "https://rodrigo-cl-porto.github.io/linkedin-games-solvers/"}
+    {"Jupyter Book" = "https://rodrigo-cl-porto.github.io/linkedin-games-linopt-solvers/"}
 ]
 
 [project.theme]

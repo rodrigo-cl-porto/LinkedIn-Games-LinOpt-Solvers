@@ -2,19 +2,15 @@
     <img src="./assets/logo.svg" alt="logo" width="40%">
 </div>
 
-# 🐍 Linear Optimization Solvers for LinkedIn Games 𖣯
+# 𖣯 LinkedIn Games Python Library
 
-This repository holds a Python package that provides a simple set of components to solve LinkedIn board games ([Queens][linkedin-queens], [Tango][linkedin-tango], [Zip][linkedin-zip], [Mini Sudoku][linkedin-mini-sudoku] and [Patches][linkedin-patches] for now) using Linear Optimization models. This library leverages popular Python libraries such as [Pyomo] for mathematical modeling and [NetworkX] for graph-based representations of game boards.
-
-This repository also contains a Jupyter Book that teachs how this library implements Linear Optimization models to solve each game. The book introduces the basics of mathematical optimization, explain the components of the library and presents the line of reasoning behind the model's structure of each minigame.
+This is the documentation for LinkedIn Games Python package. This package provides a simple set of components to solve LinkedIn board games ([Queens][linkedin-queens], [Tango][linkedin-tango], [Zip][linkedin-zip], [Mini Sudoku][linkedin-mini-sudoku] and [Patches][linkedin-patches] for now) using Linear Optimization models.
 
 [linkedin-queens]: https://www.linkedin.com/games/queens/
 [linkedin-tango]: https://www.linkedin.com/games/tango/
 [linkedin-zip]: https://www.linkedin.com/games/zip/
 [linkedin-mini-sudoku]: https://www.linkedin.com/games/mini-sudoku/
 [linkedin-patches]: https://www.linkedin.com/games/patches/
-[Pyomo]: https://www.pyomo.org/
-[NetworkX]: https://networkx.org/en/
 
 # Installing
 
@@ -73,7 +69,7 @@ Which, by its turn, matches the official solution of this game:
 
 You can read more about the usage and implementation of this library on this [Jupyter Book].
 
-[Jupyter Book]: https://rodrigo-cl-porto.github.io/linkedin-games-solvers/
+[Jupyter Book]: https://rodrigo-cl-porto.github.io/linkedin-games-linopt-solvers/
 
 ## Table of Contents
 
@@ -89,11 +85,11 @@ You can read more about the usage and implementation of this library on this [Ju
     - [Mini Sudoku][how-to-solve-mini-sudoku]
     - [Patches][how-to-solve-patches]
 
-[home]: https://rodrigo-cl-porto.github.io/linkedin-games-solvers/
-[what-is-optimization]: https://rodrigo-cl-porto.github.io/linkedin-games-solvers/getting-started/what-is-optimization/
-[linkedin-games-library]: https://rodrigo-cl-porto.github.io/linkedin-games-solvers/getting-started/linkedin-games-library/
-[how-to-solve-queens]: https://rodrigo-cl-porto.github.io/linkedin-games-solvers/how-to-solve/queens/
-[how-to-solve-tango]: https://rodrigo-cl-porto.github.io/linkedin-games-solvers/how-to-solve/tango/
-[how-to-solve-zip]: https://rodrigo-cl-porto.github.io/linkedin-games-solvers/how-to-solve/zip/
-[how-to-solve-mini-sudoku]: https://rodrigo-cl-porto.github.io/linkedin-games-solvers/how-to-solve/mini-sudoku/
-[how-to-solve-patches]: https://rodrigo-cl-porto.github.io/linkedin-games-solvers/how-to-solve/patches/
+[home]: https://rodrigo-cl-porto.github.io/linkedin-games-linopt-solvers/
+[what-is-optimization]: https://rodrigo-cl-porto.github.io/linkedin-games-linopt-solvers/getting-started/what-is-optimization/
+[linkedin-games-library]: https://rodrigo-cl-porto.github.io/linkedin-games-linopt-solvers/getting-started/linkedin-games-library/
+[how-to-solve-queens]: https://rodrigo-cl-porto.github.io/linkedin-games-linopt-solvers/how-to-solve/queens/
+[how-to-solve-tango]: https://rodrigo-cl-porto.github.io/linkedin-games-linopt-solvers/how-to-solve/tango/
+[how-to-solve-zip]: https://rodrigo-cl-porto.github.io/linkedin-games-linopt-solvers/how-to-solve/zip/
+[how-to-solve-mini-sudoku]: https://rodrigo-cl-porto.github.io/linkedin-games-linopt-solvers/how-to-solve/mini-sudoku/
+[how-to-solve-patches]: https://rodrigo-cl-porto.github.io/linkedin-games-linopt-solvers/how-to-solve/patches/
