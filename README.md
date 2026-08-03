@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://cdn.jsdelivr.net/gh/rodrigo-cl-porto/Linkedin-Games-LinOpt-Solvers/docs/assets/logo.svg" alt="logo" width="40%">
+    <img src="https://cdn.jsdelivr.net/gh/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers/docs/assets/logo.svg" alt="logo" width="40%">
 </div>
 
 # 🐍 Linear Optimization Solvers for LinkedIn Games 𖣯
@@ -35,7 +35,7 @@ uv add linkedin-games
 In order to solve this Patches game:
 
 <div align="center">
-    <img src="https://cdn.jsdelivr.net/gh/rodrigo-cl-porto/Linkedin-Games-LinOpt-Solvers/docs/assets/patches-121.jpg" alt="Patches No. 121" width="40%">
+    <img src="https://cdn.jsdelivr.net/gh/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers/docs/assets/patches-121.jpg" alt="Patches No. 121" width="40%">
 </div>
 
 One can run this simple code snippet.
@@ -60,24 +60,24 @@ patches.show()
 Which will return the following result:
 
 <div align="center">
-    <img src="https://cdn.jsdelivr.net/gh/rodrigo-cl-porto/Linkedin-Games-LinOpt-Solvers/docs/assets/patches-121-solved.png" alt="Patches No. 121 solved" width="40%">
+    <img src="https://cdn.jsdelivr.net/gh/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers/docs/assets/patches-121-solved.png" alt="Patches No. 121 solved" width="40%">
 </div>
 
 Which, by its turn, matches the official solution of this game:
 
 <div align="center">
-    <img src="https://cdn.jsdelivr.net/gh/rodrigo-cl-porto/Linkedin-Games-LinOpt-Solvers/docs/assets/patches-121-solution.jpg" alt="Solution of Patches No. 121" width="40%">
+    <img src="https://cdn.jsdelivr.net/gh/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers/docs/assets/patches-121-solution.jpg" alt="Solution of Patches No. 121" width="40%">
 </div>
 
 # 📙 Jupyter Book
 
 You can read more about the usage and implementation of this library on this [Jupyter Book].
 
-[Jupyter Book]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/
+[Jupyter Book]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/
 
 ## Table of Contents
 
-- Solving Linkedin Games by Linear Optimization
+- Solving LinkedIn Games by Linear Optimization
     - [Home][home]
 - Getting Started
     - [What is Optimization?][what-is-optimization]
@@ -89,14 +89,14 @@ You can read more about the usage and implementation of this library on this [Ju
     - [Mini Sudoku][how-to-solve-mini-sudoku]
     - [Patches][how-to-solve-patches]
 
-[home]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/
-[what-is-optimization]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/getting-started/what-is-optimization/
-[linkedin-games-library]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/getting-started/linkedin-games-library/
-[how-to-solve-queens]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/how-to-solve/queens/
-[how-to-solve-tango]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/how-to-solve/tango/
-[how-to-solve-zip]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/how-to-solve/zip/
-[how-to-solve-mini-sudoku]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/how-to-solve/mini-sudoku/
-[how-to-solve-patches]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/how-to-solve/patches/
+[home]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/
+[what-is-optimization]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/getting-started/what-is-optimization/
+[linkedin-games-library]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/getting-started/linkedin-games-library/
+[how-to-solve-queens]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/how-to-solve/queens/
+[how-to-solve-tango]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/how-to-solve/tango/
+[how-to-solve-zip]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/how-to-solve/zip/
+[how-to-solve-mini-sudoku]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/how-to-solve/mini-sudoku/
+[how-to-solve-patches]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/how-to-solve/patches/
 
 # ❤️ Donate
 

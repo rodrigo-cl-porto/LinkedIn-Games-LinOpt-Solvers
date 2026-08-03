@@ -1,6 +1,6 @@
 [project]
 name = "linkedin-games"
-version = "0.1.5"
+version = "0.1.6"
 description = "A Python package for solving LinkedIn board games like Queens, Tango, Zip, Mini Sudoku and Patches using Linear Optimization models."
 keywords = [
     "LinkedIn Games",
@@ -36,9 +36,9 @@ dependencies = [
 mkdocstrings = { handler = "python" }
 
 [project.urls]
-"Source Code" = "https://github.com/rodrigo-cl-porto/Linkedin-Games-LinOpt-Solvers"
-"Jupyter Book" = "https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/"
-"Documentation" = "https://Linkedin-Games-LinOpt-Solvers.readthedocs.io/"
+"Source Code" = "https://github.com/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers"
+"Jupyter Book" = "https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/"
+"Documentation" = "https://LinkedIn-Games-LinOpt-Solvers.readthedocs.io/"
 "LinkedIn Profile" = "https://www.linkedin.com/in/rodrigo-cl-porto/"
 "GitHub Profile" = "https://github.com/rodrigo-cl-porto"
 
@@ -177,7 +177,10 @@ cmd = "ruff check"
 
 [tool.poe.tasks.build]
 help = "Build the Python package to dist folder."
-cmd = "uv build --no-sources"
+shell = """
+    rm -rf dist &
+    uv build --no-sources
+"""
 
 [tool.poe.tasks.publish]
 help = "Publish the built package to PyPI (Python Package Index) site."

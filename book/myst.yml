@@ -25,7 +25,7 @@ project:
       corresponding: true
       github: rodrigo-cl-porto
       linkedin: https://www.linkedin.com/in/rodrigo-cl-porto
-  github: https://github.com/rodrigo-cl-porto/Linkedin-Games-LinOpt-Solvers
+  github: https://github.com/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers
   social:
     linkedin: https://www.linkedin.com/in/rodrigo-cl-porto
     github: rodrigo-cl-porto
@@ -91,7 +91,7 @@ site:
     logo_dark: ./assets/site/logo_dark.svg
   nav:
     - title: Documentation
-      url: https://Linkedin-Games-LinOpt-Solvers.readthedocs.io/en/latest
+      url: https://LinkedIn-Games-LinOpt-Solvers.readthedocs.io/en/latest
     - title: Useful Pythonic Concepts
       children:
       - title: Chained and Multiple Assigments

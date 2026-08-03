@@ -69,11 +69,11 @@ Which, by its turn, matches the official solution of this game:
 
 You can read more about the usage and implementation of this library on this [Jupyter Book].
 
-[Jupyter Book]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/
+[Jupyter Book]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/
 
 ## Table of Contents
 
-- Solving Linkedin Games by Linear Optimization
+- Solving LinkedIn Games by Linear Optimization
     - [Home][home]
 - Getting Started
     - [What is Optimization?][what-is-optimization]
@@ -85,11 +85,11 @@ You can read more about the usage and implementation of this library on this [Ju
     - [Mini Sudoku][how-to-solve-mini-sudoku]
     - [Patches][how-to-solve-patches]
 
-[home]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/
-[what-is-optimization]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/getting-started/what-is-optimization/
-[linkedin-games-library]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/getting-started/linkedin-games-library/
-[how-to-solve-queens]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/how-to-solve/queens/
-[how-to-solve-tango]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/how-to-solve/tango/
-[how-to-solve-zip]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/how-to-solve/zip/
-[how-to-solve-mini-sudoku]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/how-to-solve/mini-sudoku/
-[how-to-solve-patches]: https://rodrigo-cl-porto.github.io/Linkedin-Games-LinOpt-Solvers/how-to-solve/patches/
+[home]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/
+[what-is-optimization]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/getting-started/what-is-optimization/
+[linkedin-games-library]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/getting-started/linkedin-games-library/
+[how-to-solve-queens]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/how-to-solve/queens/
+[how-to-solve-tango]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/how-to-solve/tango/
+[how-to-solve-zip]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/how-to-solve/zip/
+[how-to-solve-mini-sudoku]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/how-to-solve/mini-sudoku/
+[how-to-solve-patches]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/how-to-solve/patches/
