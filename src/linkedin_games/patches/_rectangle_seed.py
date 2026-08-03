@@ -207,11 +207,11 @@ class RectangleSeed:
         Returns:
             Hex code color as a `"#RRGGBB"` string.
         """
-        return self.__color.hex
+        return self.__color.hex_code
     
     @color_code.setter
     def color_code(self, value:str) -> None:
-        self.__color.hex = value
+        self.__color.hex_code = value
 
 
     @property

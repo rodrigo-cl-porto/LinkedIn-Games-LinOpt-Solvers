@@ -1,6 +1,5 @@
 from typing import Self
 
-from ..core._color import Color
 
 
 class Rectangle:

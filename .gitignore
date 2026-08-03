@@ -1,7 +1,7 @@
 # Environment variables
 .env
 
-# Jupyter Book build
+# Jupyter Book and Zensical builds
 _build/
 
 # VS Code settings
@@ -21,8 +21,4 @@ __pycache__/
 .ipynb_checkpoints/
 
 # Distribution / packaging
-*.egg-info/
 dist/
-
-# Zensical site
-site/

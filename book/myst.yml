@@ -37,7 +37,7 @@ project:
     - title: Getting Started
       children:
       - title: What is Optimization?
-        file: ./1-getting-started/1-what-is-optimization.ipynb
+        file: ./1-getting-started/1-what-is-optimization.md
       - title: LinkedIn Games Library
         file: ./1-getting-started/2-linkedin-games-library.md
     - title: How to Solve
@@ -75,7 +75,7 @@ project:
       title: Solving LinkedIn Games by Linear Optimization
       articles:
         - ./home.md
-        - ./1-getting-started/1-what-is-optimization.ipynb
+        - ./1-getting-started/1-what-is-optimization.md
         - ./1-getting-started/2-linkedin-games-library.md
         - ./2-how-to-solve/1-queens.ipynb
         - ./2-how-to-solve/2-tango.ipynb

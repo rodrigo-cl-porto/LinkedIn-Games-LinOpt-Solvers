@@ -1,6 +1,6 @@
 ---
 title: LinkedIn Games Library
-short_title: LinkedIn Games
+short_title: LinkedIn Games Solvers
 date: 2026-07-13
 downloads:
     - file: 2-linkedin-games-library.md

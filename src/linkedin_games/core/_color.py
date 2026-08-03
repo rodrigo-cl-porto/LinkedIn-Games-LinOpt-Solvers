@@ -1,45 +1,45 @@
 import re
-from typing import Self
 
 from matplotlib.colors import CSS4_COLORS
 
 
 class Color:
-    """A class that provides color properties to a component."""
+    """Class to provide color properties to a component."""
 
     __HEX_PATTERN: re.Pattern = re.compile(r"^\#[0-9A-F]{6}$")
     __COLOR_HEXES: dict[str, str] = CSS4_COLORS
-    __COLOR_NAMES: dict[str, str] = {
-        hex: name for name, hex in CSS4_COLORS.items()
-    }
 
-    def __init__(self, color:str="#FFFFFF") -> Self:
+    def __init__(self, color: str="#FFFFFF") -> None:
+        """
+        Args:
+            color: Color name or its hex code as a "#RRGGBB" string.
+        """
+        Color.__COLOR_NAMES: dict[str, str] = {hex_code: name for name, hex_code in CSS4_COLORS.items()}
         self.color = color
 
 
     @staticmethod
-    def __hex_to_rgb(hex: str) -> tuple[int, int, int]:
+    def __hex_code_to_rgb(hex_code: str) -> tuple[int, int, int]:
         """Convert '#RRGGBB' to an (R, G, B) tuple."""
-        hex = hex.lstrip("#")
-        return tuple(int(hex[i : i + 2], 16) for i in (0, 2, 4))
+        hex_code = hex_code.lstrip("#")
+        return tuple(int(hex_code[i : i + 2], 16) for i in (0, 2, 4))
 
 
     @staticmethod
-    def __get_closest_color_name(hex: str) -> str:
+    def __get_closest_color_name(hex_code: str) -> str:
         """Find the closest color name from hex code by Euclidean distance."""
-        if hex in Color.__COLOR_NAMES:
-            return Color.__COLOR_NAMES[hex]
+        if hex_code in Color.__COLOR_NAMES:
+            return Color.__COLOR_NAMES[hex_code]
 
-        target_rgb = Color.__hex_to_rgb(hex)
+        target_rgb = Color.__hex_code_to_rgb(hex_code)
         closest_color = None
         min_distance = float("inf")
 
         for color, hex_val in Color.__COLOR_HEXES.items():
-            color_rgb = Color.__hex_to_rgb(hex_val)
+            color_rgb = Color.__hex_code_to_rgb(hex_val)
             distance_squared = sum(
-                (t - c) ** 2 for t, c in zip(target_rgb, color_rgb)
+                (t - c) ** 2 for t, c in zip(target_rgb, color_rgb, strict=True)
             )
-
             if distance_squared < min_distance:
                 min_distance = distance_squared
                 closest_color = color
@@ -66,54 +66,42 @@ class Color:
     def color(self, value:str) -> None:
 
         if not isinstance(value, str):
-            msg = (
-                f"The color must be a string."
-                f" Got a {type(value).__name__} instead."
-            )
-            raise ValueError(msg)
+            msg = f"The color must be a string. Got a {type(value).__name__} instead."
+            raise TypeError(msg)
         
         color = " ".join(value.strip().lower().split())
-        hex = " ".join(value.strip().upper().split())
+        hex_code = " ".join(value.strip().upper().split())
 
-        if Color.__is_hex_code(hex):
-            self.__hex = hex
-            self.__name = Color.__get_closest_color_name(hex)
+        if Color.__is_hex_code(hex_code):
+            self.__hex_code = hex_code
+            self.__name = Color.__get_closest_color_name(hex_code)
 
         elif Color.__is_color_name(color):
             self.__name = color
             color = color.replace(" ", "")
-            self.__hex = Color.__COLOR_HEXES[color]
+            self.__hex_code = Color.__COLOR_HEXES[color]
         
         else:
-            msg = (
-                f"The color must be a valid color name or a hex code like '#RRGGBB'."
-                f" Got {color!r} instead."
-            )
+            msg = f"The color must be a valid color name or a hex code like '#RRGGBB'. Got {color!r} instead."
             raise ValueError(msg)
 
 
     @property
-    def hex(self) -> str:
-        return self.__hex
+    def hex_code(self) -> str:
+        return self.__hex_code
 
-    @hex.setter
+    @hex_code.setter
     def hex(self, value:str) -> None:
 
         if not isinstance(value, str):
-            msg = (
-                f"The hex code must be a string."
-                f" Got a {type(value).__name__} instead."
-            )
+            msg = f"The hex code must be a string. Got a {type(value).__name__} instead."
             raise TypeError(msg)
 
         if not Color.__is_hex_code(value):
-            msg = (
-                f"The hex code must match to '#RRGGBB' pattern."
-                f" Got {value!r} instead."
-            )
+            msg = f"The hex code must match to '#RRGGBB' pattern. Got {value!r} instead."
             raise ValueError(msg)
 
-        self.__hex = value
+        self.__hex_code = value
         self.__name = Color.__get_closest_color_name(value)
 
 
@@ -124,16 +112,12 @@ class Color:
     @name.setter
     def name(self, value:str) -> None:
         if not isinstance(value, str):
-            msg = (
-                "The color name must be a string."
-                f" Got a {type(value).__name__} instead."
-            )
+            msg = f"The color name must be a string. Got a {type(value).__name__} instead."
             raise TypeError(msg)
 
         value = " ".join(value.strip().lower().split())
         if not Color.__is_color_name(value):
             msg = f"The name {value!r} is not a valid color."
             raise ValueError(msg)
-        else:
-            self.__hex = Color.__COLOR_HEXES[value.replace(" ", "")]
-            self.__name = value
+        self.__hex_code = Color.__COLOR_HEXES[value.replace(" ", "")]
+        self.__name = value

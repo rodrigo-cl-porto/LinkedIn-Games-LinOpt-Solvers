@@ -1,21 +1,23 @@
-[project]
+[project] # https://zensical.org/docs/get-started/
 site_name = "LinkedIn Games Solvers"
 site_url = "https://linkedin-games-solvers.readthedocs.io/"
 site_description = "Documentation site for LinkedIn Games Solvers Python package."
 site_author = "Rodrigo Porto"
 copyright = "Copyright &copy; <span id='year-copyright'></span> Rodrigo Porto"
 docs_dir = "docs"
-site_dir = "docs/site"
+site_dir = "docs/_build"
 dev_addr = "localhost:3000"
 repo_url = "https://github.com/rodrigo-cl-porto/linkedin-games-solvers"
 nav = [
     {"Home" = "index.md"},
     {"API" = [
-        "api/classic-sudoku.md",
-        "api/mini-sudoku.md",
         "api/patches.md",
         "api/queens.md",
-        "api/sudoku.md",
+        {"Sudoku" = [
+            "api/sudoku.md",
+            {"Classic Sudoku" = "api/classic-sudoku.md"},
+            {"Mini Sudoku" = "api/mini-sudoku.md"},
+        ]},
         "api/tango.md",
         "api/zip.md"
     ]},
@@ -46,9 +48,9 @@ next = "fontawesome/solid/angle-right"
 [[project.theme.palette]]
 media = "(prefers-color-scheme)"
 scheme = "slate"
-primary = "pink"
-accent = "orange"
-toggle.icon = "lucide/moon"
+primary = "blue"
+accent = "deep orange"
+toggle.icon = "lucide/sun"
 toggle.name = "Switch to light mode"
 
 # Palette toggle for light mode
@@ -56,17 +58,17 @@ toggle.name = "Switch to light mode"
 media = "(prefers-color-scheme: light)"
 scheme = "default"
 primary = "blue"
-accent = "orange"
-toggle.icon = "lucide/sun"
+accent = "deep orange"
+toggle.icon = "lucide/moon"
 toggle.name = "Switch to dark mode"
 
 # Palette toggle for dark mode
 [[project.theme.palette]]
 media = "(prefers-color-scheme: dark)"
 scheme = "slate"
-primary = "deepblue"
-accent = "purple"
-toggle.icon = "lucide/moon"
+primary = "blue"
+accent = "deep orange"
+toggle.icon = "lucide/sun"
 toggle.name = "Switch to light mode"
 
 [project.extra]
@@ -104,7 +106,7 @@ paths = ["src"]
 [project.plugins.mkdocstrings.handlers.python.options]
 docstring_style = "google"
 inherited_members = true
-show_source = true
+show_source = false
 summary = true
 group_by_category = true
 merge_init_into_class = true

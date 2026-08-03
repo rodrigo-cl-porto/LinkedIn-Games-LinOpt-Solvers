@@ -178,7 +178,7 @@ class Tango(GameBoard):
         self.__opposite_pairs = list(set(values))
 
 
-    def _set_solution(self, verbose:bool=False):
+    def _set_solution(self, verbose:bool=False) -> None:
         nx.set_node_attributes(
             self._board,
             name="value",
