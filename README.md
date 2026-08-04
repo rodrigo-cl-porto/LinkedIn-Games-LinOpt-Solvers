@@ -37,8 +37,7 @@ uv add linkedin-games
 
 # Related Links
 
-- [Binder]()
-- [Source Code](https://github.com/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers)
+- [Binder](https://mybinder.org/v2/gh/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers/binder)
 - [PyPI](https://pypi.org/project/linkedin-games/)
 - [Documentation](https://linkedin-games-linopt-solvers.readthedocs.io/)
 - [Jupyter Book](https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/)
