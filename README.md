@@ -21,20 +21,6 @@
 
 This branch is reserved to be hosted on Binder to serve as a Jupyter Lab playground of LinkedIn Games Python package.
 
-# Installing
-
-To install the LinkedIn Games library, you can use the `pip` command:
-
-```bash
-pip install linkedin-games
-```
-
-Or run the command below if you use `uv` as your package manager:
-
-```bash
-uv add linkedin-games
-```
-
 # Related Links
 
 - [Binder](https://mybinder.org/v2/gh/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers/binder)
