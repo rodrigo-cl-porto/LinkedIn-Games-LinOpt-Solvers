@@ -1,0 +1,30 @@
+[project]
+name = "linkedin-games-playground"
+version = "0.1.0"
+description = "This branch is reserved to be hosted on Binder to serve as a Jupyter Lab playground."
+keywords = [
+    "LinkedIn Games",
+    "LinkedIn",
+    "Games",
+    "Queens",
+    "Tango",
+    "Zip",
+    "Mini Sudoku",
+    "Patches",
+    "Optimization",
+    "Linear Optimization"
+]
+authors = [{ name = "Rodrigo C. L. Porto", email = "rodrigo.cl.porto@gmail.com" }]
+readme = "README.md"
+license = { file = "LICENSE.md" }
+requires-python = ">=3.13"
+dependencies = [
+    "linkedin-games>=0.1.0rc3",
+]
+
+[project.urls]
+"Source Code" = "https://github.com/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers"
+"Jupyter Book" = "https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/"
+"Documentation" = "https://linkedin-games-linopt-solvers.readthedocs.io/"
+"LinkedIn Profile" = "https://www.linkedin.com/in/rodrigo-cl-porto/"
+"GitHub Profile" = "https://github.com/rodrigo-cl-porto"
