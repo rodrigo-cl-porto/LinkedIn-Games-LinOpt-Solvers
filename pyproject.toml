@@ -30,7 +30,3 @@ dependencies = [
 "Documentation" = "https://linkedin-games-linopt-solvers.readthedocs.io/"
 "LinkedIn Profile" = "https://www.linkedin.com/in/rodrigo-cl-porto/"
 "GitHub Profile" = "https://github.com/rodrigo-cl-porto"
-
-[build-system]
-requires = ["uv_build>=0.12.1,<0.13.0"]
-build-backend = "uv_build"
