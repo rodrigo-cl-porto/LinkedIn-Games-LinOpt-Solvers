@@ -18,11 +18,13 @@ jobs:
       - name: Copy the Repo to Virtual Server
         uses: actions/checkout@v6
         with:
-          sparse-checkout: | # Avoid copying unnecessary folder to virtual server.
-            /*
-            !/docs
-            !/book
-            !/tests
+          sparse-checkout: | # Copy only the necessary folders and files to virtual machine.
+            src
+            .python-version
+            LICENSE.md
+            pyproject.toml
+            README.md
+            uv.lock
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
@@ -32,6 +34,12 @@ jobs:
 
       - name: Build distribution packages
         run: uv build --no-sources
+
+      - name: Upload Windows dists
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-dists
+          path: dist/
 
   publish-testpypi:
     name: Publish to TestPyPI via OIDC
@@ -48,6 +56,12 @@ jobs:
       url: https://pypi.org
 
     steps:
+      - name: Retrieve release distributions
+        uses: actions/download-artifact@v5
+        with:
+          name: release-dists
+          path: dist/
+
       - name: Publish to TestPyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
