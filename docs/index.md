@@ -1,15 +1,20 @@
-<div align="center">
-    <img src="./assets/logo.svg" alt="logo" width="20%">
+<div id="logo" align="center">
+    <img src="./assets/logo.svg" alt="logo" width="30%">
 </div>
 
-<div align="center">
-    
-[![PyPI - Package Version](https://img.shields.io/pypi/v/linkedin-games?logo=pypi&style=flat&color=blue&logoColor=gold)](https://pypi.org/project/linkedin-games/)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/linkedin-games?logo=pypi&style=flat&color=blue&logoColor=gold)](https://pypi.org/project/linkedin-games/)
-[![PyPI - Installs](https://img.shields.io/pypi/dm/linkedin-games?logo=pypi&style=flat&color=blue&logoColor=gold)](https://pypi.org/project/linkedin-games/)
-[![Documentation Status](https://readthedocs.org/projects/linkedin-games-linopt-solvers/badge/?version=latest&style=flat)](https://linkedin-games-linopt-solvers.readthedocs.io/)
-[![License - MIT](https://img.shields.io/badge/license-MIT-9400d3.svg?style=flat&color=orange)](https://spdx.org/licenses/)
-
+<div id="project-metadata" align="center">
+    <a href="https://pypi.org/project/linkedin-games/">
+        <img src="https://img.shields.io/pypi/v/linkedin-games?logo=pypi&style=flat&color=blue&logoColor=gold" alt="PyPI - Package Version"/>
+    </a>
+    <a href="https://pypi.org/project/linkedin-games/">
+        <img src="https://img.shields.io/pypi/pyversions/linkedin-games?logo=pypi&style=flat&color=blue&logoColor=gold" alt="PyPI - Python Version"/>
+    </a>
+    <a href="https://linkedin-games-linopt-solvers.readthedocs.io/">
+        <img src="https://readthedocs.org/projects/linkedin-games-linopt-solvers/badge/?version=latest&style=flat" alt="Docs Status"/>
+    </a>
+    <a href="https://spdx.org/licenses/">
+        <img src="https://img.shields.io/badge/license-MIT-9400d3.svg?style=flat&color=orange" alt="License - MIT"/>
+    </a>
 </div>
 
 # 𖣯 LinkedIn Games Python Library
@@ -30,7 +35,7 @@ To install the LinkedIn Games library, you can use the `pip` command:
 pip install linkedin-games
 ```
 
-Or run the command below if you use `uv` as your package manager (which I personally recommend):
+Or run the command below if you use `uv` as your package manager:
 
 ```bash
 uv add linkedin-games
@@ -80,26 +85,3 @@ Which, by its turn, matches the official solution of this game:
 You can read more about the usage and implementation of this library on this [Jupyter Book].
 
 [Jupyter Book]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/
-
-## Table of Contents
-
-- Solving LinkedIn Games by Linear Optimization
-    - [Home][home]
-- Getting Started
-    - [What is Optimization?][what-is-optimization]
-    - [LinkedIn Games Library][linkedin-games-library]
-- How to Solve
-    - [Queens][how-to-solve-queens]
-    - [Tango][how-to-solve-tango]
-    - [Zip][how-to-solve-zip]
-    - [Mini Sudoku][how-to-solve-mini-sudoku]
-    - [Patches][how-to-solve-patches]
-
-[home]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/
-[what-is-optimization]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/getting-started/what-is-optimization/
-[linkedin-games-library]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/getting-started/linkedin-games-library/
-[how-to-solve-queens]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/how-to-solve/queens/
-[how-to-solve-tango]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/how-to-solve/tango/
-[how-to-solve-zip]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/how-to-solve/zip/
-[how-to-solve-mini-sudoku]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/how-to-solve/mini-sudoku/
-[how-to-solve-patches]: https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/how-to-solve/patches/

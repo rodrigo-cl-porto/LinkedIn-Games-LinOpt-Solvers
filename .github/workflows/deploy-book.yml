@@ -1,4 +1,3 @@
-# Deploy Jupyter Book 2 (MyST) to GitHub Pages
 name: Jupyter Book (via MyST) GitHub Pages Deploy
 
 on:
@@ -25,13 +24,14 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
-    # 👉 roda os comandos dentro de ./book
+    # run commands inside ./book
     defaults:
       run:
         working-directory: book
 
     steps:
-      - uses: actions/checkout@v4
+      - name: copy repo to virtual server
+        uses: actions/checkout@v6
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

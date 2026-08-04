@@ -1004,7 +1004,7 @@ wheels = [
 
 [[package]]
 name = "linkedin-games"
-version = "0.1.9"
+version = "0.1.0rc3"
 source = { editable = "." }
 dependencies = [
     { name = "highspy" },

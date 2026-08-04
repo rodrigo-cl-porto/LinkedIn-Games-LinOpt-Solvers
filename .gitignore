@@ -14,8 +14,7 @@ _build/
 __pycache__/
 *.py[codz]
 *$py.class
-.pytest_cache/
-.ruff_cache/
+*cache/
 
 # Jupyter Lab checkpoints
 .ipynb_checkpoints/
