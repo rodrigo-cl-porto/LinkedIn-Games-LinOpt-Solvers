@@ -1,5 +1,5 @@
 [project]
-name = "linkedin-games-playground"
+name = "linkedin-games-jupyter-playground"
 version = "0.1.0"
 description = "This branch is reserved to be hosted on Binder to serve as a Jupyter Lab playground."
 authors = [{ name = "Rodrigo C. L. Porto", email = "rodrigo.cl.porto@gmail.com" }]
@@ -16,3 +16,11 @@ bypass-selection = true
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "ipywidgets>=8.1.8",
+    "jupyterlab>=4.6.2",
+    "nbconvert>=7.17.1",
+    "poethepoet>=0.48.0",
+]

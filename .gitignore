@@ -1,3 +1,6 @@
+# Environment variables
+*.env
+
 # VS Code settings
 .vscode
 
@@ -12,3 +15,6 @@ __pycache__/
 
 # Jupyter Lab checkpoints
 .ipynb_checkpoints/
+
+# Package distributions
+dist/
