@@ -1,6 +1,6 @@
 [project]
 name = "linkedin-games"
-version = "0.1.0rc3"
+version = "0.1.0rc5"
 description = "A Python package for solving LinkedIn board games like Queens, Tango, Zip, Mini Sudoku and Patches using Linear Optimization models."
 keywords = [
     "LinkedIn Games",
@@ -70,13 +70,22 @@ requires = ["uv_build>=0.12.1,<0.13.0"]
 build-backend = "uv_build"
 
 
+# Package Manager
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+publish-url = "https://test.pypi.org/legacy/"
+explicit = true
+
+
+# Linting
 [tool.ruff] # https://docs.astral.sh/ruff/
 line-length = 120
 target-version = "py313"
 fix = true
 show-fixes = true
 indent-width = 4
-exclude = ["venv", ".venv", "env", ".env", "node_modules", "__pycache__"]
+exclude = [".venv", ".env", "__pycache__", "tests"]
 
 [tool.ruff.lint]
 exclude = ["*.ipynb"]
@@ -139,12 +148,14 @@ indent-style = "space"
 line-ending = "lf"
 
 
+# Testing
 [tool.pytest.ini_options]
 addopts = "-s --color=yes --tb=short"
 pythonpath = ["src"]
 testpaths = ["tests"]
 
 
+# Task Runner
 [tool.poe] # https://poethepoet.natn.io/index.html
 executor = "uv"
 verbosity = -1
@@ -193,6 +204,15 @@ shell = """
     rm -rf dist &
     uv build --no-sources
 """
+
+[tool.poe.tasks.test-publish]
+help = "Publish the built package to TestPyPI via OIDC"
+cmd = "uv publish --system-certs --index testpypi --token $UV_TEST_PUBLISH_TOKEN"
+envfile=".env"
+
+[tool.poe.tasks.test-deploy]
+help = "Lint and test the code before building and publishing the Python package to TestPyPI."
+sequence = ["lint", "test", "build", "test-publish"]
 
 [tool.poe.tasks.publish]
 help = "Publish the built package to PyPI (Python Package Index) site."

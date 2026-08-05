@@ -1,5 +1,5 @@
 # Environment variables
-.env
+*.env
 
 # Jupyter Book and Zensical builds
 _build/
