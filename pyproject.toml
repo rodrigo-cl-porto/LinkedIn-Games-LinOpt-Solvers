@@ -22,7 +22,13 @@ classifiers = [
     "Intended Audience :: Education",
     "Natural Language :: English",
     "Programming Language :: Python :: 3.13",
-    "Topic :: Games/Entertainment :: Puzzle Games"
+    "Framework :: Pytest",
+    "Topic :: Games/Entertainment :: Puzzle Games",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Version Control :: Git",
+    "Typing :: Typed"
 ]
 requires-python = ">=3.13"
 dependencies = [
@@ -131,6 +137,12 @@ ignore = [
 quote-style = "double"
 indent-style = "space"
 line-ending = "lf"
+
+
+[tool.pytest.ini_options]
+addopts = "-s --color=yes --tb=short"
+pythonpath = ["src"]
+testpaths = ["tests"]
 
 
 [tool.poe] # https://poethepoet.natn.io/index.html
