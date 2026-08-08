@@ -1,6 +1,6 @@
 [project]
 name = "linkedin-games"
-version = "0.1.0rc6"
+version = "0.1.0rc7"
 description = "A Python package for solving LinkedIn board games like Queens, Tango, Zip, Mini Sudoku and Patches using Linear Optimization models."
 keywords = [
     "LinkedIn Games",
@@ -192,7 +192,7 @@ env = { NODE_TLS_REJECT_UNAUTHORIZED = "0" }
 
 [tool.poe.tasks.test]
 help = "Run all the automatic tests."
-cmd = "pytest --maxfail=1"
+cmd = "pytest --maxfail=1 -vv"
 cwd = "tests"
 
 [tool.poe.tasks.lint]

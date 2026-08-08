@@ -28,7 +28,7 @@ def test_patches_16():
         {'dims': (2,1), 'top_left': (3,6)},
         {'dims': (2,1), 'top_left': (5,1)},
         {'dims': (2,3), 'top_left': (5,2)},
-        {'dims': (2,2), 'top_left': (5,5)}
+        {'dims': (2,2), 'top_left': (5,5)},
     ]
     assert patches.rectangles == rectangles
 
@@ -54,7 +54,7 @@ def test_patches_46():
         {'dims': (2,5), 'top_left': (3,2)},
         {'dims': (1,3), 'top_left': (5,2)},
         {'dims': (4,2), 'top_left': (5,5)},
-        {'dims': (3,3), 'top_left': (6,2)}
+        {'dims': (3,3), 'top_left': (6,2)},
     ]
     assert patches.rectangles == rectangles
 
@@ -98,7 +98,7 @@ def test_patches_94():
         {'dims': (2,3), 'top_left': (5,6)},
         {'dims': (2,4), 'top_left': (7,2)},
         {'dims': (2,2), 'top_left': (7,6)},
-        {'dims': (2,1), 'top_left': (7,8)}
+        {'dims': (2,1), 'top_left': (7,8)},
     ]
     assert patches.rectangles == rectangles
 
@@ -122,23 +122,19 @@ def test_patches_121():
         {'dims': (1,4), 'top_left': (3,3)},
         {'dims': (1,2), 'top_left': (4,3)},
         {'dims': (3,2), 'top_left': (4,5)},
-        {'dims': (2,4), 'top_left': (5,1)}
+        {'dims': (2,4), 'top_left': (5,1)},
     ]
     assert patches.rectangles == rectangles
 
 
 def test_patches_141():
-    patches = Patches(
-        size=6,
-        seeds={
-            (1,1): {"color": "#846A0B", "area": 8},
-            (2,5): {"color": "#0A7541", "area": 8},
-            (3,3): {"color": "#5A3DB1"},
-            (4,4): {"color": "#EF6C00"},
-            (5,2): {"color": "#096B78", "area": 8},
-            (6,6): {"color": "#E30102", "area": 6, "shape": "vertical"},
-        }
-    )
+    seeds = {
+        (1,7): {"shape": "square"},
+        (3,3): {"area": 15},
+        (6,6): {"area": 25},
+        (8,2): {"shape": "vertical"},
+    }
+    patches = Patches(8, seeds)
     patches.solve()
     rectangles = [
         {'dims': (3,5), 'top_left': (1,1)},
