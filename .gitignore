@@ -1,6 +1,9 @@
 # Environment variables
 *.env
 
+# Package folder
+src
+
 # VS Code settings
 .vscode
 
