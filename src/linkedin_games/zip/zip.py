@@ -108,7 +108,7 @@ class Zip(ColorGeneratorMixin, GameBoard):
 
 
     @property
-    def walls(self) -> list[tuple[tuple[int, int], tuple[int, int]]]:
+    def walls(self) -> list[tuple[tuple[int, int], tuple[int, int]]] | None:
         """
         The pairs of squares separated by a wall.
         
@@ -181,29 +181,56 @@ class Zip(ColorGeneratorMixin, GameBoard):
 
     def show(self) -> None:
         """Show Zip's board."""
-        plt.figure(figsize=(3.4, 3.4))
+        
+        width = height = self.size * 0.7
+        plt.figure(figsize=(width, height))
         path_color = super()._generate_hex_code()
         labels = {self.model.N.at(k): k for k in self.model.K}
         labels = {(i-1, j-1): k for (i,j), k in labels.items()}
-        nx.draw(
+        pos={(i,j): (j,-i) for i, j in self.board.nodes()}
+
+        if self.walls is not None:
+            walls = nx.draw_networkx_edges(
+                self.board,
+                pos=pos,
+                edgelist=[((i-1, j-1), (r-1, s-1)) for (i,j),(r,s) in self.walls],
+                edge_color="#000000",
+                hide_ticks=True,
+                arrows=False,
+                width=30
+            )
+            walls.set_zorder(0)
+
+        board_squares = nx.draw_networkx_nodes(
             self.board,
-            pos= {(i,j): (j,-i) for i, j in self.board.nodes()},
+            pos= pos,
+            node_shape="s",
+            node_size= 1100,
+            node_color= "#FFFFFF",
+            linewidths= 2,
+        )
+        board_squares.set_zorder(1)
+
+        nx.draw( # Drawing the path
+            self.board,
+            pos= pos,
             with_labels= True,
             labels=labels,
             arrows=False,
-            node_shape="o", # round nodes
-            node_size= 1000,
+            node_shape="o" if self.is_solved else "s",
+            node_size= 800,
             node_color= [
                 "white" if (i+1,j+1) in self.numbered_squares else path_color
                 for (i,j) in self.board.nodes()
             ],
             edge_color= path_color,
             edgecolors= path_color,
-            linewidths= 3,
-            width= 35,
+            linewidths= 1,
+            width= 30,
             edgelist= [
                 ((i-1, j-1), (r-1, s-1)) for i,j,r,s in self.model.E
                 if round(pyo.value(self.model.x[i,j,r,s])) == 1
             ]
         )
+
         plt.show()

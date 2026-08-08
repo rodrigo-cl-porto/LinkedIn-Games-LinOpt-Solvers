@@ -19,16 +19,16 @@ def test_patches_16():
     )
     patches.solve()
     rectangles = [
-        {'dims': (1, 2), 'top_left': (1, 1)},
-        {'dims': (2, 3), 'top_left': (1, 3)},
-        {'dims': (2, 1), 'top_left': (1, 6)},
-        {'dims': (3, 2), 'top_left': (2, 1)},
-        {'dims': (2, 1), 'top_left': (3, 3)},
-        {'dims': (2, 2), 'top_left': (3, 4)},
-        {'dims': (2, 1), 'top_left': (3, 6)},
-        {'dims': (2, 1), 'top_left': (5, 1)},
-        {'dims': (2, 3), 'top_left': (5, 2)},
-        {'dims': (2, 2), 'top_left': (5, 5)}
+        {'dims': (1,2), 'top_left': (1,1)},
+        {'dims': (2,3), 'top_left': (1,3)},
+        {'dims': (2,1), 'top_left': (1,6)},
+        {'dims': (3,2), 'top_left': (2,1)},
+        {'dims': (2,1), 'top_left': (3,3)},
+        {'dims': (2,2), 'top_left': (3,4)},
+        {'dims': (2,1), 'top_left': (3,6)},
+        {'dims': (2,1), 'top_left': (5,1)},
+        {'dims': (2,3), 'top_left': (5,2)},
+        {'dims': (2,2), 'top_left': (5,5)}
     ]
     assert patches.rectangles == rectangles
 
@@ -44,17 +44,17 @@ def test_patches_46():
         (6,5): {"shape": "vertical"},
         (7,3): {"shape": "square"},
     }
-    patches = Patches((8,8), seeds)
+    patches = Patches(8, seeds)
     patches.solve()
     rectangles = [
         {'dims': (8,1), 'top_left': (1,1)},
         {'dims': (1,7), 'top_left': (1,2)},
         {'dims': (1,5), 'top_left': (2,2)},
+        {'dims': (7,2), 'top_left': (2,7)},
         {'dims': (2,5), 'top_left': (3,2)},
         {'dims': (1,3), 'top_left': (5,2)},
-        {'dims': (3,3), 'top_left': (6,2)},
         {'dims': (4,2), 'top_left': (5,5)},
-        {'dims': (7,2), 'top_left': (2,7)},
+        {'dims': (3,3), 'top_left': (6,2)}
     ]
     assert patches.rectangles == rectangles
 
@@ -83,22 +83,22 @@ def test_patches_94():
     )
     patches.solve()
     rectangles = [
-        {'dims': (1, 5), 'top_left': (1, 1)},
-        {'dims': (1, 3), 'top_left': (1, 6)},
-        {'dims': (1, 3), 'top_left': (2, 1)},
-        {'dims': (1, 5), 'top_left': (2, 4)},
-        {'dims': (6, 1), 'top_left': (3, 1)},
-        {'dims': (1, 3), 'top_left': (3, 2)},
-        {'dims': (1, 4), 'top_left': (3, 5)},
-        {'dims': (1, 3), 'top_left': (4, 2)},
-        {'dims': (3, 1), 'top_left': (4, 5)},
-        {'dims': (1, 3), 'top_left': (4, 6)},
-        {'dims': (2, 2), 'top_left': (5, 2)},
-        {'dims': (2, 1), 'top_left': (5, 4)},
-        {'dims': (2, 3), 'top_left': (5, 6)},
-        {'dims': (2, 4), 'top_left': (7, 2)},
-        {'dims': (2, 2), 'top_left': (7, 6)},
-        {'dims': (2, 1), 'top_left': (7, 8)}
+        {'dims': (1,5), 'top_left': (1,1)},
+        {'dims': (1,3), 'top_left': (1,6)},
+        {'dims': (1,3), 'top_left': (2,1)},
+        {'dims': (1,5), 'top_left': (2,4)},
+        {'dims': (6,1), 'top_left': (3,1)},
+        {'dims': (1,3), 'top_left': (3,2)},
+        {'dims': (1,4), 'top_left': (3,5)},
+        {'dims': (1,3), 'top_left': (4,2)},
+        {'dims': (3,1), 'top_left': (4,5)},
+        {'dims': (1,3), 'top_left': (4,6)},
+        {'dims': (2,2), 'top_left': (5,2)},
+        {'dims': (2,1), 'top_left': (5,4)},
+        {'dims': (2,3), 'top_left': (5,6)},
+        {'dims': (2,4), 'top_left': (7,2)},
+        {'dims': (2,2), 'top_left': (7,6)},
+        {'dims': (2,1), 'top_left': (7,8)}
     ]
     assert patches.rectangles == rectangles
 
@@ -117,12 +117,12 @@ def test_patches_121():
     )
     patches.solve()
     rectangles = [
-        {'dims': (4, 2), 'top_left': (1, 1)},
-        {'dims': (2, 4), 'top_left': (1, 3)},
-        {'dims': (1, 4), 'top_left': (3, 3)},
-        {'dims': (1, 2), 'top_left': (4, 3)},
-        {'dims': (3, 2), 'top_left': (4, 5)},
-        {'dims': (2, 4), 'top_left': (5, 1)}
+        {'dims': (4,2), 'top_left': (1,1)},
+        {'dims': (2,4), 'top_left': (1,3)},
+        {'dims': (1,4), 'top_left': (3,3)},
+        {'dims': (1,2), 'top_left': (4,3)},
+        {'dims': (3,2), 'top_left': (4,5)},
+        {'dims': (2,4), 'top_left': (5,1)}
     ]
     assert patches.rectangles == rectangles
 
@@ -141,9 +141,9 @@ def test_patches_141():
     )
     patches.solve()
     rectangles = [
-        {'dims': (3, 5), 'top_left': (1, 1)},
-        {'dims': (3, 3), 'top_left': (1, 6)},
-        {'dims': (5, 3), 'top_left': (4, 1)},
-        {'dims': (5, 5), 'top_left': (4, 4)},
+        {'dims': (3,5), 'top_left': (1,1)},
+        {'dims': (3,3), 'top_left': (1,6)},
+        {'dims': (5,3), 'top_left': (4,1)},
+        {'dims': (5,5), 'top_left': (4,4)},
     ]
     assert patches.rectangles == rectangles

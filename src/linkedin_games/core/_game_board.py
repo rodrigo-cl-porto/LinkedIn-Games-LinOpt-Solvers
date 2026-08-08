@@ -21,6 +21,7 @@ class GameBoard(ABC):
         self._set_board_dims(board_dims)
         self._set_board()
         self._model: pyo.ConcreteModel | None = None
+        self.__is_solved:bool = False
 
 
     def __hash__(self) -> int:

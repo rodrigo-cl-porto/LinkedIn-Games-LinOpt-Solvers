@@ -1,7 +1,7 @@
-from .sudoku import Sudoku
+from .general_sudoku import GeneralSudoku
 
 
-class MiniSudoku(Sudoku):
+class MiniSudoku(GeneralSudoku):
     """
     The [LinkedIn Mini Sudoku](https://www.linkedin.com/games/mini-sudoku/) game.
     

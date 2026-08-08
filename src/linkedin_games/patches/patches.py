@@ -109,6 +109,16 @@ class Patches(ColorGeneratorMixin, GameBoard):
             ) for square, seed in seeds.items()
         }
 
+        nx.set_node_attributes(self._board, "#FFFFFF", name="value")
+        nx.set_node_attributes( # Adding a color for each square on the board
+            self._board,
+            name="value",
+            values={
+                tuple(i-1 for i in seed.square): seed.color
+                for seed in self.__seeds
+            }
+        )
+
     @property
     def rectangles(self) -> dict[str, str|tuple[int, int]] | None:
         """
@@ -116,7 +126,7 @@ class Patches(ColorGeneratorMixin, GameBoard):
 
         Returns:
             The solving rectangles as a list of dictionaries in the format
-                `{"color_code": color_code, "top_left": (top, left), "dims": (width, height)}`.
+                `{"color_code": color_code, "top_left": (top, left), "dims": (height, width)}`.
         """
         if not self.is_solved:
             return None
@@ -131,12 +141,7 @@ class Patches(ColorGeneratorMixin, GameBoard):
             left = round(pyo.value(self.model.l[seed.color_code]))
             width = round(pyo.value(self.model.w[seed.color_code]))
             height = round(pyo.value(self.model.h[seed.color_code]))
-            seed.rectangle = {
-                "top": top,
-                "left": left,
-                "height": height,
-                "width": width
-            }
+            seed.rectangle = {"top": top, "left": left, "height": height, "width": width}
         nx.set_node_attributes(
             self.board,
             name="value",
@@ -152,13 +157,17 @@ class Patches(ColorGeneratorMixin, GameBoard):
 
     def show(self) -> None:
         """Show Patches' board."""
-        plt.figure(figsize=(3, 3))
+        width = height = self.size * 0.5
+        plt.figure(figsize=(width, height))
         nx.draw(
             self.board,
             pos={(i, j): (j, -i) for (i, j) in self.board.nodes()},
             node_size=1100,
             node_shape="s",
             node_color= list(nx.get_node_attributes(self.board, "value").values()),
-            width=0
+            width=0,
+            arrows=False,
+            edgecolors="black",
+            linewidths=1
         )
         plt.show()

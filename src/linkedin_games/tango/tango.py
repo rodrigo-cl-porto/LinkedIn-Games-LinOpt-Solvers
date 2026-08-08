@@ -191,14 +191,15 @@ class Tango(GameBoard):
 
     def show(self) -> None:
         """Show Tango's board."""
-        plt.figure(figsize=(3.4, 3.4))
+        plt.figure(figsize=(3, 3))
         pos = {(i, j): (j, -i) for i, j in self.board.nodes()}
         nx.draw(
             self.board,
             pos= pos,
+            arrows=False,
             with_labels= True,
             labels= nx.get_node_attributes(self.board, "value"),
-            node_size= 1000,
+            node_size= 1100,
             node_color= [
                 "#EEEAE7" if (i+1,j+1) in self.filled_squares else "white"
                 for (i, j) in self.board.nodes()

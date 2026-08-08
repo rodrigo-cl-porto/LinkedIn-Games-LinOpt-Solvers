@@ -19,8 +19,8 @@ class PatchesModel(pyo.ConcreteModel):
         self.n = pyo.Param(initialize=n, within=pyo.PositiveIntegers)
 
         # RANGE SETS
-        I = self.I = pyo.RangeSet(n) # Rows
-        J = self.J = pyo.RangeSet(m) # Columns
+        I = self.I = pyo.RangeSet(m) # Rows
+        J = self.J = pyo.RangeSet(n) # Columns
         K = self.K = pyo.Set(initialize=(seed["color"] for seed in seeds.values())) # Rectangles
 
         # COMPOSITE SETS
@@ -41,10 +41,18 @@ class PatchesModel(pyo.ConcreteModel):
 
         # DECISION VARIABLES
         ## Integer variables
-        l = self.l = pyo.Var(K, domain=pyo.PositiveIntegers) # Index of the leftmost column of the rectangle k
-        t = self.t = pyo.Var(K, domain=pyo.PositiveIntegers) # Index of the top row of the rectangle k
-        w = self.w = pyo.Var(K, domain=pyo.PositiveIntegers) # Width of rectangle k
-        h = self.h = pyo.Var(K, domain=pyo.PositiveIntegers) # Height of rectangle k
+        l = self.l = pyo.Var( # Index of the leftmost column of the rectangle k
+            K, domain=pyo.PositiveIntegers, initialize=1
+        )
+        t = self.t = pyo.Var( # Index of the top row of the rectangle k
+            K, domain=pyo.PositiveIntegers, initialize=1
+        )
+        w = self.w = pyo.Var( # Width of rectangle k
+            K, domain=pyo.PositiveIntegers, initialize=1
+        )
+        h = self.h = pyo.Var( # Height of rectangle k
+            K, domain=pyo.PositiveIntegers, initialize=1
+        )
 
         ## Binary variables
         u = self.u = pyo.Var(I, K, domain=pyo.Binary, initialize=0) # u_ik = 1 if row i passes through rectangle k
@@ -85,6 +93,14 @@ class PatchesModel(pyo.ConcreteModel):
         )
         self.right_boundary_constraints = pyo.Constraint(
             J, K, rule=lambda model, j, k: j - (l[k] + w[k] - 1) <= n * (1 - v[j, k])
+        )
+
+        ## Rectangle Dimensions constraints
+        self.height_constraints = pyo.Constraint(
+            K, rule=lambda model, k: sum(u[i,k] for i in I) == h[k]
+        )
+        self.width_constraints = pyo.Constraint(
+            K, rule=lambda model, k: sum(v[j,k] for j in J) == w[k]
         )
 
         ## Linking-Binary-Variables Constraints

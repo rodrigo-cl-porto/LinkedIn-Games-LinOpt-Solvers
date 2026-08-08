@@ -31,6 +31,7 @@ class Queens(ColorGeneratorMixin, GameBoard):
             regions: Regions as a dictionary of `color: {(row, column), ...}` items.
         """
         super().__init__(board_dims=(size, size))
+        self.__crowns: nx.Graph | None = None
         self.__set_regions(regions)
         self._model = QueensModel(self.board_dims, self.regions)
 
@@ -63,11 +64,11 @@ class Queens(ColorGeneratorMixin, GameBoard):
     def __set_regions(self, regions:dict[str, set[tuple[int, int]]]) -> None:
 
         if not isinstance(regions, (dict, list)):
-            msg = f"regions must be a dict or set. Got {type(regions).__name__} instead."
+            msg = f"regions must be a dict or list. Got {type(regions).__name__} instead."
             raise TypeError(msg)
 
         if len(regions) < 1:
-            msg = "The set of Regions cannot be empty!"
+            msg = "regions cannot be empty!"
             raise ValueError(msg)
 
         if isinstance(regions, list):
@@ -77,10 +78,7 @@ class Queens(ColorGeneratorMixin, GameBoard):
         all_region_squares = [square for squares in regions.values() for square in squares]
         overlapping_squares = {square for square in all_region_squares if all_region_squares.count(square) > 1}
         if overlapping_squares:
-            msg = (
-                "The regions must not overlap each other."
-                f" Overlapping squares: {overlapping_squares}"
-            )
+            msg = f"The regions must not overlap each other. Overlapping squares: {overlapping_squares}"
             raise ValueError(msg)
 
         all_region_squares = set(all_region_squares)
@@ -88,8 +86,7 @@ class Queens(ColorGeneratorMixin, GameBoard):
             if len(all_region_squares) > len(self):
                 squares_not_in_board = all_region_squares - self.board_squares.keys()
                 msg = (
-                    "The regions must cover the entire board"
-                    " and must not go beyond the board's boundaries."
+                    "The regions must cover the entire board and must not go beyond the board's boundaries."
                     f" Squares outside the board: {squares_not_in_board!r}"
                 )
                 raise ValueError(msg)
@@ -97,8 +94,7 @@ class Queens(ColorGeneratorMixin, GameBoard):
             if len(all_region_squares) < len(self):
                 missing_squares = self.board_squares.keys() - all_region_squares
                 msg = (
-                    "The regions must cover the entire board"
-                    " and must not go beyond the board's boundaries."
+                    "The regions must cover the entire board and must not go beyond the board's boundaries."
                     f" Squares not in an region: {missing_squares!r}"
                 )
                 raise ValueError(msg)
@@ -141,15 +137,21 @@ class Queens(ColorGeneratorMixin, GameBoard):
 
     def show(self) -> None:
         """Show the Queens' board."""
-        plt.figure(figsize=(3.4, 3.4))
+        width = height = self.size * 0.5
+        plt.figure(figsize=(width, height))
         nx.draw(
             self.board,
             pos={(i, j): (j, -i) for i, j in self.board.nodes()},
             with_labels=True,
-            labels=dict.fromkeys(self.__crowns.nodes(), "O"),
-            node_size=1000,
+            arrows=False,
+            labels=
+                dict.fromkeys(self.__crowns.nodes(), "O") if self.__crowns is not None
+                else dict.fromkeys(self.board.nodes(), ""),
+            node_size=1100,
             node_color=list(nx.get_node_attributes(self.board, "color").values()),
             node_shape="s", # Squared-shape nodes
-            width=0
+            width=0,
+            edgecolors="black",
+            linewidths=.5
         )
         plt.show()
