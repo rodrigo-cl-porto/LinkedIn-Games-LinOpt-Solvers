@@ -94,14 +94,14 @@ class Tango(GameBoard):
         """
         return self.__matching_pairs
     
-    def __set_matching_pairs(self, values:set|list|tuple[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
+    def __set_matching_pairs(self, values:set|list[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
 
         if values is None:
-            self.__matching_pairs = values
+            self.__matching_pairs = None
             return
 
-        if not isinstance(values, (list, tuple, set)):
-            msg = f"matching_pairs must be a list, tuple or set. Got a {type(values).__name__} instead."
+        if not isinstance(values, (list, set)):
+            msg = f"matching_pairs must be a list or set. Got a {type(values).__name__} instead."
             raise TypeError(msg)
 
         invalid_items = [pair for pair in values if not isinstance(pair, tuple) or len(pair) != 2]
@@ -142,14 +142,14 @@ class Tango(GameBoard):
         """
         return self.__opposite_pairs
 
-    def __set_opposite_pairs(self, values:set|list|tuple[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
+    def __set_opposite_pairs(self, values:set|list[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
 
         if values is None:
-            self.__opposite_pairs = values
+            self.__opposite_pairs = None
             return
 
-        if not isinstance(values, (list, tuple, set)):
-            msg = f"opposite_pairs must be a list, tuple or set. Got a {type(values).__name__} instead."
+        if not isinstance(values, (list, set)):
+            msg = f"opposite_pairs must be a list or set. Got a {type(values).__name__} instead."
             raise TypeError(msg)
 
         invalid_items = [pair for pair in values if not isinstance(pair, tuple) or len(pair) != 2]

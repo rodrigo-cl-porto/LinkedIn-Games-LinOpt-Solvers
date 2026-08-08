@@ -9,7 +9,7 @@ class Rectangle:
         """
         Args:
             top_left: Board position of the rectangle's top-left square as a `(row, column)` tuple.
-            dims: Rectangle dimensions as a `(width, height)` tuple.
+            dims: Rectangle dimensions as a `(height, width)` tuple.
             color: A color name or a hex code as `#RRGGBB` string.
         """
         self.top_left = top_left
@@ -70,13 +70,13 @@ class Rectangle:
         Dimensions of the rectangle.
 
         Returns:
-            Rectangle dimensions as a `(width, height)` tuple.
+            Rectangle dimensions as a `(height, width)` tuple.
         """
-        return (self.width, self.height)
+        return (self.height, self.width)
     
     @dims.setter
     def dims(self, value:tuple[int, int]) -> None:
-        self.width, self.height = value
+        self.height, self.width  = value
 
 
     @property
@@ -207,7 +207,7 @@ class Rectangle:
 
 
     def to_dict(self) -> dict[str, str|tuple[int, int]]:
-        return {"top_left": (self.top, self.left), "dims": (self.width, self.height)}
+        return {"top_left": (self.top, self.left), "dims": (self.height, self.width)}
 
 
     @property

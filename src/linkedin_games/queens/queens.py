@@ -4,12 +4,13 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
+from ..core._color_generator_mixin import ColorGeneratorMixin
 from ..core._game_board import GameBoard
 from ._model import QueensModel
 from ._region import Region
 
 
-class Queens(GameBoard):
+class Queens(ColorGeneratorMixin, GameBoard):
     """
     The [LinkedIn Queens](https://www.linkedin.com/games/queens/) game.
     
@@ -23,19 +24,29 @@ class Queens(GameBoard):
         - There cannot be adjacent crowns, not even along adjacent diagonals.
     """
 
-    def __init__(self, board_dims: tuple[int, int], regions: dict[str, set[tuple[int, int]]]) -> None:
+    def __init__(self, size:int, regions: dict[str, set[tuple[int, int]]] | list[set[tuple[int, int]]]) -> None:
         """
         Args:
-            board_dims: Board dimensions as a `(rows, columns)` tuple.
+            size: The side length of the game.
             regions: Regions as a dictionary of `color: {(row, column), ...}` items.
         """
-        super().__init__(board_dims)
+        super().__init__(board_dims=(size, size))
         self.__set_regions(regions)
         self._model = QueensModel(self.board_dims, self.regions)
 
 
     def __hash__(self) -> int:
         return hash((self._board_dims, self.__regions))
+
+
+    @property
+    def size(self) -> int:
+        """The side length of the game.
+
+        Returns:
+            The number of rows (or columns) on game's board.
+        """
+        return self.board_dims[0]
 
 
     @property
@@ -51,13 +62,17 @@ class Queens(GameBoard):
 
     def __set_regions(self, regions:dict[str, set[tuple[int, int]]]) -> None:
 
-        if not isinstance(regions, dict):
-            msg = "regions must be a dict of Region classes."
+        if not isinstance(regions, (dict, list)):
+            msg = f"regions must be a dict or set. Got {type(regions).__name__} instead."
             raise TypeError(msg)
 
         if len(regions) < 1:
             msg = "The set of Regions cannot be empty!"
             raise ValueError(msg)
+
+        if isinstance(regions, list):
+            colors = super()._generate_hex_codes(len(regions))
+            regions = dict(zip(colors, regions, strict=True))
 
         all_region_squares = [square for squares in regions.values() for square in squares]
         overlapping_squares = {square for square in all_region_squares if all_region_squares.count(square) > 1}

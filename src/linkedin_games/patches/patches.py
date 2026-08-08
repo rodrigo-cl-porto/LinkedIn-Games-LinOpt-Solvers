@@ -4,12 +4,13 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
+from ..core._color_generator_mixin import ColorGeneratorMixin
 from ..core._game_board import GameBoard
 from ._model import PatchesModel
 from ._rectangle_seed import RectangleSeed
 
 
-class Patches(GameBoard):
+class Patches(ColorGeneratorMixin, GameBoard):
     """
     The [LinkedIn Patches](https://www.linkedin.com/games/patches/) game.
     
@@ -26,10 +27,10 @@ class Patches(GameBoard):
         - A rectangle must cover only one seed;
         - The area of all rectangles must be greater than 1 square on the board.
     """
-    def __init__(self, board_dims:tuple[int, int], seeds: dict[tuple[int, int], dict[str, str|int]]) -> None:
+    def __init__(self, size:int, seeds: dict[tuple[int, int], dict[str, str|int]]) -> None:
         """
         Args:
-            board_dims: Board dimensions as a `(rows, columns)` tuple.
+            size: The side length of the game.
             seeds: Rectangle seeds on board as a dictionary of
                 `(row, column): {"color": color, "area": area, "shape": shape}` items.
         
@@ -37,13 +38,23 @@ class Patches(GameBoard):
             TypeError: if type inputs are not respected.
             ValueError: If there are some seeds with the same color.
         """
-        super().__init__(board_dims)
+        super().__init__(board_dims=(size, size))
         self.__set_seeds(seeds)
         self._model = PatchesModel(self.board_dims, self.seeds)
 
 
     def __hash__(self) -> int:
         return hash((self._board_dims, self.__seeds))
+
+
+    @property
+    def size(self) -> int:
+        """The side length of the game.
+
+        Returns:
+            The number of rows (or columns) on game's board.
+        """
+        return self.board_dims[0]
 
 
     @property
@@ -73,10 +84,21 @@ class Patches(GameBoard):
             msg = "seeds cannot be empty!"
             raise ValueError(msg)
 
-        colors = [seed["color"] for seed in seeds.values()]
+        seeds = {square: ({} if seed is None else seed) for square, seed in seeds.items()}
+
+        colors = [seed.get("color") for seed in seeds.values() if seed.get("color") is not None]
         if len(colors) != len(set(colors)):
             msg = "There must not be two or more seeds with the same color."
             raise ValueError(msg)
+
+        if len(colors) < len(seeds):
+            for seed in seeds.values():
+                if seed.get("color") is None:
+                    random_color = super()._generate_hex_code()
+                    while random_color in colors:
+                        random_color = super()._generate_hex_code()
+                    seed["color"] = random_color
+                    colors.append(random_color)
 
         self.__seeds = {
             RectangleSeed(
@@ -112,17 +134,20 @@ class Patches(GameBoard):
             seed.rectangle = {
                 "top": top,
                 "left": left,
-                "width": width,
-                "height": height
+                "height": height,
+                "width": width
             }
         nx.set_node_attributes(
             self.board,
-            name="color",
-            values={(i-1, j-1): seed.color_code for seed in self.__seeds for (i,j) in seed.rectangle.squares}
+            name="value",
+            values={
+                (i-1, j-1): seed.color_code
+                for seed in self.__seeds for (i,j) in seed.rectangle.squares
+            }
         )
         if verbose:
             print("These are the rectagles that solves the game:")
-            pprint(self.solution)
+            pprint(self.rectangles)
 
 
     def show(self) -> None:
@@ -133,7 +158,7 @@ class Patches(GameBoard):
             pos={(i, j): (j, -i) for (i, j) in self.board.nodes()},
             node_size=1100,
             node_shape="s",
-            node_color= list(nx.get_node_attributes(self.board, "color").values()),
+            node_color= list(nx.get_node_attributes(self.board, "value").values()),
             width=0
         )
         plt.show()

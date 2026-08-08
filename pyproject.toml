@@ -136,6 +136,7 @@ ignore = [
     "E741",
     "RUF001", # ambiguous-unicode-character-string
     "RUF002", # ambiguous-unicode-character-docstring
+    "S311", # suspicious-non-cryptographic-random-usage
     "W293"
 ]
 

@@ -8,7 +8,7 @@ from ._rectangle_shape import RectangleShape
 
 class RectangleSeed:
     """A seed that creates a rectangle in the Patches game."""
-    def __init__(self, square:tuple[int, int], area:int|None=None, shape:str="any", color:str="white") -> None:
+    def __init__(self, square:tuple[int, int], area:int|None=None, shape:str="any", color:str="#FFFFFF") -> None:
         """
         Args:
             square: The board position of the seed as a `(row, column)` tuple.
@@ -227,7 +227,7 @@ class RectangleSeed:
     @rectangle.setter
     def rectangle(self, value:dict[str, str|int]) -> None:
 
-        rectangle_area = value["width"] * value["height"]
+        rectangle_area =  value["height"] * value["width"]
         if self.area is not None and rectangle_area != self.area:
             msg = f"The rectangle's area ({rectangle_area}) doesn't attend to the required area ({self.area})."
             raise ValueError(msg)
@@ -259,5 +259,5 @@ class RectangleSeed:
 
         self.__rectangle = Rectangle(
             top_left=(value["top"], value["left"]),
-            dims=(value["width"], value["height"])
+            dims=(value["height"], value["width"])
         )

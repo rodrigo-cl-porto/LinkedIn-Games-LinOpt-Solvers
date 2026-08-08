@@ -21,3 +21,6 @@ __pycache__/
 
 # Distribution / packaging
 dist/
+
+# Jupyter notebooks
+notebooks/

@@ -4,11 +4,12 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
+from ..core._color_generator_mixin import ColorGeneratorMixin
 from ..core._game_board import GameBoard
 from ._model import ZipModel
 
 
-class Zip(GameBoard):
+class Zip(ColorGeneratorMixin, GameBoard):
     """
     The [LinkedIn Zip](https://www.linkedin.com/games/zip/) game.
     
@@ -22,12 +23,12 @@ class Zip(GameBoard):
         starting from square number 1 to the one with the highest number.
     """
     def __init__(self,
-            board_dims: tuple[int, int],
+            size:int,
             numbered_squares: list[tuple[int, int]],
             walls: list[tuple[tuple[int, int], tuple[int, int]]] | None = None) -> None:
         """
         Args:
-            board_dims: Board dimensions as a `(rows, columns)` tuple.
+            size: The side length of the game.
             numbered_squares: Squares with a assigned number as a dictionary of `(row, column): number` items.
             walls: Pairs of squares separated by a walls as a set of `((row1, column1), (row2, column2))`.
         
@@ -37,7 +38,7 @@ class Zip(GameBoard):
                 or if the number of walls exceeds the total number of edges on the board,
                 or if any pair of squares in walls are not adjacent.
         """
-        super().__init__(board_dims)
+        super().__init__(board_dims=(size,size))
         self.__set_numbered_squares(numbered_squares)
         self.__set_walls(walls)
         self._model = ZipModel(self.board_dims, self.numbered_squares, self.walls)
@@ -45,6 +46,16 @@ class Zip(GameBoard):
 
     def __hash__(self) -> int:
         return hash((self._board_dims, self.__numbered_squares, self.__walls))
+
+
+    @property
+    def size(self) -> int:
+        """The side length of the game.
+
+        Returns:
+            The number of rows (or columns) on game's board.
+        """
+        return self.board_dims[0]
 
 
     @property
@@ -171,7 +182,7 @@ class Zip(GameBoard):
     def show(self) -> None:
         """Show Zip's board."""
         plt.figure(figsize=(3.4, 3.4))
-        path_color:str="#EE5F12"
+        path_color = super()._generate_hex_code()
         labels = {self.model.N.at(k): k for k in self.model.K}
         labels = {(i-1, j-1): k for (i,j), k in labels.items()}
         nx.draw(
