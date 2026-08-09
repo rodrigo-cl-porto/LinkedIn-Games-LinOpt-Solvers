@@ -13,13 +13,13 @@ nav = [
     {"API" = [
         "api/patches.md",
         "api/queens.md",
-        {"Sudoku" = [
-            "api/sudoku.md",
-            {"Classic Sudoku" = "api/classic-sudoku.md"},
-            {"Mini Sudoku" = "api/mini-sudoku.md"},
-        ]},
+        {"Mini Sudoku" = "api/mini-sudoku.md"},
         "api/tango.md",
-        "api/zip.md"
+        "api/zip.md",
+        {"Misc" = [
+            "api/sudoku.md",
+            {"General Sudoku" = "api/general-sudoku.md"}
+        ]},
     ]},
     {"Jupyter Book" = "https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/"}
 ]

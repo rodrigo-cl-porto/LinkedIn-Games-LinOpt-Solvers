@@ -17,27 +17,18 @@
     </a>
 </div>
 
-<div id="github-metadata" align="center">
-    <a href="https://github.com/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers">
-        <img src="https://img.shields.io/github/last-commit/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers/main?style=social&logo=github" alt="Last Commit" loading="lazy" />
-    </a>
-    <a href="https://github.com/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers">
-        <img src="https://img.shields.io/github/stars/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers" alt="GitHub Stars" loading="lazy" />
-    </a>
-    <a href="https://github.com/sponsors/rodrigo-cl-porto/">
-        <img src="https://img.shields.io/github/sponsors/rodrigo-cl-porto?logo=GitHub%20Sponsors&style=social" alt="GitHub Sponsors" loading="lazy" />
-    </a>
-</div>
-
 <div id="dev-metadata" align="center">
     <a href="https://github.com/astral-sh/uv">
         <img src="https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fraw.githubusercontent.com%2FOnyx-Nostalgia%2Fuv%2Frefs%2Fheads%2Ffix%2Flogo-badge%2Fassets%2Fbadge%2Fv0.json" alt="Package Manager - uv" loading="lazy" />
     </a>
     <a href="https://github.com/astral-sh/ruff">
-        <img src="https://img.shields.io/endpoint?style=flat&url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Linting - Ruff" loading="lazy" />
+        <img src="https://img.shields.io/endpoint?style=flat&url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Linting/Formatter - Ruff" loading="lazy" />
+    </a>
+    <a href="https://github.com/astral-sh/ty">
+        <img src="https://img.shields.io/endpoint?style=flat&url=https://raw.githubusercontent.com/astral-sh/ty/main/assets/badge/v0.json" alt="Type Checker - Ty" loading="lazy" />
     </a>
     <a href="https://github.com/pytest-dev/pytest">
-        <img src="https://img.shields.io/badge/py-test-blue?logo=pytest&style=flat" alt="Testing - pytest" loading="lazy" />
+        <img src="https://img.shields.io/badge/py-test-blue?logo=pytest&style=flat" alt="Automatic Tests - pytest" loading="lazy" />
     </a>
     <a href="https://github.com/nat-n/poethepoet">
         <img src="https://img.shields.io/badge/poe-the_poet-FFFFFF?style=flat" alt="Task Runner - Poe The Poet" loading="lazy" />
@@ -53,9 +44,21 @@
     </a>
 </div>
 
+<div id="github-metadata" align="center">
+    <a href="https://github.com/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers">
+        <img src="https://img.shields.io/github/last-commit/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers/main?style=social&logo=github" alt="Last Commit" loading="lazy" />
+    </a>
+    <a href="https://github.com/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers">
+        <img src="https://img.shields.io/github/stars/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers" alt="GitHub Stars" loading="lazy" />
+    </a>
+    <a href="https://github.com/sponsors/rodrigo-cl-porto/">
+        <img src="https://img.shields.io/github/sponsors/rodrigo-cl-porto?logo=GitHub%20Sponsors&style=social" alt="GitHub Sponsors" loading="lazy" />
+    </a>
+</div>
+
 # 🐍 Linear Optimization Solvers for LinkedIn Games 𖣯
 
-This repository holds a Python package that provides a simple set of components to solve LinkedIn board games ([Queens][linkedin-queens], [Tango][linkedin-tango], [Zip][linkedin-zip], [Mini Sudoku][linkedin-mini-sudoku] and [Patches][linkedin-patches] for now) using Linear Optimization models. This library leverages popular Python libraries such as [Pyomo] for mathematical modeling and [NetworkX] for graph-based representations of game boards.
+This repository holds a Python package that provides a simple set of components to solve LinkedIn board games ([Queens][linkedin-queens], [Tango][linkedin-tango], [Zip][linkedin-zip], [Mini Sudoku][linkedin-mini-sudoku] and [Patches][linkedin-patches] for now) using Linear Optimization models.
 
 This repository also contains a Jupyter Book that teachs how this library implements Linear Optimization models to solve each game. The book introduces the basics of mathematical optimization, explain the components of the library and presents the line of reasoning behind the model's structure of each minigame.
 

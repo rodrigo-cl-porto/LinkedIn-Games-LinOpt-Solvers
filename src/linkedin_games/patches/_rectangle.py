@@ -1,7 +1,3 @@
-from typing import Self
-
-
-
 class Rectangle:
     """A Patches rectangle, used as part of the game's solution."""
     
@@ -21,35 +17,34 @@ class Rectangle:
             f"{type(self).__name__}(\n\t"
             f"left={self.left},\n\t"
             f"top={self.top},\n\t"
-            f"width={self.width},\n\t"
             f"height={self.height},\n\t"
-            f"color_code={self.color_code}\n)"
+            f"width={self.width},\n)"
         )
 
 
     def __str__(self) -> str:
         return (
-            f"A {self.color} {type(self).__name__}"
+            f"A {type(self).__name__}"
             f" with top-left square at ({self.top_left})"
             f" with dimensions of {self.dims}"
         )
     
 
     def __hash__(self) -> int:
-        return hash((self.top, self.left, self.width, self.height, self.color_code))
+        return hash((self.top, self.left, self.width, self.height))
 
 
     def __len__(self) -> int:
         return self.width * self.height
 
 
-    def __eq__(self, other:Self) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Rectangle):
             return False
         return self.top_left == other.top_left and self.dims == other.dims
 
 
-    def __ne__(self, other:Self) -> bool:
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
 
@@ -211,7 +206,7 @@ class Rectangle:
 
 
     @property
-    def squares(self) -> tuple[tuple[int, int]]:
+    def squares(self) -> tuple[tuple[int, int],...]:
         """
         The board squares occupied by the rectangle.
         

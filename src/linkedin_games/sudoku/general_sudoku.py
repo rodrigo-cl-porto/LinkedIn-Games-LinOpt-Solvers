@@ -100,7 +100,7 @@ class GeneralSudoku(GameBoard):
         """
         return self.__filled_squares
     
-    def __set_filled_squares(self, values: dict[tuple[int, int]: int]) -> None:
+    def __set_filled_squares(self, values: dict[tuple[int, int], int]) -> None:
 
         if not isinstance(values, dict):
             msg = f"The filled squares must be a dictionary. Got a {type(values).__name__} instead."

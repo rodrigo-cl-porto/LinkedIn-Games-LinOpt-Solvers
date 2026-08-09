@@ -1,5 +1,3 @@
-from typing import Self
-
 from ..core._color import Color
 
 
@@ -32,13 +30,13 @@ class Region:
         return len(self.squares)
 
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Region):
             return False
         return self.squares == other.squares
 
 
-    def __ne__(self, other: Self) -> bool:
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
 

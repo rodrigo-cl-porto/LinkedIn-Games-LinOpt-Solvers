@@ -1,5 +1,4 @@
 from math import sqrt
-from typing import Self
 
 from ..core._color import Color
 from ._rectangle import Rectangle
@@ -20,7 +19,7 @@ class RectangleSeed:
         self.__set_shape(shape)
         self.__set_area(area)
         self.__color = Color(color)
-        self.__rectangle: Rectangle | None = None
+        self.__rectangle = Rectangle(dims=(1,1), top_left=(1,1))
 
 
     def __repr__(self) -> str:
@@ -56,18 +55,18 @@ class RectangleSeed:
         return 1
 
 
-    def __eq__(self, other: Self) -> bool:
-        if not isinstance(other, Self):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, RectangleSeed):
             return False
         return (
-            self.color_code == other.self.color_code
+            self.color_code == other.color_code
             and self.square == other.square
             and self.area == other.area
             and self.shape == other.shape
         )
 
 
-    def __ne__(self, other: Self) -> bool:
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
 
@@ -215,7 +214,7 @@ class RectangleSeed:
 
 
     @property
-    def rectangle(self) -> Rectangle | None:
+    def rectangle(self) -> Rectangle:
         """
         The seed's rectangle.
         
@@ -225,7 +224,7 @@ class RectangleSeed:
         return self.__rectangle
 
     @rectangle.setter
-    def rectangle(self, value:dict[str, str|int]) -> None:
+    def rectangle(self, value: dict[str, int]) -> None:
 
         rectangle_area =  value["height"] * value["width"]
         if self.area is not None and rectangle_area != self.area:

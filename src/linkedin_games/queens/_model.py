@@ -24,7 +24,7 @@ class QueensModel(pyo.ConcreteModel):
 
         # COMPOSITE SETS
         S = self.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Board Squares
-        R = self.R = pyo.Set(K, initialize=regions, dimen=2) # Region Squares
+        R = self.R = pyo.Set(K, initialize=regions, dimen=2, within=S) # Region Squares
         D = self.D = pyo.Set(initialize=lambda model: # Diagonals
             [((i, j), (i + 1, j + 1)) for (i, j) in S if (i + 1, j + 1) in S] +
             [((i, j), (i + 1, j - 1)) for (i, j) in S if (i + 1, j - 1) in S]
@@ -38,13 +38,13 @@ class QueensModel(pyo.ConcreteModel):
 
         # CONSTRAINTS
         self.single_crown_per_row_constraints = pyo.Constraint(
-            I, rule=lambda model, i: sum(x[i, j] for j in J) == 1
+            I, rule=lambda model, i: pyo.quicksum(x[i, j] for j in J) == 1
         )
         self.single_crown_per_column_constraints = pyo.Constraint(
-            J, rule=lambda model, j: sum(x[i, j] for i in I) == 1
+            J, rule=lambda model, j: pyo.quicksum(x[i, j] for i in I) == 1
         )
         self.single_crown_per_region_constraints = pyo.Constraint(
-            K, rule=lambda model, k: sum(x[i, j] for (i, j) in R[k]) == 1
+            K, rule=lambda model, k: pyo.quicksum(x[i, j] for (i, j) in R[k]) == 1
         )
         self.adjacent_squares_by_vertex_constraints = pyo.Constraint(
             D, rule=lambda model, i, j, r, s: x[i, j] + x[r, s] <= 1

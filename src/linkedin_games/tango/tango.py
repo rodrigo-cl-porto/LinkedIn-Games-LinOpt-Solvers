@@ -25,9 +25,13 @@ class Tango(GameBoard):
         - Squares separated by the `×` sign must contain opposite symbols.
     """
     def __init__(self,
-            filled_squares:dict[tuple[int, int]: int] | None = None,
-            matching_pairs:set|list|tuple[tuple[tuple[int, int], tuple[int, int]]] | None = None,
-            opposite_pairs:set|list|tuple[tuple[tuple[int, int], tuple[int, int]]] | None = None,
+            filled_squares: dict[tuple[int, int], int],
+            matching_pairs: set[tuple[tuple[int, int], tuple[int, int]]]
+                | list[tuple[tuple[int, int], tuple[int, int]]]
+                | None = None,
+            opposite_pairs: set[tuple[tuple[int, int], tuple[int, int]]]
+                | list[tuple[tuple[int, int], tuple[int, int]]]
+                | None = None,
             ) -> None:
         """
         Args:
@@ -55,7 +59,7 @@ class Tango(GameBoard):
 
 
     @property
-    def filled_squares(self) -> dict[tuple[int, int]: int]:
+    def filled_squares(self) -> dict[tuple[int, int], int]:
         """
         Squares that are already filled with a symbol.
         
@@ -64,7 +68,7 @@ class Tango(GameBoard):
         """
         return self.__filled_squares
     
-    def __set_filled_squares(self, values:dict[tuple[int, int]: int]) -> None:
+    def __set_filled_squares(self, values:dict[tuple[int, int], int]) -> None:
     
         if len(values) > len(self):
             msg = f"The number of filled squares exceeds the amount of board squares. Got {len(values)} filled squares."
@@ -94,7 +98,11 @@ class Tango(GameBoard):
         """
         return self.__matching_pairs
     
-    def __set_matching_pairs(self, values:set|list[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
+    def __set_matching_pairs(self,
+            values: set[tuple[tuple[int, int], tuple[int, int]]]
+                | list[tuple[tuple[int, int], tuple[int, int]]]
+                | None
+        ) -> None:
 
         if values is None:
             self.__matching_pairs = None
@@ -122,7 +130,7 @@ class Tango(GameBoard):
             msg = f"Coordinates must be positive integers. Invalid squares: {invalid_items!r}."
             raise ValueError(msg)
 
-        invalid_items = [pair for pair in values if super()._manhattan_distance(*pair) != 1]
+        invalid_items = [pair for pair in values if self._manhattan_distance(*pair) != 1]
         if invalid_items:
             msg = f"Squares in a pair must be consecutive ones. Invalid pairs: {invalid_items!r}."
             raise ValueError(msg)
@@ -142,7 +150,11 @@ class Tango(GameBoard):
         """
         return self.__opposite_pairs
 
-    def __set_opposite_pairs(self, values:set|list[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
+    def __set_opposite_pairs(self,
+            values: set[tuple[tuple[int, int], tuple[int, int]]]
+                | list[tuple[tuple[int, int], tuple[int, int]]]
+                | None
+        ) -> None:
 
         if values is None:
             self.__opposite_pairs = None
@@ -170,7 +182,7 @@ class Tango(GameBoard):
             msg = f"Coordinates must be positive integers. Invalid squares: {invalid_items!r}."
             raise ValueError(msg)
 
-        invalid_items = [pair for pair in values if super()._manhattan_distance(*pair) != 1]
+        invalid_items = [pair for pair in values if self._manhattan_distance(*pair) != 1]
         if invalid_items:
             msg = f"Squares in a pair must be consecutive ones. Invalid pairs: {invalid_items!r}."
             raise ValueError(msg)

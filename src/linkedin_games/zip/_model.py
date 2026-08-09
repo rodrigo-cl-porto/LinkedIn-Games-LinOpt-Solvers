@@ -7,7 +7,7 @@ class ZipModel(pyo.ConcreteModel):
     def __init__(self,
             board_dims: tuple[int, int],
             numbered_squares: list[tuple[int, int]],
-            walls: list[tuple[int, int], tuple[int, int]] | None) -> None:
+            walls: list[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
         """
         Args:
             board_dims: Board dimensions as a `(row, column)` tuple.
@@ -34,12 +34,12 @@ class ZipModel(pyo.ConcreteModel):
             [((i,j), (i, j+1)) for i in I for j in J if j+1 in J] +
             [((i,j), (i, j-1)) for i in I for j in J if j-1 in J]
         )
-        W = self.W = pyo.Set(initialize=walls) # Walls
-        N = self.N = pyo.Set(initialize=numbered_squares)
+        W = self.W = pyo.Set(initialize=walls, within=E) # Walls
+        N = self.N = pyo.Set(initialize=numbered_squares, within=S)
 
         # DECISION VARIABLES
         x = self.x = pyo.Var(E, within=pyo.Binary, initialize=0)
-        u = self.u = pyo.Var(S, within=pyo.NonNegativeReals)
+        u = self.u = pyo.Var(S, within=pyo.PositiveIntegers)
 
         # OBJECTIVE FUNCTION
         self.obj = pyo.Objective(expr=0) # feasibility problem
@@ -47,13 +47,13 @@ class ZipModel(pyo.ConcreteModel):
         # CONSTRAINTS
         self.outgoing_edges_constraints = pyo.Constraint(
             S, rule=lambda model, i, j:
-                sum(x[(i,j), w] for w in S if ((i,j), w) in E) == 0 if N.at(len(K)) == (i,j) else
-                sum(x[(i,j), w] for w in S if ((i,j), w) in E) == 1
+                pyo.quicksum(x[(i,j), w] for w in S if ((i,j), w) in E) == 0 if N[len(K)] == (i,j) else
+                pyo.quicksum(x[(i,j), w] for w in S if ((i,j), w) in E) == 1
         )
         self.incoming_edges_constraints = pyo.Constraint(
             S, rule=lambda model, i, j:
-                sum(x[s, (i,j)] for s in S if (s, (i,j)) in E) == 0 if N.at(1) == (i,j) else
-                sum(x[s, (i,j)] for s in S if (s, (i,j)) in E) == 1
+                pyo.quicksum(x[s, (i,j)] for s in S if (s, (i,j)) in E) == 0 if N[1] == (i,j) else
+                pyo.quicksum(x[s, (i,j)] for s in S if (s, (i,j)) in E) == 1
         )
         self.wall_constraints = pyo.Constraint(
             W, rule=lambda model, i, j, r, s: x[i,j,r,s] + x[r,s,i,j] == 0
@@ -64,7 +64,7 @@ class ZipModel(pyo.ConcreteModel):
         )
         self.ordinal_position_constraints = pyo.Constraint(
             K, rule= lambda model, k:
-                u[N.at(k)] == 1 if k == 1 else
-                u[N.at(k)] == M if k == len(N) else
-                u[N.at(k)] >= u[N.at(k-1)] + 1
+                u[N[k]] == 1 if k == 1 else
+                u[N[k]] == M if k == len(N) else
+                u[N[k]] >= u[N[k-1]] + 1
         )

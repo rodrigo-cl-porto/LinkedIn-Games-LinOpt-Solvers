@@ -1,6 +1,6 @@
 [project]
 name = "linkedin-games"
-version = "0.1.0rc7"
+version = "0.1.0rc8"
 description = "A Python package for solving LinkedIn board games like Queens, Tango, Zip, Mini Sudoku and Patches using Linear Optimization models."
 keywords = [
     "LinkedIn Games",
@@ -58,7 +58,8 @@ book = [
 dev = [
     "poethepoet>=0.48.0", # Task runner
     "pytest>=9.1.1",      # Automatic tests
-    "ruff>=0.15.22",      # Linting
+    "ruff>=0.15.22",      # Linting/Formatter
+    "ty>=0.0.69",         # Type Checker
 ]
 docs = [
     "mkdocstrings-python>=2.0.5",
@@ -148,6 +149,14 @@ quote-style = "double"
 indent-style = "space"
 line-ending = "lf"
 
+
+[tool.ty.environment] # https://docs.astral.sh/ty
+root = ["./src"]
+
+[tool.ty.rules]
+unsupported-operator = "ignore"
+not-iterable = "warn"
+invalid-method-override = "warn"
 
 # Testing
 [tool.pytest.ini_options]

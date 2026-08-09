@@ -6,7 +6,7 @@ class TangoModel(pyo.ConcreteModel):
 
     def __init__(self,
             board_dims: tuple[int, int],
-            filled_squares: dict[tuple[int, int]: int] | None = None,
+            filled_squares: dict[tuple[int, int], int],
             matching_pairs: list[tuple[tuple[int, int], tuple[int, int]]] | None = None,
             opposite_pairs: list[tuple[tuple[int, int], tuple[int, int]]] | None = None) -> None:
         """
@@ -36,7 +36,7 @@ class TangoModel(pyo.ConcreteModel):
         O = self.O = pyo.Set(initialize=opposite_pairs)
 
         # DECISION VARIABLES
-        x = self.x = pyo.Var(S, within=pyo.Binary)
+        x = self.x = pyo.Var(S, within=pyo.Binary, initialize=0)
 
         # PARAMETERS
         m = self.m # Total number of rows
@@ -48,10 +48,10 @@ class TangoModel(pyo.ConcreteModel):
 
         # CONSTRAINTS
         self.equal_moons_suns_per_row_constraints = pyo.Constraint(
-            I, rule=lambda model, i: sum(x[i, j] for j in J) == n / 2
+            I, rule=lambda model, i: pyo.quicksum(x[i, j] for j in J) == n / 2
         )
         self.equal_moons_suns_per_column_constraints = pyo.Constraint(
-            J, rule=lambda model, j: sum(x[i,j] for i in I) == m / 2
+            J, rule=lambda model, j: pyo.quicksum(x[i,j] for i in I) == m / 2
         )
         self.no_three_consecutive_moons_per_row_constraints = pyo.Constraint(
             I, pyo.RangeSet(n-2),

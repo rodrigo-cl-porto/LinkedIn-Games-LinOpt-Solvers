@@ -27,7 +27,10 @@ class Patches(ColorGeneratorMixin, GameBoard):
         - A rectangle must cover only one seed;
         - The area of all rectangles must be greater than 1 square on the board.
     """
-    def __init__(self, size:int, seeds: dict[tuple[int, int], dict[str, str|int]]) -> None:
+    def __init__(
+            self,
+            size:int,
+            seeds: dict[tuple[int, int], dict[str, str] | dict[str, int] | dict[str, str | int] | None]) -> None:
         """
         Args:
             size: The side length of the game.
@@ -75,7 +78,13 @@ class Patches(ColorGeneratorMixin, GameBoard):
         }
 
 
-    def __set_seeds(self, seeds: dict[tuple[int, int], dict[str, str|int]]) -> None:
+    def __set_seeds(
+            self,
+            seeds: dict[
+                tuple[int, int],
+                dict[str, str] | dict[str, int] | dict[str, str | int | None] | dict[str, None] | None
+            ]) -> None:
+
         if not isinstance(seeds, dict):
             msg = f"seeds must be a dictionary. Got {type(seeds).__name__} instead."
             raise TypeError(msg)
@@ -84,20 +93,26 @@ class Patches(ColorGeneratorMixin, GameBoard):
             msg = "seeds cannot be empty!"
             raise ValueError(msg)
 
-        seeds = {square: ({} if seed is None else seed) for square, seed in seeds.items()}
+        seeds = {
+            square: ({"color": None, "area": None, "shape":None} if seed is None else seed)
+            for square, seed in seeds.items()
+        }
 
-        colors = [seed.get("color") for seed in seeds.values() if seed.get("color") is not None]
+        colors = [seed.get("color") for seed in seeds.values() if seed is not None and seed.get("color") is not None]
         if len(colors) != len(set(colors)):
             msg = "There must not be two or more seeds with the same color."
             raise ValueError(msg)
 
         if len(colors) < len(seeds):
             for seed in seeds.values():
-                if seed.get("color") is None:
+                if seed is None or seed.get("color") is None:
                     random_color = super()._generate_hex_code()
                     while random_color in colors:
                         random_color = super()._generate_hex_code()
-                    seed["color"] = random_color
+                    if seed is None:
+                        seed = {"color": random_color}
+                    else:
+                        seed["color"] = random_color
                     colors.append(random_color)
 
         self.__seeds = {
@@ -120,7 +135,7 @@ class Patches(ColorGeneratorMixin, GameBoard):
         )
 
     @property
-    def rectangles(self) -> dict[str, str|tuple[int, int]] | None:
+    def rectangles(self) -> list[dict[str, str | tuple[int, int]]] | None:
         """
         All rectangles that solves the Patches game.
 
@@ -137,11 +152,12 @@ class Patches(ColorGeneratorMixin, GameBoard):
 
     def _set_solution(self, verbose:bool = False) -> None:
         for seed in self.__seeds:
-            top = round(pyo.value(self.model.t[seed.color_code]))
-            left = round(pyo.value(self.model.l[seed.color_code]))
-            width = round(pyo.value(self.model.w[seed.color_code]))
-            height = round(pyo.value(self.model.h[seed.color_code]))
-            seed.rectangle = {"top": top, "left": left, "height": height, "width": width}
+            seed.rectangle = {
+                "top": round(pyo.value(self.model.t[seed.color_code])),
+                "left": round(pyo.value(self.model.l[seed.color_code])),
+                "height": round(pyo.value(self.model.h[seed.color_code])),
+                "width": round(pyo.value(self.model.w[seed.color_code]))
+            }
         nx.set_node_attributes(
             self.board,
             name="value",

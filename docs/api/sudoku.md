@@ -1,1 +1,1 @@
-::: linkedin_games.Sudoku
+::: linkedin_games.sudoku.Sudoku

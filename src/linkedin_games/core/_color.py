@@ -1,5 +1,4 @@
 import re
-
 from matplotlib.colors import CSS4_COLORS
 
 
@@ -7,19 +6,19 @@ class Color:
     """Class to provide color properties to a component."""
 
     __HEX_PATTERN: re.Pattern = re.compile(r"^\#[0-9A-F]{6}$")
-    __COLOR_HEXES: dict[str, str] = CSS4_COLORS
+    __COLOR_HEXES = CSS4_COLORS
+    __COLOR_NAMES = {hex_code: name for name, hex_code in CSS4_COLORS.items()}
 
     def __init__(self, color: str="#FFFFFF") -> None:
         """
         Args:
             color: Color name or its hex code as a "#RRGGBB" string.
         """
-        Color.__COLOR_NAMES: dict[str, str] = {hex_code: name for name, hex_code in CSS4_COLORS.items()}
         self.color = color
 
 
     @staticmethod
-    def __hex_code_to_rgb(hex_code: str) -> tuple[int, int, int]:
+    def __hex_code_to_rgb(hex_code: str) -> tuple[int,...]:
         """Convert '#RRGGBB' to an (R, G, B) tuple."""
         hex_code = hex_code.lstrip("#")
         return tuple(int(hex_code[i : i + 2], 16) for i in (0, 2, 4))
@@ -32,11 +31,11 @@ class Color:
             return Color.__COLOR_NAMES[hex_code]
 
         target_rgb = Color.__hex_code_to_rgb(hex_code)
-        closest_color = None
+        closest_color = "#FFFFFF"
         min_distance = float("inf")
 
         for color, hex_val in Color.__COLOR_HEXES.items():
-            color_rgb = Color.__hex_code_to_rgb(hex_val)
+            color_rgb = Color.__hex_code_to_rgb(str(hex_val))
             distance_squared = sum(
                 (t - c) ** 2 for t, c in zip(target_rgb, color_rgb, strict=True)
             )
@@ -88,10 +87,10 @@ class Color:
 
     @property
     def hex_code(self) -> str:
-        return self.__hex_code
+        return str(self.__hex_code)
 
     @hex_code.setter
-    def hex(self, value:str) -> None:
+    def hex_code(self, value:str) -> None:
 
         if not isinstance(value, str):
             msg = f"The hex code must be a string. Got a {type(value).__name__} instead."
@@ -101,7 +100,7 @@ class Color:
             msg = f"The hex code must match to '#RRGGBB' pattern. Got {value!r} instead."
             raise ValueError(msg)
 
-        self.__hex_code = value
+        self.__hex_code = str(value)
         self.__name = Color.__get_closest_color_name(value)
 
 

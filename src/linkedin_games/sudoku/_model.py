@@ -35,7 +35,8 @@ class SudokuModel(pyo.ConcreteModel):
         S = self.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Board Squares
         B = self.B = pyo.Set( # Grid blocks
             V, U, initialize= lambda model, v, u:
-                [(i, j) for i in range(p*(v-1)+1, p*v+1) for j in range(q*(u-1)+1, q*u+1)]
+                [(i, j) for i in range(p*(v-1)+1, p*v+1) for j in range(q*(u-1)+1, q*u+1)],
+            within=S
         )
         F = self.F = pyo.Set(initialize=((i, j, k) for (i,j), k in filled_squares.items()), dimen=3) # Filled values
         
@@ -47,17 +48,17 @@ class SudokuModel(pyo.ConcreteModel):
         
         # CONSTRAINTS
         self.unique_digits_per_row_constraints = pyo.Constraint(
-            J, K, rule=lambda model, j, k: sum(x[i, j, k] for i in I) == 1
+            J, K, rule=lambda model, j, k: pyo.quicksum(x[i,j,k] for i in I) == 1
         )
         self.unique_digits_per_column_constraints = pyo.Constraint(
-            I, K, rule=lambda model, i, k: sum(x[i, j, k] for j in J) == 1
+            I, K, rule=lambda model, i, k: pyo.quicksum(x[i,j,k] for j in J) == 1
         )
         self.unique_digits_per_block_constraints = pyo.Constraint(
-            V, U, K, rule=lambda model, v, u, k: sum(x[i, j, k] for (i, j) in B[v, u]) == 1
+            V, U, K, rule=lambda model, v, u, k: pyo.quicksum(x[i,j,k] for (i, j) in B[v,u]) == 1
         )
         self.single_digit_per_square_constraints = pyo.Constraint(
-            S, rule=lambda model, i, j: sum(x[i, j, k] for k in K) == 1
+            S, rule=lambda model, i, j: pyo.quicksum(x[i,j,k] for k in K) == 1
         )
         self.alreadey_filled_squares_constraints = pyo.Constraint(
-            F, rule=lambda model, i, j, k: x[i, j, k] == 1
+            F, rule=lambda model, i, j, k: x[i,j,k] == 1
         )

@@ -61,7 +61,7 @@ class Queens(ColorGeneratorMixin, GameBoard):
         """
         return {region.color_code: region.squares for region in self.__regions}
 
-    def __set_regions(self, regions:dict[str, set[tuple[int, int]]]) -> None:
+    def __set_regions(self, regions:dict[str, set[tuple[int, int]]] | list[set[tuple[int, int]]]) -> None:
 
         if not isinstance(regions, (dict, list)):
             msg = f"regions must be a dict or list. Got {type(regions).__name__} instead."
