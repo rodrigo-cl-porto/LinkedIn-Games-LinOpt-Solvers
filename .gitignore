@@ -1,8 +1,10 @@
 # Environment variables
 *.env
 
-# Package folder
-src
+# Folders from main branch
+src/
+docs/
+tests/
 
 # VS Code settings
 .vscode
