@@ -5,10 +5,11 @@ import networkx as nx
 import pyomo.environ as pyo
 
 from ..core._game_board import GameBoard
+from ..core._taxicab_distance_mixin import TaxicabDistanceMixin
 from ._model import TangoModel
 
 
-class Tango(GameBoard):
+class Tango(TaxicabDistanceMixin, GameBoard):
     """
     The [LinkedIn Tango](https://www.linkedin.com/games/tango/) game.
 
@@ -130,7 +131,7 @@ class Tango(GameBoard):
             msg = f"Coordinates must be positive integers. Invalid squares: {invalid_items!r}."
             raise ValueError(msg)
 
-        invalid_items = [pair for pair in values if self._manhattan_distance(*pair) != 1]
+        invalid_items = [pair for pair in values if self._taxicab_distance(*pair) != 1]
         if invalid_items:
             msg = f"Squares in a pair must be consecutive ones. Invalid pairs: {invalid_items!r}."
             raise ValueError(msg)
@@ -182,7 +183,7 @@ class Tango(GameBoard):
             msg = f"Coordinates must be positive integers. Invalid squares: {invalid_items!r}."
             raise ValueError(msg)
 
-        invalid_items = [pair for pair in values if self._manhattan_distance(*pair) != 1]
+        invalid_items = [pair for pair in values if self._taxicab_distance(*pair) != 1]
         if invalid_items:
             msg = f"Squares in a pair must be consecutive ones. Invalid pairs: {invalid_items!r}."
             raise ValueError(msg)

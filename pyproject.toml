@@ -157,6 +157,7 @@ root = ["./src"]
 unsupported-operator = "ignore"
 not-iterable = "warn"
 invalid-method-override = "warn"
+not-subscriptable = "warn"
 
 # Testing
 [tool.pytest.ini_options]

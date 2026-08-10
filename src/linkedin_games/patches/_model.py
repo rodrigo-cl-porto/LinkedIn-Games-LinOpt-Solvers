@@ -18,8 +18,8 @@ class PatchesModel(pyo.ConcreteModel):
 
         # BOARD DIMENSIONS
         m, n = board_dims
-        self.m = pyo.Param(initialize=m, within=pyo.PositiveIntegers)
-        self.n = pyo.Param(initialize=n, within=pyo.PositiveIntegers)
+        self.m = pyo.Param(initialize=m, domain=pyo.PositiveIntegers)
+        self.n = pyo.Param(initialize=n, domain=pyo.PositiveIntegers)
 
         # RANGE SETS
         I = self.I = pyo.RangeSet(m) # Rows
@@ -27,38 +27,38 @@ class PatchesModel(pyo.ConcreteModel):
         K = self.K = pyo.Set(initialize=(seed["color"] for seed in seeds.values())) # Rectangles
 
         # COMPOSITE SETS
-        S = self.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Board Squares
+        S = self.S = pyo.Set(initialize=lambda model: [(i,j) for i in I for j in J]) # Board Squares
         E = self.E = pyo.Set(initialize=[(*square, seed["color"]) for square, seed in seeds.items()]) # Rectangle Seeds
         V = self.V = pyo.Set( # Vertical rectangles
-            within=K,
+            domain=K,
             initialize=[seed["color"] for seed in seeds.values() if seed["shape"] == "vertical"]
         )
         H = self.H = pyo.Set( # Horizontal rectangles
-            within=K,
+            domain=K,
             initialize=[seed["color"] for seed in seeds.values() if seed["shape"] == "horizontal"]
         )
         Q = self.Q = pyo.Set( # Squared rectangles
-            within=K,
+            domain=K,
             initialize=[seed["color"] for seed in seeds.values() if seed["shape"] == "square"]
         )
         A = self.A = pyo.Set( # Rectangles with required area
-            within=K,
+            domain=K,
             initialize=[seed["color"] for seed in seeds.values() if seed["area"] is not None]
         )
 
         # DECISION VARIABLES
         ## Integer variables
-        l = self.l = pyo.Var( # Index of the leftmost column of the rectangle k
-            K, domain=pyo.PositiveIntegers, initialize=1
-        )
         t = self.t = pyo.Var( # Index of the top row of the rectangle k
-            K, domain=pyo.PositiveIntegers, initialize=1
+            K, domain=pyo.PositiveIntegers, initialize=1, bounds=(1, m)
         )
-        w = self.w = pyo.Var( # Width of rectangle k
-            K, domain=pyo.PositiveIntegers, initialize=1
+        l = self.l = pyo.Var( # Index of the leftmost column of the rectangle k
+            K, domain=pyo.PositiveIntegers, initialize=1, bounds=(1, n)
         )
         h = self.h = pyo.Var( # Height of rectangle k
-            K, domain=pyo.PositiveIntegers, initialize=1
+            K, domain=pyo.PositiveIntegers, initialize=1, bounds=(1, m)
+        )
+        w = self.w = pyo.Var( # Width of rectangle k
+            K, domain=pyo.PositiveIntegers, initialize=1, bounds=(1, n)
         )
 
         ## Binary variables
@@ -68,7 +68,7 @@ class PatchesModel(pyo.ConcreteModel):
 
         # PARAMETERS
         a = self.a = pyo.Param( # Required areas
-            K, within=pyo.PositiveIntegers,
+            K, domain=pyo.PositiveIntegers,
             initialize={seed["color"]: seed["area"] for seed in seeds.values() if seed["area"] is not None}
         )
 
@@ -91,13 +91,13 @@ class PatchesModel(pyo.ConcreteModel):
 
         ## Boundaries Constraints
         self.top_boundary_constraints = pyo.Constraint(
-            I, K, rule=lambda model, i, k: t[k] - i <= m * (1 - u[i, k])
+            I, K, rule=lambda model, i, k: t[k] - i <= m * (1 - u[i,k])
         )
         self.bottom_boundary_constraints = pyo.Constraint(
             I, K, rule=lambda model, i, k: i - (t[k] + h[k] - 1) <= m * (1 - u[i, k])
         )
         self.left_boundary_constraints = pyo.Constraint(
-            J, K, rule=lambda model, j, k: l[k] - j <= n * (1 - v[j, k])
+            J, K, rule=lambda model, j, k: l[k] - j <= n * (1 - v[j,k])
         )
         self.right_boundary_constraints = pyo.Constraint(
             J, K, rule=lambda model, j, k: j - (l[k] + w[k] - 1) <= n * (1 - v[j, k])

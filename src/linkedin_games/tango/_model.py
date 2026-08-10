@@ -8,7 +8,7 @@ class TangoModel(pyo.ConcreteModel):
             board_dims: tuple[int, int],
             filled_squares: dict[tuple[int, int], int],
             matching_pairs: list[tuple[tuple[int, int], tuple[int, int]]] | None = None,
-            opposite_pairs: list[tuple[tuple[int, int], tuple[int, int]]] | None = None) -> None:
+            opposite_pairs: list[tuple[tuple[int, int], tuple[int, int]]] | None = None) -> object:
         """
         Args:
             board_dims: Board dimensions as a `(row, column)` tuple.
@@ -22,59 +22,59 @@ class TangoModel(pyo.ConcreteModel):
 
         # BOARD DIMENSIONS
         m, n = board_dims
-        self.m = pyo.Param(initialize=m, within=pyo.PositiveIntegers)
-        self.n = pyo.Param(initialize=n, within=pyo.PositiveIntegers)
+        self.m = pyo.Param(initialize=m, domain=pyo.PositiveIntegers)
+        self.n = pyo.Param(initialize=n, domain=pyo.PositiveIntegers)
 
         # RANGE SETS
         I = self.I = pyo.RangeSet(n) # Rows
         J = self.J = pyo.RangeSet(m) # Columns
 
         # COMPOSITE SETS
-        S = self.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Board Squares
+        S = self.S = pyo.Set(initialize=lambda model: [(i,j) for i in I for j in J]) # Board Squares
         K = self.K = pyo.Set(initialize=filled_squares.keys(), dimen=2)
         M = self.M = pyo.Set(initialize=matching_pairs)
         O = self.O = pyo.Set(initialize=opposite_pairs)
 
         # DECISION VARIABLES
-        x = self.x = pyo.Var(S, within=pyo.Binary, initialize=0)
+        x = self.x = pyo.Var(S, domain=pyo.Binary, initialize=0)
 
         # PARAMETERS
         m = self.m # Total number of rows
         n = self.n # Total number of columns
-        k = self.k = pyo.Param(K, initialize=filled_squares, within=pyo.Binary) # Filled values
+        k = self.k = pyo.Param(K, initialize=filled_squares, domain=pyo.Binary) # Filled values
 
         # OBJECTIVE FUNCTION
         self.obj = pyo.Objective(expr=0) # feasibility problem
 
         # CONSTRAINTS
         self.equal_moons_suns_per_row_constraints = pyo.Constraint(
-            I, rule=lambda model, i: pyo.quicksum(x[i, j] for j in J) == n / 2
+            I, rule=lambda model, i: pyo.quicksum(x[i,j] for j in J) == n / 2
         )
         self.equal_moons_suns_per_column_constraints = pyo.Constraint(
             J, rule=lambda model, j: pyo.quicksum(x[i,j] for i in I) == m / 2
         )
         self.no_three_consecutive_moons_per_row_constraints = pyo.Constraint(
             I, pyo.RangeSet(n-2),
-            rule=lambda model, i, j: x[i, j] + x[i, j+1] + x[i, j+2] <= 2
+            rule=lambda model, i, j: x[i,j] + x[i, j+1] + x[i, j+2] <= 2
         )
         self.no_three_consecutive_suns_per_row_constraints = pyo.Constraint(
             I, pyo.RangeSet(n-2),
-            rule=lambda model, i, j: x[i, j] + x[i, j+1] + x[i, j+2] >= 1
+            rule=lambda model, i, j: x[i,j] + x[i, j+1] + x[i, j+2] >= 1
         )
         self.no_three_consecutive_moons_per_column_constraints = pyo.Constraint(
             pyo.RangeSet(m-2), J,
-            rule=lambda model, i, j: x[i, j] + x[i+1, j] + x[i+2, j] <= 2
+            rule=lambda model, i, j: x[i,j] + x[i+1, j] + x[i+2, j] <= 2
         )
         self.no_three_consecutive_suns_per_column_constraints = pyo.Constraint(
             pyo.RangeSet(m-2), J,
-            rule=lambda model, i, j: x[i, j] + x[i+1, j] + x[i+2, j] >= 1
-        )
-        self.matching_pairs_constraints = pyo.Constraint(
-            M, rule=lambda model, i, j, r, s: x[i, j] - x[r, s] == 0
-        )
-        self.opposite_pairs_constraints = pyo.Constraint(
-            O, rule=lambda model, i, j, r, s: x[i, j] + x[r, s] == 1
+            rule=lambda model, i, j: x[i,j] + x[i+1, j] + x[i+2, j] >= 1
         )
         self.already_filled_squares_constraints = pyo.Constraint(
-            K, rule=lambda model, i, j: x[i, j] == k[i, j]
+            K, rule=lambda model, i, j: x[i,j] == k[i,j]
+        )
+        self.matching_pairs_constraints = pyo.Constraint(
+            M, rule=lambda model, i, j, r, s: x[i,j] - x[r, s] == 0
+        )
+        self.opposite_pairs_constraints = pyo.Constraint(
+            O, rule=lambda model, i, j, r, s: x[i,j] + x[r, s] == 1
         )

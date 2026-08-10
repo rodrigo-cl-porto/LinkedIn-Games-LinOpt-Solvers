@@ -20,7 +20,7 @@ class GameBoard(ABC):
         """
         self._set_board_dims(board_dims)
         self._set_board()
-        self._model: pyo.ConcreteModel | None = None
+        self._model: pyo.ConcreteModel
         self.__is_solved:bool = False
 
 
@@ -35,23 +35,6 @@ class GameBoard(ABC):
 
     def __abs__(self) -> int:
         return len(self)
-
-
-    @staticmethod
-    def _manhattan_distance(square1:tuple[int, int], square2:tuple[int, int]) -> int:
-        """
-        Calculate the Manhattan distance between two board squares.
-        
-        Args:
-            square1: The first square as a `(row, column)` tuple.
-            square2: The second square as a `(row, column)` tuple.
-        
-        Returns:
-            The Manhattan distance (Normal-1) between two board squares.
-        """
-        x1, y1 = square1
-        x2, y2 = square2
-        return abs(x1 - x2) + abs(y1 - y2)
 
 
     @property
@@ -116,7 +99,7 @@ class GameBoard(ABC):
 
 
     @property
-    def board_squares(self) -> dict[tuple[int, int], int]:
+    def board_squares(self) -> dict[tuple[int, int], int] | dict[tuple[int, int], str]:
         """
         All the board squares and their respective assigned values (if any).
         
@@ -159,7 +142,7 @@ class GameBoard(ABC):
 
 
     @property
-    def solution(self) -> dict[tuple[int, int], int | str] | None:
+    def solution(self) -> dict[tuple[int, int], int] | dict[tuple[int, int], str] | None:
         """
         The solved game board.
         

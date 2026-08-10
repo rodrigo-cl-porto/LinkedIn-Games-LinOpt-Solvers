@@ -14,8 +14,8 @@ class QueensModel(pyo.ConcreteModel):
 
         # BOARD DIMENSIONS
         m, n = board_dims
-        self.m = pyo.Param(initialize=m, within=pyo.PositiveIntegers)
-        self.n = pyo.Param(initialize=n, within=pyo.PositiveIntegers)
+        self.m = pyo.Param(initialize=m, domain=pyo.PositiveIntegers)
+        self.n = pyo.Param(initialize=n, domain=pyo.PositiveIntegers)
 
         # RANGE SETS
         I = self.I = pyo.RangeSet(n) # Rows
@@ -24,7 +24,7 @@ class QueensModel(pyo.ConcreteModel):
 
         # COMPOSITE SETS
         S = self.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Board Squares
-        R = self.R = pyo.Set(K, initialize=regions, dimen=2, within=S) # Region Squares
+        R = self.R = pyo.Set(K, initialize=regions, dimen=2, domain=S) # Region Squares
         D = self.D = pyo.Set(initialize=lambda model: # Diagonals
             [((i, j), (i + 1, j + 1)) for (i, j) in S if (i + 1, j + 1) in S] +
             [((i, j), (i + 1, j - 1)) for (i, j) in S if (i + 1, j - 1) in S]
@@ -34,7 +34,7 @@ class QueensModel(pyo.ConcreteModel):
         self.obj = pyo.Objective(expr=0) # feasibility problem
 
         # DECISION VARIABLES
-        x = self.x = pyo.Var(S, within=pyo.Binary, initialize=0)
+        x = self.x = pyo.Var(S, domain=pyo.Binary, initialize=0)
 
         # CONSTRAINTS
         self.single_crown_per_row_constraints = pyo.Constraint(

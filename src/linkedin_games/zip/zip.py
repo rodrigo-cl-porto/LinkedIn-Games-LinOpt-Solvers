@@ -5,11 +5,12 @@ import networkx as nx
 import pyomo.environ as pyo
 
 from ..core._color_generator_mixin import ColorGeneratorMixin
+from ..core._taxicab_distance_mixin import TaxicabDistanceMixin
 from ..core._game_board import GameBoard
 from ._model import ZipModel
 
 
-class Zip(ColorGeneratorMixin, GameBoard):
+class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameBoard):
     """
     The [LinkedIn Zip](https://www.linkedin.com/games/zip/) game.
     
@@ -117,7 +118,9 @@ class Zip(ColorGeneratorMixin, GameBoard):
         """
         return self.__walls
     
-    def __set_walls(self, values: set|tuple|list[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
+    def __set_walls(self,
+            values: set[tuple[tuple[int, int], tuple[int, int]]]
+            | list[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
         
         if values is None:
             self.__walls = None
@@ -135,7 +138,7 @@ class Zip(ColorGeneratorMixin, GameBoard):
             msg = f"Walls must be a tuple, list or set of squares. Got a {type(values).__name__} instead."
             raise TypeError(msg)
 
-        invalid_items = [pair for pair in values if self._manhattan_distance(*pair) != 1]
+        invalid_items = [pair for pair in values if self._taxicab_distance(*pair) != 1]
         if invalid_items:
             msg = f"Squares in a pair must be consecutive ones. Invalid pairs: {invalid_items!r}."
             raise ValueError(msg)
@@ -185,7 +188,7 @@ class Zip(ColorGeneratorMixin, GameBoard):
         width = height = self.size * 0.7
         plt.figure(figsize=(width, height))
         path_color = super()._generate_hex_code()
-        labels = {self.model.N.at(k): k for k in self.model.K}
+        labels = {self.model.N[k]: k for k in self.model.K}
         labels = {(i-1, j-1): k for (i,j), k in labels.items()}
         pos={(i,j): (j,-i) for i, j in self.board.nodes()}
 

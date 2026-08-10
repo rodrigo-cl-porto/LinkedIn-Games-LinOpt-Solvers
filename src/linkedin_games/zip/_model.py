@@ -1,7 +1,8 @@
+from ..core._taxicab_distance_mixin import TaxicabDistanceMixin
 import pyomo.environ as pyo
 
 
-class ZipModel(pyo.ConcreteModel):
+class ZipModel(TaxicabDistanceMixin, pyo.ConcreteModel):
     """The Linear Optimization Model for LinkedIn Zip game."""
 
     def __init__(self,
@@ -16,10 +17,11 @@ class ZipModel(pyo.ConcreteModel):
         """
         super().__init__()
 
-        # BOARD DIMENSIONS
+        # PARAMETERS
         m, n = board_dims
-        self.m = pyo.Param(initialize=m, within=pyo.PositiveIntegers)
-        self.n = pyo.Param(initialize=n, within=pyo.PositiveIntegers)
+        M = m * n # Big M
+        self.m = pyo.Param(initialize=m, domain=pyo.PositiveIntegers)
+        self.n = pyo.Param(initialize=n, domain=pyo.PositiveIntegers)
 
         # RANGE SETS
         I = self.I = pyo.RangeSet(n) # Rows
@@ -34,12 +36,12 @@ class ZipModel(pyo.ConcreteModel):
             [((i,j), (i, j+1)) for i in I for j in J if j+1 in J] +
             [((i,j), (i, j-1)) for i in I for j in J if j-1 in J]
         )
-        W = self.W = pyo.Set(initialize=walls, within=E) # Walls
-        N = self.N = pyo.Set(initialize=numbered_squares, within=S)
+        W = self.W = pyo.Set(initialize=walls, domain=E) # Walls
+        N = self.N = pyo.Set(initialize=numbered_squares, domain=S)
 
         # DECISION VARIABLES
-        x = self.x = pyo.Var(E, within=pyo.Binary, initialize=0)
-        u = self.u = pyo.Var(S, within=pyo.PositiveIntegers)
+        x = self.x = pyo.Var(E, domain=pyo.Binary, initialize=0)
+        u = self.u = pyo.Var(S, domain=pyo.PositiveIntegers, initialize=1, bounds=(1, M))
 
         # OBJECTIVE FUNCTION
         self.obj = pyo.Objective(expr=0) # feasibility problem
@@ -58,13 +60,12 @@ class ZipModel(pyo.ConcreteModel):
         self.wall_constraints = pyo.Constraint(
             W, rule=lambda model, i, j, r, s: x[i,j,r,s] + x[r,s,i,j] == 0
         )
-        M = m * n # Big M
         self.subroute_elimination_constraints = pyo.Constraint(
-            E, rule=lambda model, i, j, r, s: u[r,s] >= u[i,j] + 1 - M * (1 - x[i,j,r,s])
+            E, rule=lambda model, i, j, r, s: u[r,s] >= u[i,j] + 1 - M * (1 - x[i,j,r,s]) + (M - 2) * x[r,s,i,j]
         )
         self.ordinal_position_constraints = pyo.Constraint(
             K, rule= lambda model, k:
                 u[N[k]] == 1 if k == 1 else
-                u[N[k]] == M if k == len(N) else
-                u[N[k]] >= u[N[k-1]] + 1
+                u[N[k]] == M if k == N else
+                u[N[k]] >= u[N[k-1]] + self._taxicab_distance(N[k], N[k-1])
         )

@@ -5,7 +5,8 @@
 _build/
 
 # VS Code settings
-.vscode
+.vscode/*
+!.vscode/extensions.json
 
 # Virtual environment
 .venv

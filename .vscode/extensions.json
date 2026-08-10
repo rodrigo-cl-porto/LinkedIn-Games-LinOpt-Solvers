@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "astral-sh.ty",
+    "charliermarsh.ruff",
+    "oderwat.indent-rainbow",
+    "ms-python.python"
+  ]
+}

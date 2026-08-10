@@ -19,10 +19,10 @@ class SudokuModel(pyo.ConcreteModel):
         # BOARD AND BLOCK DIMENSIONS
         m, n = board_dims
         p, q = block_dims
-        self.m = pyo.Param(initialize=m, within=pyo.PositiveIntegers)
-        self.n = pyo.Param(initialize=n, within=pyo.PositiveIntegers)
-        self.p = pyo.Param(initialize=p, within=pyo.PositiveIntegers)
-        self.q = pyo.Param(initialize=q, within=pyo.PositiveIntegers)
+        self.m = pyo.Param(initialize=m, domain=pyo.PositiveIntegers)
+        self.n = pyo.Param(initialize=n, domain=pyo.PositiveIntegers)
+        self.p = pyo.Param(initialize=p, domain=pyo.PositiveIntegers)
+        self.q = pyo.Param(initialize=q, domain=pyo.PositiveIntegers)
         
         # RANGE SETS
         I = self.I = pyo.RangeSet(n) # Rows
@@ -36,12 +36,12 @@ class SudokuModel(pyo.ConcreteModel):
         B = self.B = pyo.Set( # Grid blocks
             V, U, initialize= lambda model, v, u:
                 [(i, j) for i in range(p*(v-1)+1, p*v+1) for j in range(q*(u-1)+1, q*u+1)],
-            within=S
+            domain=S
         )
         F = self.F = pyo.Set(initialize=((i, j, k) for (i,j), k in filled_squares.items()), dimen=3) # Filled values
         
         # DECISION VARIABLES
-        x = self.x = pyo.Var(S, K, within=pyo.Binary, initialize=0)
+        x = self.x = pyo.Var(S, K, domain=pyo.Binary, initialize=0)
         
         # OBJECTIVE FUNCTION
         self.obj = pyo.Objective(expr=0) # feasible problem
