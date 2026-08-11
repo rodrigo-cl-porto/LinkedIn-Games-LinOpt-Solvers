@@ -1,13 +1,12 @@
 import pyomo.environ as pyo
+from ._rectangle_seed import RectangleSeed
+from ._rectangle_shape import RectangleShape
 
 
 class PatchesModel(pyo.ConcreteModel):
     """The Linear Optimization model for the Patches game."""
 
-    def __init__(
-            self,
-            board_dims: tuple[int, int],
-            seeds: dict[tuple[int, int], dict[str, str | int | None]]) -> None:
+    def __init__(self, board_dims: tuple[int, int], seeds: list[RectangleSeed]) -> object:
         """
         Args:
             board_dims: Board dimensionas as `(rows, columns)` tuple.
@@ -24,41 +23,22 @@ class PatchesModel(pyo.ConcreteModel):
         # RANGE SETS
         I = self.I = pyo.RangeSet(m) # Rows
         J = self.J = pyo.RangeSet(n) # Columns
-        K = self.K = pyo.Set(initialize=(seed["color"] for seed in seeds.values())) # Rectangles
+        K = self.K = pyo.Set(initialize=(seed.color_code for seed in seeds)) # Rectangles
 
         # COMPOSITE SETS
         S = self.S = pyo.Set(initialize=lambda model: [(i,j) for i in I for j in J]) # Board Squares
-        E = self.E = pyo.Set(initialize=[(*square, seed["color"]) for square, seed in seeds.items()]) # Rectangle Seeds
+        E = self.E = pyo.Set(initialize=[(*seed.square, seed.color_code) for seed in seeds]) # Rectangle Seeds
         V = self.V = pyo.Set( # Vertical rectangles
-            domain=K,
-            initialize=[seed["color"] for seed in seeds.values() if seed["shape"] == "vertical"]
+            initialize=[seed.color_code for seed in seeds if seed.shape == RectangleShape.VERTICAL], domain=K
         )
         H = self.H = pyo.Set( # Horizontal rectangles
-            domain=K,
-            initialize=[seed["color"] for seed in seeds.values() if seed["shape"] == "horizontal"]
+            initialize=[seed.color_code for seed in seeds if seed.shape == RectangleShape.HORIZONTAL], domain=K
         )
         Q = self.Q = pyo.Set( # Squared rectangles
-            domain=K,
-            initialize=[seed["color"] for seed in seeds.values() if seed["shape"] == "square"]
+            initialize=[seed.color_code for seed in seeds if seed.shape == RectangleShape.SQUARE], domain=K
         )
         A = self.A = pyo.Set( # Rectangles with required area
-            domain=K,
-            initialize=[seed["color"] for seed in seeds.values() if seed["area"] is not None]
-        )
-
-        # DECISION VARIABLES
-        ## Integer variables
-        t = self.t = pyo.Var( # Index of the top row of the rectangle k
-            K, domain=pyo.PositiveIntegers, initialize=1, bounds=(1, m)
-        )
-        l = self.l = pyo.Var( # Index of the leftmost column of the rectangle k
-            K, domain=pyo.PositiveIntegers, initialize=1, bounds=(1, n)
-        )
-        h = self.h = pyo.Var( # Height of rectangle k
-            K, domain=pyo.PositiveIntegers, initialize=1, bounds=(1, m)
-        )
-        w = self.w = pyo.Var( # Width of rectangle k
-            K, domain=pyo.PositiveIntegers, initialize=1, bounds=(1, n)
+            initialize=[seed.color_code for seed in seeds if seed.area is not None], domain=K
         )
 
         ## Binary variables
@@ -69,11 +49,11 @@ class PatchesModel(pyo.ConcreteModel):
         # PARAMETERS
         a = self.a = pyo.Param( # Required areas
             K, domain=pyo.PositiveIntegers,
-            initialize={seed["color"]: seed["area"] for seed in seeds.values() if seed["area"] is not None}
+            initialize={seed.color_code: seed.area for seed in seeds if seed.area is not None}
         )
 
         # OBJECTIVE FUNCTION
-        self.obj = pyo.Objective(expr=0) # feasible problem
+        self.obj = pyo.Objective(expr=0) # feasibility problem
 
         # CONSTRAINTS
         ## Non overlapping rectangles
@@ -81,60 +61,42 @@ class PatchesModel(pyo.ConcreteModel):
             S, rule=lambda model, i, j: pyo.quicksum(x[i, j, k] for k in K) == 1
         )
 
-        ## Board-Boundaries Constraints
-        self.top_row_constraints = pyo.Constraint(
-            K, rule=lambda model, k: t[k] + h[k] - 1 <= m
+        ## Contiguity constraints
+        self.row_contiguity_constraints = pyo.Constraint(
+            pyo.RangeSet(1, m-2), pyo.RangeSet(3, m), K, rule=lambda model, i1, i2, k:
+                pyo.quicksum(u[i,k] for i in range(i1, i2+1)) >= i2 - i1 + 1 - m*(1 - u[i1,k]) - m*(1 - u[i2,k])
+                if i2 - i1 > 1 else pyo.Constraint.Skip
         )
-        self.leftmost_column_constraints = pyo.Constraint(
-            K, rule=lambda model, k: l[k] + w[k] - 1 <= n
-        )
-
-        ## Boundaries Constraints
-        self.top_boundary_constraints = pyo.Constraint(
-            I, K, rule=lambda model, i, k: t[k] - i <= m * (1 - u[i,k])
-        )
-        self.bottom_boundary_constraints = pyo.Constraint(
-            I, K, rule=lambda model, i, k: i - (t[k] + h[k] - 1) <= m * (1 - u[i, k])
-        )
-        self.left_boundary_constraints = pyo.Constraint(
-            J, K, rule=lambda model, j, k: l[k] - j <= n * (1 - v[j,k])
-        )
-        self.right_boundary_constraints = pyo.Constraint(
-            J, K, rule=lambda model, j, k: j - (l[k] + w[k] - 1) <= n * (1 - v[j, k])
+        self.column_contiguity_contraints = pyo.Constraint(
+            pyo.RangeSet(1, n-2), pyo.RangeSet(3, n), K, rule=lambda model, j1, j2, k:
+                pyo.quicksum(v[j,k] for j in range(j1, j2+1)) >= j2 - j1 + 1 - n*(1 - v[j1,k]) - n*(1 - v[j2,k])
+                if j2 - j1 > 1 else pyo.Constraint.Skip
         )
 
-        ## Rectangle Dimensions constraints
-        self.height_constraints = pyo.Constraint(
-            K, rule=lambda model, k: pyo.quicksum(u[i,k] for i in I) == h[k]
-        )
-        self.width_constraints = pyo.Constraint(
-            K, rule=lambda model, k: pyo.quicksum(v[j,k] for j in J) == w[k]
-        )
-
-        ## Linking-Binary-Variables Constraints
+        ## McCormick Linearization constraints
         self.cutout_row_constraints = pyo.Constraint(
-            I, J, K, rule=lambda model, i, j, k: x[i, j, k] <= u[i, k]
+            I, J, K, rule=lambda model, i, j, k: x[i,j,k] <= u[i,k]
         )
         self.cutout_column_constraints = pyo.Constraint(
-            I, J, K, rule=lambda model, i, j, k: x[i, j, k] <= v[j, k]
+            I, J, K, rule=lambda model, i, j, k: x[i,j,k] <= v[j,k]
         )
-        self.square_activator_constraints = pyo.Constraint(
-            I, J, K, rule=lambda model, i, j, k: x[i, j, k] >= u[i, k] + v[j, k] - 1
+        self.square_activation_constraints = pyo.Constraint(
+            I, J, K, rule=lambda model, i, j, k: x[i,j,k] >= u[i,k] + v[j,k] - 1
         )
 
-        ## Seed Square Constraints
-        self.seed_square_coverage_constraints = pyo.Constraint(
-            E, rule=lambda model, i, j, k: x[i, j, k] == 1
+        ## Rectangle Seed Constraints
+        self.seed_square_constraints = pyo.Constraint(
+            E, rule=lambda model, i, j, k: x[i,j,k] == 1
         )
-        self.area_constraints = pyo.Constraint(  # Required area
+        self.area_constraints = pyo.Constraint( # Required areas
             A, rule=lambda model, k: pyo.quicksum(x[i, j, k] for (i, j) in S) == a[k]
         )
         self.vertical_rectangles_constraints = pyo.Constraint(
-            V, rule=lambda model, k: w[k] <= h[k] - 1
+            V, rule=lambda model, k: pyo.quicksum(u[i,k] for i in I) >= pyo.quicksum(v[j,k] for j in J) + 1
         )
         self.horizontal_rectangles_constraints = pyo.Constraint(
-            H, rule=lambda model, k: w[k] >= h[k] + 1
+            H, rule=lambda model, k: pyo.quicksum(v[j,k] for j in J) >= pyo.quicksum(u[i,k] for i in I) + 1
         )
         self.square_rectangles_constraints = pyo.Constraint(
-            Q, rule=lambda model, k: w[k] == h[k]
+            Q, rule=lambda model, k: pyo.quicksum(u[i,k] for i in I) == pyo.quicksum(v[j,k] for j in J)
         )

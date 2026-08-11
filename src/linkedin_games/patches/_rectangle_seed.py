@@ -7,7 +7,13 @@ from ._rectangle_shape import RectangleShape
 
 class RectangleSeed:
     """A seed that creates a rectangle in the Patches game."""
-    def __init__(self, square:tuple[int, int], area:int|None=None, shape:str="any", color:str="#FFFFFF") -> None:
+
+    def __init__(self,
+            square:tuple[int, int],
+            area:int|None = None,
+            shape:str="any",
+            color:str|None="#FFFFFF"
+        ) -> object:
         """
         Args:
             square: The board position of the seed as a `(row, column)` tuple.
@@ -19,7 +25,7 @@ class RectangleSeed:
         self.__set_shape(shape)
         self.__set_area(area)
         self.__color = Color(color)
-        self.__rectangle = Rectangle(dims=(1,1), top_left=(1,1))
+        self.__rectangle: Rectangle
 
 
     def __repr__(self) -> str:
@@ -113,11 +119,7 @@ class RectangleSeed:
             msg = f"Seed square must be a pair (m,n). Got a tuple with length {len(value)}."
             raise ValueError(msg)
         
-        if (
-            any(not isinstance(coord, int)
-            or isinstance(coord, bool)
-            or coord < 1 for coord in value)
-        ):
+        if (any(not isinstance(coord, int) or isinstance(coord, bool) or coord < 1 for coord in value)):
             msg = f"Seed square coordinates must be positive integers. Got {value!r} instead."
             raise ValueError(msg)
         
@@ -137,13 +139,13 @@ class RectangleSeed:
     def __set_shape(self, value:str) -> None:
 
         if value is None:
-            self.__shape = RectangleShape("any")
+            self.__shape = RectangleShape.ANY
             return
-
+        
         if not isinstance(value, str):
             msg = f"The rectangle shape must be a string. Got a {type(value).__name__} instead."
             raise TypeError(msg)
-
+        
         try:
             self.__shape = RectangleShape(value.strip().lower())
         except ValueError as exc:

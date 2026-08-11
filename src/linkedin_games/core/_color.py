@@ -1,3 +1,4 @@
+from typing import ClassVar
 import re
 from matplotlib.colors import CSS4_COLORS
 
@@ -5,11 +6,11 @@ from matplotlib.colors import CSS4_COLORS
 class Color:
     """Class to provide color properties to a component."""
 
-    __HEX_PATTERN: re.Pattern = re.compile(r"^\#[0-9A-F]{6}$")
+    __HEX_PATTERN: re.Pattern = re.compile(r"\#[0-9A-F]{6}")
     __COLOR_HEXES = CSS4_COLORS
-    __COLOR_NAMES = {hex_code: name for name, hex_code in CSS4_COLORS.items()}
+    __COLOR_NAMES: ClassVar = {hex_code: name for name, hex_code in CSS4_COLORS.items()}
 
-    def __init__(self, color: str="#FFFFFF") -> None:
+    def __init__(self, color: str|None="#FFFFFF") -> object:
         """
         Args:
             color: Color name or its hex code as a "#RRGGBB" string.
@@ -62,7 +63,12 @@ class Color:
         return self.__name
 
     @color.setter
-    def color(self, value:str) -> None:
+    def color(self, value: str|None) -> None:
+
+        if value is None:
+            self.__name = "white"
+            self.__hex_code = "#FFFFFF"
+            return
 
         if not isinstance(value, str):
             msg = f"The color must be a string. Got a {type(value).__name__} instead."
@@ -109,7 +115,13 @@ class Color:
         return self.__name
 
     @name.setter
-    def name(self, value:str) -> None:
+    def name(self, value: str| None) -> None:
+
+        if value is None:
+            self.__hex_code = "#FFFFFF"
+            self.__name = "white"
+            return
+
         if not isinstance(value, str):
             msg = f"The color name must be a string. Got a {type(value).__name__} instead."
             raise TypeError(msg)
@@ -118,5 +130,6 @@ class Color:
         if not Color.__is_color_name(value):
             msg = f"The name {value!r} is not a valid color."
             raise ValueError(msg)
+        
         self.__hex_code = Color.__COLOR_HEXES[value.replace(" ", "")]
         self.__name = value

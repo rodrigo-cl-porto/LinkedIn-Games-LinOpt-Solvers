@@ -21,7 +21,7 @@ class GeneralSudoku(GameBoard):
         Each row, column, and block must be filled with a digit from 1 to `n`,
         without repetition in each row, column, or `p`x`q` block.
     """
-    def __init__(self, size: int, block_dims: tuple[int, int], filled_squares: dict[tuple[int, int], int]) -> None:
+    def __init__(self, size: int, block_dims: tuple[int, int], filled_squares: dict[tuple[int, int], int]) -> object:
         """
         Args:
             size: The Sudoku's number of rows (or columns).
@@ -41,7 +41,23 @@ class GeneralSudoku(GameBoard):
 
 
     def __hash__(self) -> int:
-        return hash((self.__block_dims, self.__block_dims, self.__filled_squares))
+        return hash((self._board_dims, self.__block_dims, self.__filled_squares))
+
+
+    def __eq__(self, other: object) -> bool:
+
+        if not isinstance(other, GeneralSudoku):
+            return False
+        
+        return (
+            self.size == other.size
+            and self.block_dims == other.block_dims
+            and self.filled_squares == other.filled_squares
+        )
+
+
+    def __ne__(self, other: object) -> bool:
+        return not self.__eq__(other)
 
 
     @property
@@ -141,14 +157,14 @@ class GeneralSudoku(GameBoard):
 
 
     def _set_solution(self, verbose:bool=False) -> None:
+
+        S = self.model.S
+        K = self.model.K
+        x = self.model.x
         nx.set_node_attributes(
             self.board,
             name="value",
-            values= {
-                (i-1, j-1): k
-                for i in self.model.I for j in self.model.J for k in self.model.K
-                if int(pyo.value(self.model.x[i, j, k])) == 1
-            }
+            values= {(i-1, j-1): k for (i, j) in S for k in K if int(pyo.value(x[i, j, k])) == 1}
         )
         if verbose:
             print("These are the digits for each square:")

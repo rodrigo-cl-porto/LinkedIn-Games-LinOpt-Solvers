@@ -106,7 +106,7 @@ seeds = {
     (5,2): {"color": "teal",   "area"=8},
     (6,6): {"color": "red",    "area"=6, "shape"="vertical"}
 }
-patches = Patches((6, 6), seeds)
+patches = Patches(size=6, seeds=seeds)
 patches.solve()
 patches.show()
 ```

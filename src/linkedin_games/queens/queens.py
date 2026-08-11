@@ -24,14 +24,14 @@ class Queens(ColorGeneratorMixin, GameBoard):
         - There cannot be adjacent crowns, not even along adjacent diagonals.
     """
 
-    def __init__(self, size:int, regions: dict[str, set[tuple[int, int]]] | list[set[tuple[int, int]]]) -> None:
+    def __init__(self, size:int, regions: dict[str, set[tuple[int, int]]] | list[set[tuple[int, int]]]) -> object:
         """
         Args:
             size: The side length of the game.
             regions: Regions as a dictionary of `color: {(row, column), ...}` items.
         """
         super().__init__(board_dims=(size, size))
-        self.__crowns: nx.Graph | None = None
+        self.__crowns: nx.Graph
         self.__set_regions(regions)
         self._model = QueensModel(self.board_dims, self.regions)
 
@@ -99,7 +99,7 @@ class Queens(ColorGeneratorMixin, GameBoard):
                 )
                 raise ValueError(msg)
 
-        self.__regions = {Region(color=color, squares=squares) for color, squares in regions.items()}
+        self.__regions = [Region(color=color, squares=squares) for color, squares in regions.items()]
 
         nx.set_node_attributes( # Adding a color for each square on the board
             self._board,
@@ -123,13 +123,18 @@ class Queens(ColorGeneratorMixin, GameBoard):
 
 
     def _set_solution(self, verbose:bool = False) -> None:
+
+        x = self.model.x
+        S = self.model.S
         nx.set_node_attributes(
             self.board,
             name="value",
-            values={(i-1, j-1): round(pyo.value(self.model.x[i, j])) for (i, j) in self.model.S}
+            values={(i-1, j-1): round(pyo.value(x[i, j])) for (i, j) in S}
         )
+
         crowns = [square for square, value in nx.get_node_attributes(self.board, "value").items() if value == 1]
         self.__crowns = self.board.subgraph(crowns)
+        
         if verbose:
             print("These are the squares that contain a crown:")
             pprint(self.crowns)

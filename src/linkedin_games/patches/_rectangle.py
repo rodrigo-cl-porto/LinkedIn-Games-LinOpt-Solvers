@@ -1,7 +1,7 @@
 class Rectangle:
     """A Patches rectangle, used as part of the game's solution."""
     
-    def __init__(self, top_left:tuple[int, int], dims:tuple[int, int]) -> None:
+    def __init__(self, top_left:tuple[int, int], dims:tuple[int, int]) -> object:
         """
         Args:
             top_left: Board position of the rectangle's top-left square as a `(row, column)` tuple.

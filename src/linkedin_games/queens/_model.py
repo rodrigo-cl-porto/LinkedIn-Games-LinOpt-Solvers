@@ -1,10 +1,11 @@
 import pyomo.environ as pyo
 
 
+
 class QueensModel(pyo.ConcreteModel):
     """The Linear Optimization model for the Queens game."""
 
-    def __init__(self, board_dims: tuple[int, int], regions: dict[str, set[tuple[int, int]]]) -> None:
+    def __init__(self, board_dims: tuple[int, int], regions: dict[str, set[tuple[int, int]]]) -> object:
         """
         Args:
             board_dims: Board dimensionas as a `(rows, columns)` tuple.

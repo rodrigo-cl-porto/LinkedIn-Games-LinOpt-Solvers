@@ -4,7 +4,7 @@ from ..core._color import Color
 class Region:
     """A colored region on a Queens board."""
     
-    def __init__(self, squares:set[tuple[int, int]], color:str="white") -> None:
+    def __init__(self, squares:set[tuple[int, int]], color:str="white") -> object:
         """
         Args:
             squares: All board squares that make up the region as a set of `(row, column)`.

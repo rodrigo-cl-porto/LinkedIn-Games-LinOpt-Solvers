@@ -38,6 +38,16 @@ class ZipModel(TaxicabDistanceMixin, pyo.ConcreteModel):
         )
         W = self.W = pyo.Set(initialize=walls, domain=E) # Walls
         N = self.N = pyo.Set(initialize=numbered_squares, domain=S)
+        neighbors = {
+            (i, j): [
+                (r, c) for r, c in [
+                    (i-1, j),
+                    (i+1, j),
+                    (i, j-1),
+                    (i, j+1)
+                ] if (r, c) in S
+            ] for (i, j) in S
+        }
 
         # DECISION VARIABLES
         x = self.x = pyo.Var(E, domain=pyo.Binary, initialize=0)
@@ -49,13 +59,13 @@ class ZipModel(TaxicabDistanceMixin, pyo.ConcreteModel):
         # CONSTRAINTS
         self.outgoing_edges_constraints = pyo.Constraint(
             S, rule=lambda model, i, j:
-                pyo.quicksum(x[(i,j), w] for w in S if ((i,j), w) in E) == 0 if N[len(K)] == (i,j) else
-                pyo.quicksum(x[(i,j), w] for w in S if ((i,j), w) in E) == 1
+                pyo.quicksum(x[(i,j), w] for w in neighbors[(i,j)]) == 0 if N[len(K)] == (i,j) else
+                pyo.quicksum(x[(i,j), w] for w in neighbors[(i,j)]) == 1
         )
         self.incoming_edges_constraints = pyo.Constraint(
             S, rule=lambda model, i, j:
-                pyo.quicksum(x[s, (i,j)] for s in S if (s, (i,j)) in E) == 0 if N[1] == (i,j) else
-                pyo.quicksum(x[s, (i,j)] for s in S if (s, (i,j)) in E) == 1
+                pyo.quicksum(x[s, (i,j)] for s in neighbors[(i,j)]) == 0 if N[1] == (i,j) else
+                pyo.quicksum(x[s, (i,j)] for s in neighbors[(i,j)]) == 1
         )
         self.wall_constraints = pyo.Constraint(
             W, rule=lambda model, i, j, r, s: x[i,j,r,s] + x[r,s,i,j] == 0
@@ -66,6 +76,6 @@ class ZipModel(TaxicabDistanceMixin, pyo.ConcreteModel):
         self.ordinal_position_constraints = pyo.Constraint(
             K, rule= lambda model, k:
                 u[N[k]] == 1 if k == 1 else
-                u[N[k]] == M if k == N else
+                u[N[k]] == M if k == len(N) else
                 u[N[k]] >= u[N[k-1]] + self._taxicab_distance(N[k], N[k-1])
         )

@@ -7,7 +7,7 @@ class SudokuModel(pyo.ConcreteModel):
     def __init__(self,
             board_dims: tuple[int, int],
             block_dims: tuple[int, int],
-            filled_squares: dict[tuple[int, int], int]) -> None:
+            filled_squares: dict[tuple[int, int], int]) -> object:
         """
         Args:
             board_dims: Board dimensions as a `(rows, columns)` tuple.
