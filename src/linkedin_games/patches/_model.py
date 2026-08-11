@@ -64,12 +64,12 @@ class PatchesModel(pyo.ConcreteModel):
         ## Contiguity constraints
         self.row_contiguity_constraints = pyo.Constraint(
             pyo.RangeSet(1, m-2), pyo.RangeSet(3, m), K, rule=lambda model, i1, i2, k:
-                pyo.quicksum(u[i,k] for i in range(i1, i2+1)) >= i2 - i1 + 1 - m*(1 - u[i1,k]) - m*(1 - u[i2,k])
+                u[i1, k] - pyo.quicksum(u[i,k] for i in range(i1+1, i2)) + u[i2, k] <= 1
                 if i2 - i1 > 1 else pyo.Constraint.Skip
         )
         self.column_contiguity_contraints = pyo.Constraint(
             pyo.RangeSet(1, n-2), pyo.RangeSet(3, n), K, rule=lambda model, j1, j2, k:
-                pyo.quicksum(v[j,k] for j in range(j1, j2+1)) >= j2 - j1 + 1 - n*(1 - v[j1,k]) - n*(1 - v[j2,k])
+                v[j1, k] - pyo.quicksum(v[j,k] for j in range(j1+1, j2)) + v[j2, k] <= 1
                 if j2 - j1 > 1 else pyo.Constraint.Skip
         )
 

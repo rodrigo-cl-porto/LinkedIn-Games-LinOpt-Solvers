@@ -38,7 +38,20 @@ class ZipModel(TaxicabDistanceMixin, pyo.ConcreteModel):
         )
         W = self.W = pyo.Set(initialize=walls, domain=E) # Walls
         N = self.N = pyo.Set(initialize=numbered_squares, domain=S)
-        neighbors = {
+
+        # DECISION VARIABLES
+        x = self.x = pyo.Var(E, domain=pyo.Binary, initialize=0) # Decision to go from square (i,j) to (r,s)
+        u = self.u = pyo.Var( # Visitiation order of a square (i, j)
+            S, domain=pyo.PositiveIntegers, initialize=1, bounds=(1, M)
+        ) 
+
+        # OBJECTIVE FUNCTION
+        self.obj = pyo.Objective(expr=0) # feasibility problem
+
+        # CONSTRAINTS
+
+        ## Edge constraints
+        neighbors = { # This dictionary is important to access all neighbors of a square quickly.
             (i, j): [
                 (r, c) for r, c in [
                     (i-1, j),
@@ -48,15 +61,6 @@ class ZipModel(TaxicabDistanceMixin, pyo.ConcreteModel):
                 ] if (r, c) in S
             ] for (i, j) in S
         }
-
-        # DECISION VARIABLES
-        x = self.x = pyo.Var(E, domain=pyo.Binary, initialize=0)
-        u = self.u = pyo.Var(S, domain=pyo.PositiveIntegers, initialize=1, bounds=(1, M))
-
-        # OBJECTIVE FUNCTION
-        self.obj = pyo.Objective(expr=0) # feasibility problem
-
-        # CONSTRAINTS
         self.outgoing_edges_constraints = pyo.Constraint(
             S, rule=lambda model, i, j:
                 pyo.quicksum(x[(i,j), w] for w in neighbors[(i,j)]) == 0 if N[len(K)] == (i,j) else
@@ -67,13 +71,19 @@ class ZipModel(TaxicabDistanceMixin, pyo.ConcreteModel):
                 pyo.quicksum(x[s, (i,j)] for s in neighbors[(i,j)]) == 0 if N[1] == (i,j) else
                 pyo.quicksum(x[s, (i,j)] for s in neighbors[(i,j)]) == 1
         )
+
+        ## Blocked paths constraints
         self.wall_constraints = pyo.Constraint(
             W, rule=lambda model, i, j, r, s: x[i,j,r,s] + x[r,s,i,j] == 0
         )
+
+        # Miller-Tucker-Zemlin constraints with lifting
         self.subroute_elimination_constraints = pyo.Constraint(
             E, rule=lambda model, i, j, r, s: u[r,s] >= u[i,j] + 1 - M * (1 - x[i,j,r,s]) + (M - 2) * x[r,s,i,j]
         )
-        self.ordinal_position_constraints = pyo.Constraint(
+
+        ## Visitation order constraints
+        self.visitation_order_constraints = pyo.Constraint(
             K, rule= lambda model, k:
                 u[N[k]] == 1 if k == 1 else
                 u[N[k]] == M if k == len(N) else

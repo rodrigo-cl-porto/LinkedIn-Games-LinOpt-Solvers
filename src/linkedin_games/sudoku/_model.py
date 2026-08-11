@@ -44,7 +44,7 @@ class SudokuModel(pyo.ConcreteModel):
         x = self.x = pyo.Var(S, K, domain=pyo.Binary, initialize=0)
         
         # OBJECTIVE FUNCTION
-        self.obj = pyo.Objective(expr=0) # feasible problem
+        self.obj = pyo.Objective(expr=0) # feasibility problem
         
         # CONSTRAINTS
         self.unique_digits_per_row_constraints = pyo.Constraint(
