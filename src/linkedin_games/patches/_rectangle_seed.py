@@ -1,3 +1,4 @@
+from typing import Any
 from math import sqrt
 
 from ..core._color import Color
@@ -11,7 +12,7 @@ class RectangleSeed:
     def __init__(self,
             square:tuple[int, int],
             area:int|None = None,
-            shape:str="any",
+            shape:str|None=RectangleShape.ANY,
             color:str|None="#FFFFFF"
         ) -> object:
         """
@@ -72,13 +73,14 @@ class RectangleSeed:
         )
 
 
-    def __ne__(self, other: object) -> bool:
+    def __ne__(self, other:object) -> bool:
         return not self.__eq__(other)
 
 
     @staticmethod
     def __is_perfect_square(n:int) -> bool:
-        """Check if a number is a perfect square.
+        """
+        Check if a number is a perfect square.
         
         Args:
             n: The number to check.
@@ -89,7 +91,7 @@ class RectangleSeed:
         return sqrt(n) % 1 == 0
 
 
-    def to_dict(self) -> dict[str, str|int|tuple[int, int] | None]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "color": self.color,
             "color_code": self.color_code,
@@ -136,7 +138,7 @@ class RectangleSeed:
         """
         return str(self.__shape)
 
-    def __set_shape(self, value:str) -> None:
+    def __set_shape(self, value:str|None) -> None:
 
         if value is None:
             self.__shape = RectangleShape.ANY

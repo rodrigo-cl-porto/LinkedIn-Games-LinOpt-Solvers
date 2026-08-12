@@ -96,7 +96,7 @@ class Color:
         return str(self.__hex_code)
 
     @hex_code.setter
-    def hex_code(self, value:str) -> None:
+    def hex_code(self, value:str | None) -> None:
 
         if not isinstance(value, str):
             msg = f"The hex code must be a string. Got a {type(value).__name__} instead."
@@ -116,11 +116,6 @@ class Color:
 
     @name.setter
     def name(self, value: str| None) -> None:
-
-        if value is None:
-            self.__hex_code = "#FFFFFF"
-            self.__name = "white"
-            return
 
         if not isinstance(value, str):
             msg = f"The color name must be a string. Got a {type(value).__name__} instead."

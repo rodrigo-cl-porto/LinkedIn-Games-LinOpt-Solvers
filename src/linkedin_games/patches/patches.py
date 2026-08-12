@@ -1,3 +1,4 @@
+from typing import Any
 from pprint import pprint
 
 import matplotlib.pyplot as plt
@@ -27,8 +28,7 @@ class Patches(ColorGeneratorMixin, GameBoard):
         - A rectangle must cover only one seed;
         - The area of all rectangles must be greater than 1 square on the board.
     """
-
-    def __init__(self, size:int, seeds: dict[tuple[int, int], dict[str, str | int | None] | None]) -> object:
+    def __init__(self, size:int, seeds: dict[tuple[int, int], dict[str, Any] | None]) -> object:
         """
         Args:
             size: The side length of the game.
@@ -59,7 +59,7 @@ class Patches(ColorGeneratorMixin, GameBoard):
 
 
     @property
-    def seeds(self) -> dict[tuple[int, int], dict[str, str | int | None]]:
+    def seeds(self) -> dict[tuple[int, int], dict[str, Any]]:
         """
         The seeds of the game.
         
@@ -76,7 +76,7 @@ class Patches(ColorGeneratorMixin, GameBoard):
         }
 
 
-    def __set_seeds(self, seeds: dict[tuple[int, int], dict[str, str | int | None] | None]) -> None:
+    def __set_seeds(self, seeds: dict[tuple[int, int], dict[str, Any] | None]) -> None:
 
         if not isinstance(seeds, dict):
             msg = f"seeds must be a dictionary. Got {type(seeds).__name__} instead."
@@ -86,42 +86,30 @@ class Patches(ColorGeneratorMixin, GameBoard):
             msg = "seeds cannot be empty!"
             raise ValueError(msg)
 
-        seeds = {
-            square: (
-                {"color": None, "area": None, "shape": None} if seed is None
-                else {
-                    "color": seed["color"] if seed.get("color") not in (None, "") else None,
-                    "area": seed.get("area"),
-                    "shape": seed.get("shape")
-                }
+        rectangle_seeds = [
+            RectangleSeed(
+                square=square,
+                color=seed.get("color") if seed is not None else None,
+                area=seed.get("area") if seed is not None else None,
+                shape=seed.get("shape") if seed is not None else None
             ) for square, seed in seeds.items()
-        }
+        ]
 
-        colors = [seed["color"] for seed in seeds.values() if seed["color"] is not None]
+        colors = [seed.color_code for seed in rectangle_seeds if seed.color_code != "#FFFFFF"]
         if len(colors) != len(set(colors)):
             msg = "There must not be two or more seeds with the same color."
             raise ValueError(msg)
 
-        if len(colors) < len(seeds):
-            for seed in seeds.values():
-                if seed["color"] is None:
+        if len(colors) < len(rectangle_seeds):
+            for seed in rectangle_seeds:
+                if seed.color_code == "#FFFFFF":
                     random_color = self._generate_hex_code()
                     while random_color in colors:
                         random_color = self._generate_hex_code()
-                    if seed is None:
-                        seed = {"color": random_color}
-                    else:
-                        seed["color"] = random_color
+                    seed.color = random_color
                     colors.append(random_color)
 
-        self.__seeds = [
-            RectangleSeed(
-                color=seed["color"],
-                square=square,
-                area=seed["area"],
-                shape=seed["shape"]
-            ) for square, seed in seeds.items()
-        ]
+        self.__seeds =  rectangle_seeds
 
         nx.set_node_attributes(self._board, "#FFFFFF", name="value")
         nx.set_node_attributes( # Adding a color for each square on the board
@@ -151,17 +139,13 @@ class Patches(ColorGeneratorMixin, GameBoard):
 
     def _set_solution(self, verbose:bool = False) -> None:
 
-        u = self.model.u
-        v = self.model.v
-        I = self.model.I
-        J = self.model.J
         for seed in self.__seeds:
             k = seed.color_code
             seed.rectangle = {
-                "top": min(i for i in I if pyo.value(u[i,k]) > 0.5),
-                "left": min(j for j in J if pyo.value(v[j,k]) > 0.5),
-                "height": pyo.quicksum(round(pyo.value(u[i,k])) for i in I),
-                "width": pyo.quicksum(round(pyo.value(v[j,k])) for j in J),
+                "top": round(pyo.value(self.model.t[k])),
+                "left": round(pyo.value(self.model.l[k])),
+                "height": round(pyo.value(self.model.h[k])),
+                "width": round(pyo.value(self.model.w[k]))
             }
         
         nx.set_node_attributes(

@@ -76,15 +76,15 @@ class PatchesModel(pyo.ConcreteModel):
             S, rule=lambda model, i, j: pyo.quicksum(x[i, j, k] for k in K) == 1
         )
 
-        ## Board-Boundaries Constraints
-        self.top_row_constraints = pyo.Constraint(
+        ## Board Boundaries Constraints
+        self.bottom_row_constraints = pyo.Constraint(
             K, rule=lambda model, k: t[k] + h[k] - 1 <= m
         )
-        self.leftmost_column_constraints = pyo.Constraint(
+        self.rightmost_column_constraints = pyo.Constraint(
             K, rule=lambda model, k: l[k] + w[k] - 1 <= n
         )
         
-        ## Boundaries Constraints
+        ## Rectangle Boundaries Constraints
         self.top_boundary_constraints = pyo.Constraint(
             I, K, rule=lambda model, i, k: t[k] - i <= m * (1 - u[i,k])
         )
@@ -125,11 +125,11 @@ class PatchesModel(pyo.ConcreteModel):
             A, rule=lambda model, k: pyo.quicksum(x[i, j, k] for (i, j) in S) == a[k]
         )
         self.vertical_rectangles_constraints = pyo.Constraint(
-            V, rule=lambda model, k: pyo.quicksum(u[i,k] for i in I) >= pyo.quicksum(v[j,k] for j in J) + 1
+            V, rule=lambda model, k: h[k] >= w[k] + 1
         )
         self.horizontal_rectangles_constraints = pyo.Constraint(
-            H, rule=lambda model, k: pyo.quicksum(v[j,k] for j in J) >= pyo.quicksum(u[i,k] for i in I) + 1
+            H, rule=lambda model, k: w[k] >= h[k] + 1
         )
         self.square_rectangles_constraints = pyo.Constraint(
-            Q, rule=lambda model, k: pyo.quicksum(u[i,k] for i in I) == pyo.quicksum(v[j,k] for j in J)
+            Q, rule=lambda model, k: h[k] == w[k]
         )
