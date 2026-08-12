@@ -43,7 +43,7 @@ class ZipModel(TaxicabDistanceMixin, pyo.ConcreteModel):
         x = self.x = pyo.Var(E, domain=pyo.Binary, initialize=0) # Decision to go from square (i,j) to (r,s)
         u = self.u = pyo.Var( # Visitiation order of a square (i, j)
             S, domain=pyo.PositiveIntegers, initialize=1, bounds=(1, M)
-        ) 
+        )
 
         # OBJECTIVE FUNCTION
         self.obj = pyo.Objective(expr=0) # feasibility problem

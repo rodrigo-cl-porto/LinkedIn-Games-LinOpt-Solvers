@@ -41,6 +41,21 @@ class PatchesModel(pyo.ConcreteModel):
             initialize=[seed.color_code for seed in seeds if seed.area is not None], domain=K
         )
 
+        # DECISION VARIABLES
+        ## Integer variables
+        t = self.t = pyo.Var( # Index of the top row of the rectangle k
+            K, domain=pyo.PositiveIntegers, initialize=1, bounds=(1, m)
+        )
+        l = self.l = pyo.Var( # Index of the leftmost column of the rectangle k
+            K, domain=pyo.PositiveIntegers, initialize=1, bounds=(1, n)
+        )
+        h = self.h = pyo.Var( # Height of rectangle k
+            K, domain=pyo.PositiveIntegers, initialize=1, bounds=(1, m)
+        )
+        w = self.w = pyo.Var( # Width of rectangle k
+            K, domain=pyo.PositiveIntegers, initialize=1, bounds=(1, n)
+        )
+
         ## Binary variables
         u = self.u = pyo.Var(I, K, domain=pyo.Binary, initialize=0) # u_ik = 1 if row i passes through rectangle k
         v = self.v = pyo.Var(J, K, domain=pyo.Binary, initialize=0) # v_jk = 1 if column j passes through rect k
@@ -61,16 +76,34 @@ class PatchesModel(pyo.ConcreteModel):
             S, rule=lambda model, i, j: pyo.quicksum(x[i, j, k] for k in K) == 1
         )
 
-        ## Contiguity constraints
-        self.row_contiguity_constraints = pyo.Constraint(
-            pyo.RangeSet(1, m-2), pyo.RangeSet(3, m), K, rule=lambda model, i1, i2, k:
-                u[i1, k] - pyo.quicksum(u[i,k] for i in range(i1+1, i2)) + u[i2, k] <= 1
-                if i2 - i1 > 1 else pyo.Constraint.Skip
+        ## Board-Boundaries Constraints
+        self.top_row_constraints = pyo.Constraint(
+            K, rule=lambda model, k: t[k] + h[k] - 1 <= m
         )
-        self.column_contiguity_contraints = pyo.Constraint(
-            pyo.RangeSet(1, n-2), pyo.RangeSet(3, n), K, rule=lambda model, j1, j2, k:
-                v[j1, k] - pyo.quicksum(v[j,k] for j in range(j1+1, j2)) + v[j2, k] <= 1
-                if j2 - j1 > 1 else pyo.Constraint.Skip
+        self.leftmost_column_constraints = pyo.Constraint(
+            K, rule=lambda model, k: l[k] + w[k] - 1 <= n
+        )
+        
+        ## Boundaries Constraints
+        self.top_boundary_constraints = pyo.Constraint(
+            I, K, rule=lambda model, i, k: t[k] - i <= m * (1 - u[i,k])
+        )
+        self.bottom_boundary_constraints = pyo.Constraint(
+            I, K, rule=lambda model, i, k: i - (t[k] + h[k] - 1) <= m * (1 - u[i,k])
+        )
+        self.left_boundary_constraints = pyo.Constraint(
+            J, K, rule=lambda model, j, k: l[k] - j <= n * (1 - v[j,k])
+        )
+        self.right_boundary_constraints = pyo.Constraint(
+            J, K, rule=lambda model, j, k: j - (l[k] + w[k] - 1) <= n * (1 - v[j,k])
+        )
+
+        ## Rectangle Dimensions constraints
+        self.height_constraints = pyo.Constraint(
+            K, rule=lambda model, k: pyo.quicksum(u[i,k] for i in I) == h[k]
+        )
+        self.width_constraints = pyo.Constraint(
+            K, rule=lambda model, k: pyo.quicksum(v[j,k] for j in J) == w[k]
         )
 
         ## McCormick Linearization constraints
