@@ -160,19 +160,23 @@ class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameBoard):
             return None
         return self.__path
 
+
     def _set_solution(self, verbose:bool=False) -> None:
+
+        S = self.model.S
+        E = self.model.E
+        u = self.model.u
+        x = self.model.x
+
         nx.set_node_attributes(
             self.board,
             name="value",
-            values={(i-1, j-1): round(pyo.value(self.model.u[i,j])) for i, j in self.model.S}
+            values={(i-1, j-1): round(pyo.value(u[i,j])) for i, j in S}
         )
         nx.set_edge_attributes(
             self.board,
             name="value",
-            values={
-                ((i-1, j-1), (r-1, s-1)): round(pyo.value(self.model.x[i,j,r,s]))
-                for i, j, r, s in self.model.E
-            }
+            values={((i-1, j-1), (r-1, s-1)): round(pyo.value(x[i,j,r,s])) for i, j, r, s in E}
         )
         path = nx.get_node_attributes(self.board, "value")
         path = sorted(path.keys(), key=path.get)
@@ -184,11 +188,16 @@ class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameBoard):
 
     def show(self) -> None:
         """Show Zip's board."""
-        
+
+        E = self.model.E
+        N = self.model.N
+        K = self.model.K
+        x = self.model.x
+
         width = height = self.size * 0.7
         plt.figure(figsize=(width, height))
         path_color = super()._generate_hex_code()
-        labels = {self.model.N[k]: k for k in self.model.K}
+        labels = {N[k]: k for k in K}
         labels = {(i-1, j-1): k for (i,j), k in labels.items()}
         pos={(i,j): (j,-i) for i, j in self.board.nodes()}
 
@@ -231,8 +240,8 @@ class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameBoard):
             linewidths= 1,
             width= 30,
             edgelist= [
-                ((i-1, j-1), (r-1, s-1)) for i,j,r,s in self.model.E
-                if round(pyo.value(self.model.x[i,j,r,s])) == 1
+                ((i-1, j-1), (r-1, s-1)) for i,j,r,s in E
+                if round(pyo.value(x[i,j,r,s])) == 1
             ]
         )
 

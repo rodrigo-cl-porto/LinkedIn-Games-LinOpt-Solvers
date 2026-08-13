@@ -192,10 +192,12 @@ class Tango(TaxicabDistanceMixin, GameBoard):
 
 
     def _set_solution(self, verbose:bool=False) -> None:
+        S= self.model.S
+        x = self.model.x
         nx.set_node_attributes(
             self._board,
             name="value",
-            values={(i-1, j-1): round(pyo.value(self.model.x[i,j])) for i, j in self.model.S}
+            values={(i-1, j-1): round(pyo.value(x[i,j])) for i, j in S}
         )
         if verbose:
             print("Tango solution:")
@@ -204,6 +206,10 @@ class Tango(TaxicabDistanceMixin, GameBoard):
 
     def show(self) -> None:
         """Show Tango's board."""
+
+        O = self.model.O
+        M = self.model.M
+
         plt.figure(figsize=(3, 3))
         pos = {(i, j): (j, -i) for i, j in self.board.nodes()}
         nx.draw(
@@ -222,15 +228,15 @@ class Tango(TaxicabDistanceMixin, GameBoard):
             linewidths=1,
             width=0,
             edgelist=
-                [((i-1, j-1), (r-1,s-1)) for i,j,r,s in self.model.O] +
-                [((i-1, j-1), (r-1,s-1)) for i,j,r,s in self.model.M]
+                [((i-1, j-1), (r-1, s-1)) for i,j,r,s in O] +
+                [((i-1, j-1), (r-1, s-1)) for i,j,r,s in M]
         )
         nx.draw_networkx_edge_labels(
             self._board,
             pos= pos,
             edge_labels=
-                {((i-1, j-1), (r-1,s-1)): "×" for i,j,r,s in self.model.O} |
-                {((i-1, j-1), (r-1,s-1)): "=" for i,j,r,s in self.model.M},
+                {((i-1, j-1), (r-1, s-1)): "×" for i,j,r,s in O} |
+                {((i-1, j-1), (r-1, s-1)): "=" for i,j,r,s in M},
             font_color="#887658"
         )
         plt.show()

@@ -106,6 +106,7 @@ paths = ["src"]
 [project.plugins.mkdocstrings.handlers.python.options]
 docstring_style = "google"
 inherited_members = true
+show_bases = false
 show_source = false
 summary = true
 group_by_category = true

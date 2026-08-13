@@ -164,7 +164,7 @@ class GeneralSudoku(GameBoard):
         nx.set_node_attributes(
             self.board,
             name="value",
-            values= {(i-1, j-1): k for (i, j) in S for k in K if int(pyo.value(x[i, j, k])) == 1}
+            values= {(i-1, j-1): k for (i, j) in S for k in K if round(pyo.value(x[i, j, k])) == 1}
         )
         if verbose:
             print("These are the digits for each square:")

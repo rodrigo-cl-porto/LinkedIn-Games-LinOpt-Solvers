@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Literal
 from pprint import pprint
 
 import matplotlib.pyplot as plt
@@ -9,6 +9,7 @@ from ..core._color_generator_mixin import ColorGeneratorMixin
 from ..core._game_board import GameBoard
 from ._model import PatchesModel
 from ._rectangle_seed import RectangleSeed
+from ._seed_type import Seed
 
 
 class Patches(ColorGeneratorMixin, GameBoard):
@@ -28,12 +29,23 @@ class Patches(ColorGeneratorMixin, GameBoard):
         - A rectangle must cover only one seed;
         - The area of all rectangles must be greater than 1 square on the board.
     """
-    def __init__(self, size:int, seeds: dict[tuple[int, int], dict[str, Any] | None]) -> object:
+    def __init__(self, size:int, seeds: dict[tuple[int, int], Seed | None]) -> object:
         """
         Args:
             size: The side length of the game.
-            seeds: Rectangle seeds on board as a dictionary of
-                `(row, column): {"color": color, "area": area, "shape": shape}` items.
+            seeds: Rectangle seeds on board as a dictionary of items as:
+                ```python
+                (row, column) : {
+                    "color": str | None, # optional
+                    "area": int | None, # optional
+                    "shape": Literal[ # optional
+                        "vertical",
+                        "horizontal",
+                        "square",
+                        "any"
+                    ] | None
+                } | None
+                ```
         
         Raises:
             TypeError: if type inputs are not respected.
@@ -59,13 +71,24 @@ class Patches(ColorGeneratorMixin, GameBoard):
 
 
     @property
-    def seeds(self) -> dict[tuple[int, int], dict[str, Any]]:
+    def seeds(self) -> dict[tuple[int, int], dict[Literal["color", "shape", "area"], str | int | None]]:
         """
         The seeds of the game.
         
         Returns:
-            All the information about the seeds as a dictionary of
-                `(row, column): {"color": color, "area": area, "shape": shape}` items.
+            All the information about the seeds as a dictionary of items as
+                ```python
+                (row: int, column: int): {
+                    "color": str       # color name or hex code as #RRGGBB,
+                    "area": int | None # required area,
+                    "shape": Literal[  # rectangle shape
+                        "vertical",
+                        "horizontal",
+                        "square",
+                        "any"
+                    ]
+                }
+                ```
         """
         return {
             seed.square : {
@@ -76,7 +99,7 @@ class Patches(ColorGeneratorMixin, GameBoard):
         }
 
 
-    def __set_seeds(self, seeds: dict[tuple[int, int], dict[str, Any] | None]) -> None:
+    def __set_seeds(self, seeds: dict[tuple[int, int], Seed | None]) -> None:
 
         if not isinstance(seeds, dict):
             msg = f"seeds must be a dictionary. Got {type(seeds).__name__} instead."
