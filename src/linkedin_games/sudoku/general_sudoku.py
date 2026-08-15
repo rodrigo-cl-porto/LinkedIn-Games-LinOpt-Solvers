@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-from ..core._game_board import GameBoard
+from .._core._game_board import GameBoard
 from ._model import SudokuModel
 
 

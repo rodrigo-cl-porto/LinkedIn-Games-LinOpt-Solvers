@@ -1,4 +1,4 @@
-from .general_sudoku import GeneralSudoku
+from ..sudoku.general_sudoku import GeneralSudoku
 
 
 class MiniSudoku(GeneralSudoku):
@@ -14,7 +14,6 @@ class MiniSudoku(GeneralSudoku):
         Each row, column, and 2x3 block must be filled with a digit from 1 to 6,
         without repetition in each row, column, or block.
     """
-    
     def __init__(self, filled_squares: dict[tuple[int, int], int]) -> None:
         """
         Args:

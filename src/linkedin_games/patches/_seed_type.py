@@ -1,13 +1,13 @@
 from typing import TypedDict, Literal
 
-from ._rectangle_shape import RectangleShape
+from ._patch_shape import PatchShape
 
 class Seed(TypedDict, total=False):
     color: str | None
     area: int | None
     shape: Literal[
-        RectangleShape.VERTICAL,
-        RectangleShape.HORIZONTAL,
-        RectangleShape.SQUARE,
-        RectangleShape.ANY
+        PatchShape.VERTICAL,
+        PatchShape.HORIZONTAL,
+        PatchShape.SQUARE,
+        PatchShape.ANY
     ] | None

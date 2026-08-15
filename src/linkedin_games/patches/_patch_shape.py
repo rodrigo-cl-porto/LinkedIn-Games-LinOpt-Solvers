@@ -1,7 +1,7 @@
 from enum import StrEnum
 
 
-class RectangleShape(StrEnum):
+class PatchShape(StrEnum):
     """Valid rectangle shape required by a Patches seed."""
     ANY = "any"
     VERTICAL = "vertical"

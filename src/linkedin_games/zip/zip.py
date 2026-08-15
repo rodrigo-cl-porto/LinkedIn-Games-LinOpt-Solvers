@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-from ..core._color_generator_mixin import ColorGeneratorMixin
-from ..core._taxicab_distance_mixin import TaxicabDistanceMixin
-from ..core._game_board import GameBoard
+from .._core._game_board import GameBoard
+from .._mixin._color_generator_mixin import ColorGeneratorMixin
+from .._mixin._taxicab_distance_mixin import TaxicabDistanceMixin
 from ._model import ZipModel
 
 
@@ -197,7 +197,7 @@ class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameBoard):
         width = height = self.size * 0.7
         plt.figure(figsize=(width, height))
         path_color = super()._generate_hex_code()
-        labels = {N[k]: k for k in K}
+        labels = {N.at(k): k for k in K}
         labels = {(i-1, j-1): k for (i,j), k in labels.items()}
         pos={(i,j): (j,-i) for i, j in self.board.nodes()}
 

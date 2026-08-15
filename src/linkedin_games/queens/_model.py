@@ -1,7 +1,6 @@
 import pyomo.environ as pyo
 
 
-
 class QueensModel(pyo.ConcreteModel):
     """The Linear Optimization model for the Queens game."""
 

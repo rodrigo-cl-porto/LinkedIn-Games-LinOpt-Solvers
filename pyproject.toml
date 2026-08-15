@@ -1,6 +1,6 @@
 [project]
 name = "linkedin-games"
-version = "0.1.0"
+version = "0.1.1"
 description = "A Python package for solving LinkedIn board games like Queens, Tango, Zip, Mini Sudoku and Patches using Linear Optimization models."
 keywords = [
     "LinkedIn Games",

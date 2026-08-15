@@ -5,29 +5,27 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-from ..core._color_generator_mixin import ColorGeneratorMixin
-from ..core._game_board import GameBoard
-from ._model import PatchesModel
+from .._core._game_board import GameBoard
+from .._mixin._color_generator_mixin import ColorGeneratorMixin
+from ._model import ShikakuModel
 from ._rectangle_seed import RectangleSeed
 from ._seed_type import Seed
 
 
 class Shikaku(ColorGeneratorMixin, GameBoard):
     """
-    The [LinkedIn Patches](https://www.linkedin.com/games/patches/) game.
+    The Shikaku game.
     
-    A game board with some colored rectangle seeds that may state some features about the rectangles
-        to be built on the board, such as a required area (optional) or a required shape
-        (which can be a `vertical` rectangle, a `horizontal` rectangle, a `square` or any shape).
+    A game board with some numbered squares that states the rectangles' areas
+        to be built on the board.
 
     Objective:
-        Partition the board into non-overlapping rectangular patches so that each patch meets
-        the prescriptions on their respective seeds.
+        Partition the board into non-overlapping rectangular figures so that each geometric shape
+        covers the numbered square with a area that matches the number on its numbered square.
     
     Rules:
-        - Each seed must be covered by only one rectangle that attends its prescriptions;
+        - Each numbered square (seed) must be covered by only one rectangle that has a area equal to its number;
         - A rectangle must cover only one seed;
-        - The area of all rectangles must be greater than 1 square on the board.
     """
     def __init__(self,
             size:int,
@@ -36,19 +34,20 @@ class Shikaku(ColorGeneratorMixin, GameBoard):
         """
         Args:
             size: The side length of the game.
-            seeds: Rectangle seeds on board as a dictionary of items as `(row, column) : area` or as `(row, column) : {"color": str, "area": int}`.
+            seeds: Rectangle seeds on board as a dictionary of items as
+                `(row, column) : area` or as `(row, column) : {"color": str, "area": int}`.
         
         Raises:
             TypeError: if type inputs are not respected.
             ValueError: If there are some seeds with the same color.
         """
         super().__init__(board_dims=(size, size))
-        self.__set_seeds(seeds)
-        self._model = PatchesModel(self.board_dims, self.__seeds)
+        self._set_seeds(seeds)
+        self._set_model()
 
 
     def __hash__(self) -> int:
-        return hash((self._board_dims, self.__seeds))
+        return hash((self._board_dims, self._seeds))
 
 
     @property
@@ -80,14 +79,12 @@ class Shikaku(ColorGeneratorMixin, GameBoard):
             seed.square : {
                 "color": seed.color_code,
                 "area": seed.area
-            } for seed in self.__seeds
+            } for seed in self._seeds
         }
 
-
-    def __set_seeds(self,
-            seeds: dict[tuple[int, int], int | dict[Literal["color", "area"], str | int]]
-        ) -> None:
-
+    
+    def _set_seeds(self, seeds: dict[tuple[int, int], Seed | None]) -> None:
+    
         if not isinstance(seeds, dict):
             msg = f"seeds must be a dictionary. Got {type(seeds).__name__} instead."
             raise TypeError(msg)
@@ -96,29 +93,8 @@ class Shikaku(ColorGeneratorMixin, GameBoard):
             msg = "seeds cannot be empty!"
             raise ValueError(msg)
 
-        rectangle_seeds = [
-            RectangleSeed(
-                square=square,
-                color=seed.get("color") if isinstance(seed, dict) else None,
-                area=seed if isinstance(seed, int) else seed.get("area"),
-            ) for square, seed in seeds.items()
-        ]
-
-        colors = [seed.color_code for seed in rectangle_seeds if seed.color_code != "#FFFFFF"]
-        if len(colors) != len(set(colors)):
-            msg = "There must not be two or more seeds with the same color."
-            raise ValueError(msg)
-
-        if len(colors) < len(rectangle_seeds):
-            for seed in rectangle_seeds:
-                if seed.color_code == "#FFFFFF":
-                    random_color = self._generate_hex_code()
-                    while random_color in colors:
-                        random_color = self._generate_hex_code()
-                    seed.color = random_color
-                    colors.append(random_color)
-
-        self.__seeds =  rectangle_seeds
+        rectangle_seeds = self._build_rectangle_seed_list(seeds)
+        self._seeds = self.__set_seed_colors(rectangle_seeds)
 
         nx.set_node_attributes(self._board, "#FFFFFF", name="value")
         nx.set_node_attributes( # Adding a color for each square on the board
@@ -126,9 +102,43 @@ class Shikaku(ColorGeneratorMixin, GameBoard):
             name="value",
             values={
                 tuple(i-1 for i in seed.square): seed.color
-                for seed in self.__seeds
+                for seed in self._seeds
             }
         )
+
+
+    def _set_model(self) -> None:
+        self._model = ShikakuModel(self.board_dims, self._seeds)
+
+
+    @staticmethod
+    def _build_rectangle_seed_list(seeds: dict[tuple[int, int], Seed | None]) -> list[RectangleSeed]:
+        return [
+            RectangleSeed(
+                square=square,
+                color=seed.get("color") if isinstance(seed, dict) else None,
+                area=seed if isinstance(seed, int) else seed.get("area"),
+            ) for square, seed in seeds.items()
+        ]
+    
+    
+    def __set_seed_colors(self, seeds: list[RectangleSeed]) -> list[RectangleSeed]:
+        colors = [seed.color_code for seed in seeds if seed.color_code != "#FFFFFF"]
+        if len(colors) != len(set(colors)):
+            msg = "There must not be two or more seeds with the same color."
+            raise ValueError(msg)
+
+        if len(colors) < len(seeds):
+            for seed in seeds:
+                if seed.color_code == "#FFFFFF":
+                    random_color = self._generate_hex_code()
+                    while random_color in colors:
+                        random_color = self._generate_hex_code()
+                    seed.color = random_color
+                    colors.append(random_color)
+        
+        return seeds
+
 
     @property
     def rectangles(self) -> list[dict[str, str | tuple[int, int]]] | None:
@@ -142,13 +152,13 @@ class Shikaku(ColorGeneratorMixin, GameBoard):
         if not self.is_solved:
             return None
         return sorted(
-            [seed.rectangle.to_dict() for seed in self.__seeds],
+            [seed.rectangle.to_dict() for seed in self._seeds],
             key=lambda x: x["top_left"]
         )
 
     def _set_solution(self, verbose:bool = False) -> None:
 
-        for seed in self.__seeds:
+        for seed in self._seeds:
             k = seed.color_code
             seed.rectangle = {
                 "top": round(pyo.value(self.model.t[k])),
@@ -162,7 +172,7 @@ class Shikaku(ColorGeneratorMixin, GameBoard):
             name="value",
             values={
                 (i-1, j-1): seed.color_code
-                for seed in self.__seeds for (i,j) in seed.rectangle.squares
+                for seed in self._seeds for (i,j) in seed.rectangle.squares
             }
         )
 

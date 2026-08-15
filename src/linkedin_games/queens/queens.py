@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-from ..core._color_generator_mixin import ColorGeneratorMixin
-from ..core._game_board import GameBoard
+from .._core._game_board import GameBoard
+from .._mixin._color_generator_mixin import ColorGeneratorMixin
 from ._model import QueensModel
 from ._region import Region
 

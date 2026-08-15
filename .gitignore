@@ -1,3 +1,6 @@
+# Binder folder
+binder/
+
 # Environment variables
 *.env
 

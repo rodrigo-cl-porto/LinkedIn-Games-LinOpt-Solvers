@@ -1,4 +1,4 @@
-from ..core._color import Color
+from .._core._color import Color
 
 
 class Region:

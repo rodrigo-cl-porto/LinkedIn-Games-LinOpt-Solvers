@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-from ..core._game_board import GameBoard
-from ..core._taxicab_distance_mixin import TaxicabDistanceMixin
+from .._core._game_board import GameBoard
+from .._mixin._taxicab_distance_mixin import TaxicabDistanceMixin
 from ._model import TangoModel
 
 

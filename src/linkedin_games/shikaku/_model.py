@@ -98,10 +98,10 @@ class ShikakuModel(pyo.ConcreteModel):
 
         ## McCormick Linearization constraints
         self.cutout_row_constraints = pyo.Constraint(
-            I, K, rule=lambda model, i, j, k: pyo.quicksum(x[i,j,k] for j in J) <= m * u[i,k]
+            I, K, rule=lambda model, i, k: pyo.quicksum(x[i,j,k] for j in J) <= n * u[i,k]
         )
         self.cutout_column_constraints = pyo.Constraint(
-            J, K, rule=lambda model, i, j, k: pyo.quicksum(x[i,j,k] for i in I) <= n * v[j,k]
+            J, K, rule=lambda model, j, k: pyo.quicksum(x[i,j,k] for i in I) <= m * v[j,k]
         )
         self.square_activation_constraints = pyo.Constraint(
             I, J, K, rule=lambda model, i, j, k: x[i,j,k] >= u[i,k] + v[j,k] - 1

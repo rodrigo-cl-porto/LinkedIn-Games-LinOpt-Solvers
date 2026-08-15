@@ -1,4 +1,4 @@
-from ..core._taxicab_distance_mixin import TaxicabDistanceMixin
+from .._mixin._taxicab_distance_mixin import TaxicabDistanceMixin
 import pyomo.environ as pyo
 
 
@@ -63,12 +63,12 @@ class ZipModel(TaxicabDistanceMixin, pyo.ConcreteModel):
         }
         self.outgoing_edges_constraints = pyo.Constraint(
             S, rule=lambda model, i, j:
-                pyo.quicksum(x[(i,j), w] for w in neighbors[(i,j)]) == 0 if N[len(K)] == (i,j) else
+                pyo.quicksum(x[(i,j), w] for w in neighbors[(i,j)]) == 0 if N.at(len(K)) == (i,j) else
                 pyo.quicksum(x[(i,j), w] for w in neighbors[(i,j)]) == 1
         )
         self.incoming_edges_constraints = pyo.Constraint(
             S, rule=lambda model, i, j:
-                pyo.quicksum(x[s, (i,j)] for s in neighbors[(i,j)]) == 0 if N[1] == (i,j) else
+                pyo.quicksum(x[s, (i,j)] for s in neighbors[(i,j)]) == 0 if N.at(1) == (i,j) else
                 pyo.quicksum(x[s, (i,j)] for s in neighbors[(i,j)]) == 1
         )
 
@@ -85,7 +85,7 @@ class ZipModel(TaxicabDistanceMixin, pyo.ConcreteModel):
         ## Visitation order constraints
         self.visitation_order_constraints = pyo.Constraint(
             K, rule= lambda model, k:
-                u[N[k]] == 1 if k == 1 else
-                u[N[k]] == M if k == len(N) else
-                u[N[k]] >= u[N[k-1]] + self._taxicab_distance(N[k], N[k-1])
+                u[N.at(k)] == 1 if k == 1 else
+                u[N.at(k)] == M if k == len(N) else
+                u[N.at(k)] >= u[N.at(k-1)] + self._taxicab_distance(N.at(k), N.at(k-1))
         )
