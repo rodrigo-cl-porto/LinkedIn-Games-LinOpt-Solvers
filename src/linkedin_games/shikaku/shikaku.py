@@ -107,10 +107,6 @@ class Shikaku(ColorGeneratorMixin, GameBoard):
         )
 
 
-    def _set_model(self) -> None:
-        self._model = ShikakuModel(self.board_dims, self._seeds)
-
-
     @staticmethod
     def _build_rectangle_seed_list(seeds: dict[tuple[int, int], Seed | None]) -> list[RectangleSeed]:
         return [
@@ -138,6 +134,10 @@ class Shikaku(ColorGeneratorMixin, GameBoard):
                     colors.append(random_color)
         
         return seeds
+
+
+    def _set_model(self) -> None:
+        self._model = ShikakuModel(self.board_dims, self._seeds)
 
 
     @property
