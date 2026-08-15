@@ -3,6 +3,7 @@
     "astral-sh.ty",
     "charliermarsh.ruff",
     "oderwat.indent-rainbow",
-    "ms-python.python"
+    "gerane.theme-dark-dracula",
+    "vscode-icons-team.vscode-icons"
   ]
 }
