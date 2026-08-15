@@ -5,6 +5,7 @@
 src/
 docs/
 tests/
+binder/
 
 # VS Code settings
 .vscode
