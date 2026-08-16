@@ -7,7 +7,7 @@ readme = "README.md"
 license = { file = "LICENSE.md" }
 requires-python = ">=3.13"
 dependencies = [
-    "linkedin-games>=0.1.0rc3",
+    "linkedin-games>=0.1.1",
 ]
 
 [tool.hatch.build.targets.wheel]
