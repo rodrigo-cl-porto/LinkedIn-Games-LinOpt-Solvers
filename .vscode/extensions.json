@@ -4,6 +4,8 @@
     "charliermarsh.ruff",
     "oderwat.indent-rainbow",
     "gerane.theme-dark-dracula",
-    "vscode-icons-team.vscode-icons"
+    "vscode-icons-team.vscode-icons",
+    "shellomo.enhanced-toml",
+    "redhat.vscode-yaml"
   ]
 }
