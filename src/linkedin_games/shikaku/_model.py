@@ -1,34 +1,35 @@
+from typing import Any
 import pyomo.environ as pyo
-from ._rectangle_seed import RectangleSeed
 
 
 class ShikakuModel(pyo.ConcreteModel):
     """The Linear Optimization model for the Shikaku game."""
 
-    def __init__(self, board_dims: tuple[int, int], seeds: list[RectangleSeed]) -> object:
+    def __init__(self, grid_dims: tuple[int, int], seeds: list[dict[str, Any]]) -> object:
         """
         Args:
-            board_dims: Board dimensionas as `(rows, columns)` tuple.
-            seeds: Rectangle seeds on board as a dictionary of
-                `(row, column): {"color": color, "area": area, "shape": shape}`.
+            grid_dims: Grid dimensions as `(rows, columns)` tuple.
+            seeds: Rectangle seeds on grid as a dictionary of items as
+                `(row, column): area` or
+                `(row, column): {"color": str, "area": int}`.
         """
         super().__init__()
 
         # BOARD DIMENSIONS
-        m, n = board_dims
+        m, n = grid_dims
         self.m = pyo.Param(initialize=m, domain=pyo.PositiveIntegers)
         self.n = pyo.Param(initialize=n, domain=pyo.PositiveIntegers)
 
         # RANGE SETS
         I = self.I = pyo.RangeSet(m) # Rows
         J = self.J = pyo.RangeSet(n) # Columns
-        K = self.K = pyo.Set(initialize=(seed.color_code for seed in seeds)) # Rectangles
+        K = self.K = pyo.Set(initialize=(seed["color_code"] for seed in seeds)) # Rectangles
 
         # COMPOSITE SETS
-        S = self.S = pyo.Set(initialize=lambda model: [(i,j) for i in I for j in J]) # Board Squares
-        E = self.E = pyo.Set(initialize=[(*seed.square, seed.color_code) for seed in seeds]) # Rectangle Seeds
+        S = self.S = pyo.Set(initialize=lambda model: [(i,j) for i in I for j in J]) # Grid Squares
+        E = self.E = pyo.Set(initialize=[(*seed["square"], seed["color_code"]) for seed in seeds]) # Rectangle Seeds
         A = self.A = pyo.Set( # Rectangles with required area
-            initialize=[seed.color_code for seed in seeds if seed.area is not None], domain=K
+            initialize=[seed["color_code"] for seed in seeds if seed["area"] is not None], domain=K
         )
 
         # DECISION VARIABLES
@@ -54,7 +55,7 @@ class ShikakuModel(pyo.ConcreteModel):
         # PARAMETERS
         a = self.a = pyo.Param( # Required areas
             K, domain=pyo.PositiveIntegers,
-            initialize={seed.color_code: seed.area for seed in seeds if seed.area is not None}
+            initialize={seed["color_code"]: seed["area"] for seed in seeds if seed["area"] is not None}
         )
 
         # OBJECTIVE FUNCTION
@@ -66,7 +67,7 @@ class ShikakuModel(pyo.ConcreteModel):
             S, rule=lambda model, i, j: pyo.quicksum(x[i, j, k] for k in K) == 1
         )
 
-        ## Board Boundaries Constraints
+        ## Grid Boundaries Constraints
         self.bottom_row_constraints = pyo.Constraint(
             K, rule=lambda model, k: t[k] + h[k] - 1 <= m
         )
@@ -103,7 +104,7 @@ class ShikakuModel(pyo.ConcreteModel):
         self.cutout_column_constraints = pyo.Constraint(
             J, K, rule=lambda model, j, k: pyo.quicksum(x[i,j,k] for i in I) <= m * v[j,k]
         )
-        self.square_activation_constraints = pyo.Constraint(
+        self.square_coverage_constraints = pyo.Constraint(
             I, J, K, rule=lambda model, i, j, k: x[i,j,k] >= u[i,k] + v[j,k] - 1
         )
 

@@ -10,11 +10,11 @@ class RectangleSeed:
     def __init__(self,
             square: tuple[int, int],
             color: str | None = "#FFFFFF",
-            area: int | None = None
+            area: int = 1
         ) -> object:
         """
         Args:
-            square: The board position of the seed as a `(row, column)` tuple.
+            square: The grid position of the seed as a `(row, column)` tuple.
             area: The required area of the rectangle to be built.
             color: The seed's color name or its hex code as a `#RRGGBB` string.
         """

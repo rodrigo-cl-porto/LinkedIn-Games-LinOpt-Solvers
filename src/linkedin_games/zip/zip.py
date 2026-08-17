@@ -4,20 +4,20 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-from .._core._game_board import GameBoard
+from .._core._game_grid import GameGrid
 from .._mixin._color_generator_mixin import ColorGeneratorMixin
 from .._mixin._taxicab_distance_mixin import TaxicabDistanceMixin
 from ._model import ZipModel
 
 
-class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameBoard):
+class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameGrid):
     """
     The [LinkedIn Zip](https://www.linkedin.com/games/zip/) game.
     
-    A game board with some numbered squares and walls (walls are optional).
+    A game grid with some numbered squares and walls (walls are optional).
     
     Objective:
-        To trace a single path that runs through all the board squares.
+        To trace a single path that runs through all the grid squares.
 
     Rule:
         The path must move through numbered squares in ascending order,
@@ -26,7 +26,8 @@ class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameBoard):
     def __init__(self,
             size:int,
             numbered_squares: list[tuple[int, int]],
-            walls: list[tuple[tuple[int, int], tuple[int, int]]] | None = None) -> None:
+            walls: list[tuple[tuple[int, int], tuple[int, int]]] | None = None
+        ) -> None:
         """
         Args:
             size: The side length of the game.
@@ -35,18 +36,18 @@ class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameBoard):
         
         Raises:
             TypeError: If the types of the arguments don't match their required types.
-            ValueError: If the quantity of numbered squares exceeds the total number of squares on the board,
-                or if the number of walls exceeds the total number of edges on the board,
+            ValueError: If the quantity of numbered squares exceeds the total number of squares on the grid,
+                or if the number of walls exceeds the total number of edges on the grid,
                 or if any pair of squares in walls are not adjacent.
         """
-        super().__init__(board_dims=(size,size))
+        super().__init__(grid_dims=(size,size))
         self.__set_numbered_squares(numbered_squares)
         self.__set_walls(walls)
-        self._model = ZipModel(self.board_dims, self.numbered_squares, self.walls)
+        self._model = ZipModel(self.grid_dims, self.numbered_squares, self.walls)
 
 
     def __hash__(self) -> int:
-        return hash((self._board_dims, self.__numbered_squares, self.__walls))
+        return hash((self._grid_dims, self.__numbered_squares, self.__walls))
 
 
     @property
@@ -54,20 +55,20 @@ class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameBoard):
         """The side length of the game.
 
         Returns:
-            The number of rows (or columns) on game's board.
+            The number of rows (or columns) on game's grid.
         """
-        return self.board_dims[0]
+        return self.grid_dims[0]
 
 
     @property
     def number_of_edges(self) -> int:
         """
-        The number of edges on board.
+        The number of edges on grid.
         
         Returns:
-            The total number of edges on game board.
+            The total number of edges on game grid.
         """
-        return self.board.number_of_edges() / 2
+        return self.grid.number_of_edges() / 2
 
 
     @property
@@ -84,8 +85,8 @@ class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameBoard):
 
         if len(values) > len(self):
             msg = (
-                "The quantity of numbered squares exceeds the amount of board squares."
-                f" Got {len(values)} squares, while the board has {len(self)} squares."
+                "The quantity of numbered squares exceeds the amount of grid squares."
+                f" Got {len(values)} squares, while the grid has {len(self)} squares."
             )
             raise ValueError(msg)
         
@@ -102,7 +103,7 @@ class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameBoard):
 
         self.__numbered_squares = values
         nx.set_node_attributes(
-            self.board,
+            self.grid,
             name="value",
             values= {square: index for index, square in enumerate(values)}
         )
@@ -114,7 +115,7 @@ class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameBoard):
         The pairs of squares separated by a wall.
         
         Returns:
-            All the board edges blocked by a wall as a tuple of `((row1, column1), (row2, column2))`.
+            All the grid edges blocked by a wall as a tuple of `((row1, column1), (row2, column2))`.
         """
         return self.__walls
     
@@ -128,9 +129,9 @@ class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameBoard):
 
         if len(values) > self.number_of_edges:
             msg = (
-                "The number of walls exceeds the amount of board edges."
+                "The number of walls exceeds the amount of grid edges."
                 f" Got {len(values)} numbered squares,"
-                f" but the board has {self.number_of_edges} squares."
+                f" but the grid has {self.number_of_edges} squares."
             )
             raise ValueError(msg)
 
@@ -151,7 +152,7 @@ class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameBoard):
         """
         The solving path of Zip game.
         
-        The path that visits all the board squares, starting from 1-numbered squared to the highest-numbered square.
+        The path that visits all the grid squares, starting from 1-numbered squared to the highest-numbered square.
 
         Returns:
             The solving path as a list of squares as `(row, column)`.
@@ -169,16 +170,16 @@ class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameBoard):
         x = self.model.x
 
         nx.set_node_attributes(
-            self.board,
+            self.grid,
             name="value",
             values={(i-1, j-1): round(pyo.value(u[i,j])) for i, j in S}
         )
         nx.set_edge_attributes(
-            self.board,
+            self.grid,
             name="value",
             values={((i-1, j-1), (r-1, s-1)): round(pyo.value(x[i,j,r,s])) for i, j, r, s in E}
         )
-        path = nx.get_node_attributes(self.board, "value")
+        path = nx.get_node_attributes(self.grid, "value")
         path = sorted(path.keys(), key=path.get)
         self.__path = [(i+1, j+1) for (i, j) in path]
         if verbose:
@@ -187,7 +188,7 @@ class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameBoard):
 
 
     def show(self) -> None:
-        """Show Zip's board."""
+        """Show Zip's grid."""
 
         E = self.model.E
         N = self.model.N
@@ -199,11 +200,11 @@ class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameBoard):
         path_color = super()._generate_hex_code()
         labels = {N.at(k): k for k in K}
         labels = {(i-1, j-1): k for (i,j), k in labels.items()}
-        pos={(i,j): (j,-i) for i, j in self.board.nodes()}
+        pos={(i,j): (j,-i) for i, j in self.grid.nodes()}
 
         if self.walls is not None:
             walls = nx.draw_networkx_edges(
-                self.board,
+                self.grid,
                 pos=pos,
                 edgelist=[((i-1, j-1), (r-1, s-1)) for (i,j),(r,s) in self.walls],
                 edge_color="#000000",
@@ -213,18 +214,18 @@ class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameBoard):
             )
             walls.set_zorder(0)
 
-        board_squares = nx.draw_networkx_nodes(
-            self.board,
+        grid_squares = nx.draw_networkx_nodes(
+            self.grid,
             pos= pos,
             node_shape="s",
             node_size= 1100,
             node_color= "#FFFFFF",
             linewidths= 2,
         )
-        board_squares.set_zorder(1)
+        grid_squares.set_zorder(1)
 
         nx.draw( # Drawing the path
-            self.board,
+            self.grid,
             pos= pos,
             with_labels= True,
             labels=labels,
@@ -233,7 +234,7 @@ class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameBoard):
             node_size= 800,
             node_color= [
                 "white" if (i+1,j+1) in self.numbered_squares else path_color
-                for (i,j) in self.board.nodes()
+                for (i,j) in self.grid.nodes()
             ],
             edge_color= path_color,
             edgecolors= path_color,

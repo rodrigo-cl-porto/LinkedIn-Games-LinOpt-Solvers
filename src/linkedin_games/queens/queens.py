@@ -4,40 +4,40 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-from .._core._game_board import GameBoard
+from .._core._game_grid import GameGrid
 from .._mixin._color_generator_mixin import ColorGeneratorMixin
 from ._model import QueensModel
 from ._region import Region
 
 
-class Queens(ColorGeneratorMixin, GameBoard):
+class Queens(ColorGeneratorMixin, GameGrid):
     """
     The [LinkedIn Queens](https://www.linkedin.com/games/queens/) game.
     
-    A game board with colored regions intended to put crowns on it.
+    A game grid with colored regions intended to put crowns on it.
 
     Objective:
-        To place a crown in each row, column, and colored region on the board.
+        To place a crown in each row, column, and colored region on the grid.
 
     Rules:
         - There can only be one crown in each row, column and colored region;
         - There cannot be adjacent crowns, not even along adjacent diagonals.
     """
 
-    def __init__(self, size:int, regions: dict[str, set[tuple[int, int]]] | list[set[tuple[int, int]]]) -> object:
+    def __init__(self, size:int, regions: dict[str, set[tuple[int, int]]] | list[set[tuple[int, int]]]) -> None:
         """
         Args:
             size: The side length of the game.
             regions: Regions as a dictionary of `color: {(row, column), ...}` items.
         """
-        super().__init__(board_dims=(size, size))
+        super().__init__(grid_dims=(size, size))
         self.__crowns: nx.Graph
         self.__set_regions(regions)
-        self._model = QueensModel(self.board_dims, self.regions)
+        self._model = QueensModel(self.grid_dims, self.regions)
 
 
     def __hash__(self) -> int:
-        return hash((self._board_dims, self.__regions))
+        return hash((self._grid_dims, self.__regions))
 
 
     @property
@@ -45,19 +45,19 @@ class Queens(ColorGeneratorMixin, GameBoard):
         """The side length of the game.
 
         Returns:
-            The number of rows (or columns) on game's board.
+            The number of rows (or columns) on game's grid.
         """
-        return self.board_dims[0]
+        return self.grid_dims[0]
 
 
     @property
     def regions(self) -> dict[str, set[tuple[int, int]]]:
-        """All colored regions on the board.
+        """All colored regions on the grid.
 
-        It's assumed that the regions are non-overlapping and cover the entire board.
+        It's assumed that the regions are non-overlapping and cover the entire grid.
 
         Returns:
-            The set of all colored regions on the board.
+            The set of all colored regions on the grid.
         """
         return {region.color_code: region.squares for region in self.__regions}
 
@@ -82,27 +82,27 @@ class Queens(ColorGeneratorMixin, GameBoard):
             raise ValueError(msg)
 
         all_region_squares = set(all_region_squares)
-        if all_region_squares != self.board_squares:
+        if all_region_squares != self.grid_squares:
             if len(all_region_squares) > len(self):
-                squares_not_in_board = all_region_squares - self.board_squares.keys()
+                squares_not_in_grid = all_region_squares - self.grid_squares.keys()
                 msg = (
-                    "The regions must cover the entire board and must not go beyond the board's boundaries."
-                    f" Squares outside the board: {squares_not_in_board!r}"
+                    "The regions must cover the entire grid and must not go beyond the grid's boundaries."
+                    f" Squares outside the grid: {squares_not_in_grid!r}"
                 )
                 raise ValueError(msg)
 
             if len(all_region_squares) < len(self):
-                missing_squares = self.board_squares.keys() - all_region_squares
+                missing_squares = self.grid_squares.keys() - all_region_squares
                 msg = (
-                    "The regions must cover the entire board and must not go beyond the board's boundaries."
+                    "The regions must cover the entire grid and must not go beyond the grid's boundaries."
                     f" Squares not in an region: {missing_squares!r}"
                 )
                 raise ValueError(msg)
 
         self.__regions = [Region(color=color, squares=squares) for color, squares in regions.items()]
 
-        nx.set_node_attributes( # Adding a color for each square on the board
-            self._board,
+        nx.set_node_attributes( # Adding a color for each square on the grid
+            self._grid,
             name="color",
             values={(i-1, j-1): region.color for region in self.__regions for (i, j) in region.squares}
         )
@@ -127,13 +127,13 @@ class Queens(ColorGeneratorMixin, GameBoard):
         x = self.model.x
         S = self.model.S
         nx.set_node_attributes(
-            self.board,
+            self.grid,
             name="value",
             values={(i-1, j-1): round(pyo.value(x[i, j])) for (i, j) in S}
         )
 
-        crowns = [square for square, value in nx.get_node_attributes(self.board, "value").items() if value == 1]
-        self.__crowns = self.board.subgraph(crowns)
+        crowns = [square for square, value in nx.get_node_attributes(self.grid, "value").items() if value == 1]
+        self.__crowns = self.grid.subgraph(crowns)
         
         if verbose:
             print("These are the squares that contain a crown:")
@@ -141,19 +141,19 @@ class Queens(ColorGeneratorMixin, GameBoard):
 
 
     def show(self) -> None:
-        """Show the Queens' board."""
+        """Show the Queens' grid."""
         width = height = self.size * 0.5
         plt.figure(figsize=(width, height))
         nx.draw(
-            self.board,
-            pos={(i, j): (j, -i) for i, j in self.board.nodes()},
+            self.grid,
+            pos={(i, j): (j, -i) for i, j in self.grid.nodes()},
             with_labels=True,
             arrows=False,
             labels=
                 dict.fromkeys(self.__crowns.nodes(), "O") if self.__crowns is not None
-                else dict.fromkeys(self.board.nodes(), ""),
+                else dict.fromkeys(self.grid.nodes(), ""),
             node_size=1100,
-            node_color=list(nx.get_node_attributes(self.board, "color").values()),
+            node_color=list(nx.get_node_attributes(self.grid, "color").values()),
             node_shape="s", # Squared-shape nodes
             width=0,
             edgecolors="black",

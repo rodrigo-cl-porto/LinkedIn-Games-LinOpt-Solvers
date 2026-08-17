@@ -4,7 +4,7 @@ class Rectangle:
     def __init__(self, top_left:tuple[int, int], dims:tuple[int, int]) -> object:
         """
         Args:
-            top_left: Board position of the rectangle's top-left square as a `(row, column)` tuple.
+            top_left: Grid position of the rectangle's top-left square as a `(row, column)` tuple.
             dims: Rectangle dimensions as a `(height, width)` tuple.
             color: A color name or a hex code as `#RRGGBB` string.
         """
@@ -77,7 +77,7 @@ class Rectangle:
     @property
     def top_left(self) -> tuple[int, int]:
         """
-        Board position of the rectangle's top-left square.
+        Grid position of the rectangle's top-left square.
 
         Returns:
             Rectangle dimensions as a `(row, column)` tuple.
@@ -92,7 +92,7 @@ class Rectangle:
     @property
     def top(self) -> int:
         """
-        The board position of the rectangle's top row.
+        The grid position of the rectangle's top row.
         
         Returns:
             Index position of the rectangle's first row.
@@ -116,7 +116,7 @@ class Rectangle:
     @property
     def left(self) -> int:
         """
-        The board position of the rectangle's leftmost column.
+        The grid position of the rectangle's leftmost column.
         
         Returns:
             Index position of the rectangle's first column.
@@ -158,14 +158,6 @@ class Rectangle:
             msg = f"The width must be a positive integer. Got {value!r} instead."
             raise ValueError(msg)
         
-        if not hasattr(self, "__height"):
-            self.__width = value
-            return
-        
-        if self.height is None:
-            self.__width = value
-            return
-        
         self.__width = value
 
 
@@ -190,25 +182,17 @@ class Rectangle:
             msg = f"The height must be positive. Got {value!r} instead."
             raise ValueError(msg)
         
-        if not hasattr(self, "__width"):
-            self.__height = value
-            return
-        
-        if self.width is not None:
-            self.__height = value
-            return
-        
         self.__height = value
 
 
-    def to_dict(self) -> dict[str, str|tuple[int, int]]:
+    def to_dict(self) -> dict[str, tuple[int, int]]:
         return {"top_left": (self.top, self.left), "dims": (self.height, self.width)}
 
 
     @property
     def squares(self) -> tuple[tuple[int, int],...]:
         """
-        The board squares occupied by the rectangle.
+        The grid squares occupied by the rectangle.
         
         Returns:
             All the squares as a tuple of `(row, column)`.

@@ -5,19 +5,20 @@ class SudokuModel(pyo.ConcreteModel):
     """A Linear Optimization Model for a general Sudoku game."""
 
     def __init__(self,
-            board_dims: tuple[int, int],
+            grid_dims: tuple[int, int],
             block_dims: tuple[int, int],
-            filled_squares: dict[tuple[int, int], int]) -> object:
+            filled_squares: dict[tuple[int, int], int]
+        ) -> None:
         """
         Args:
-            board_dims: Board dimensions as a `(rows, columns)` tuple.
-            block_dims: Grid block dimensions as a `(rows, columns)` tuple.
+            grid_dims: Grid dimensions as a `(rows, columns)` tuple.
+            block_dims: Block dimensions as a `(rows, columns)` tuple.
             filled_squares: The starting filled squares as a dictionary of `(row, column): digit` items.
         """
         super().__init__()
 
         # BOARD AND BLOCK DIMENSIONS
-        m, n = board_dims
+        m, n = grid_dims
         p, q = block_dims
         self.m = pyo.Param(initialize=m, domain=pyo.PositiveIntegers)
         self.n = pyo.Param(initialize=n, domain=pyo.PositiveIntegers)
@@ -32,7 +33,7 @@ class SudokuModel(pyo.ConcreteModel):
         V = self.v = pyo.RangeSet(q) # Columns per block
 
         # COMPOSITE SETS
-        S = self.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Board Squares
+        S = self.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Grid Squares
         B = self.B = pyo.Set( # Grid blocks
             V, U, initialize= lambda model, v, u:
                 [(i, j) for i in range(p*(v-1)+1, p*v+1) for j in range(q*(u-1)+1, q*u+1)],

@@ -4,20 +4,20 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-from .._core._game_board import GameBoard
+from .._core._game_grid import GameGrid
 from .._mixin._taxicab_distance_mixin import TaxicabDistanceMixin
 from ._model import TangoModel
 
 
-class Tango(TaxicabDistanceMixin, GameBoard):
+class Tango(TaxicabDistanceMixin, GameGrid):
     """
     The [LinkedIn Tango](https://www.linkedin.com/games/tango/) game.
-
-    A 6x6 game board with some squares already filled by moons and suns, and which
+    
+    A 6x6 game grid with some squares already filled by moons and suns, and which
     can have some pairs of squares with an equal sign or cross sign in-between.
     
     Objective:
-        To fill all the squares on the board with moons 🌙 and suns ☀️.
+        To fill all the squares on the grid with moons 🌙 and suns ☀️.
     
     Rules:
         - The number of moons and suns in each row and column must be the same;
@@ -27,13 +27,15 @@ class Tango(TaxicabDistanceMixin, GameBoard):
     """
     def __init__(self,
             filled_squares: dict[tuple[int, int], int],
-            matching_pairs: set[tuple[tuple[int, int], tuple[int, int]]]
+            matching_pairs:
+                set[tuple[tuple[int, int], tuple[int, int]]]
                 | list[tuple[tuple[int, int], tuple[int, int]]]
                 | None = None,
-            opposite_pairs: set[tuple[tuple[int, int], tuple[int, int]]]
+            opposite_pairs:
+                set[tuple[tuple[int, int], tuple[int, int]]]
                 | list[tuple[tuple[int, int], tuple[int, int]]]
                 | None = None,
-            ) -> None:
+        ) -> None:
         """
         Args:
             filled_squares: Starting filled squares as a dictionary of `(row, column): 0 | 1` items.
@@ -44,19 +46,19 @@ class Tango(TaxicabDistanceMixin, GameBoard):
 
         Raises:
             TypeError: If the types of the arguments don't match their required types.
-            ValueError: If the quantity of numbered squares exceeds the total number of squares on the board,
-                or if the number of walls exceeds the total number of edges on the board,
+            ValueError: If the quantity of numbered squares exceeds the total number of squares on the grid,
+                or if the number of walls exceeds the total number of edges on the grid,
                 or if any pair of squares in walls are not adjacent.
         """
-        super().__init__(board_dims=(6,6))
+        super().__init__(grid_dims=(6,6))
         self.__set_filled_squares(filled_squares)
         self.__set_matching_pairs(matching_pairs)
         self.__set_opposite_pairs(opposite_pairs)
-        self._model = TangoModel(self.board_dims, self.filled_squares, self.matching_pairs, self.opposite_pairs)
+        self._model = TangoModel(self.grid_dims, self.filled_squares, self.matching_pairs, self.opposite_pairs)
 
 
     def __hash__(self) -> int:
-        return hash((self._board_dims, self.__matching_pairs, self.__opposite_pairs, self.__filled_squares))
+        return hash((self._grid_dims, self.__matching_pairs, self.__opposite_pairs, self.__filled_squares))
 
 
     @property
@@ -72,7 +74,7 @@ class Tango(TaxicabDistanceMixin, GameBoard):
     def __set_filled_squares(self, values:dict[tuple[int, int], int]) -> None:
     
         if len(values) > len(self):
-            msg = f"The number of filled squares exceeds the amount of board squares. Got {len(values)} filled squares."
+            msg = f"The number of filled squares exceeds the amount of grid squares. Got {len(values)} filled squares."
             raise ValueError(msg)
 
         if not isinstance(values, dict):
@@ -100,7 +102,8 @@ class Tango(TaxicabDistanceMixin, GameBoard):
         return self.__matching_pairs
     
     def __set_matching_pairs(self,
-            values: set[tuple[tuple[int, int], tuple[int, int]]]
+            values:
+                set[tuple[tuple[int, int], tuple[int, int]]]
                 | list[tuple[tuple[int, int], tuple[int, int]]]
                 | None
         ) -> None:
@@ -195,33 +198,33 @@ class Tango(TaxicabDistanceMixin, GameBoard):
         S= self.model.S
         x = self.model.x
         nx.set_node_attributes(
-            self._board,
+            self._grid,
             name="value",
             values={(i-1, j-1): round(pyo.value(x[i,j])) for i, j in S}
         )
         if verbose:
             print("Tango solution:")
-            pprint(self.board_squares)
+            pprint(self.grid_squares)
 
 
     def show(self) -> None:
-        """Show Tango's board."""
+        """Show Tango's grid."""
 
         O = self.model.O
         M = self.model.M
 
         plt.figure(figsize=(3, 3))
-        pos = {(i, j): (j, -i) for i, j in self.board.nodes()}
+        pos = {(i, j): (j, -i) for i, j in self.grid.nodes()}
         nx.draw(
-            self.board,
+            self.grid,
             pos= pos,
             arrows=False,
             with_labels= True,
-            labels= nx.get_node_attributes(self.board, "value"),
+            labels= nx.get_node_attributes(self.grid, "value"),
             node_size= 1100,
             node_color= [
                 "#EEEAE7" if (i+1,j+1) in self.filled_squares else "white"
-                for (i, j) in self.board.nodes()
+                for (i, j) in self.grid.nodes()
             ],
             node_shape="s",
             edgecolors="#EEEAE7",
@@ -232,7 +235,7 @@ class Tango(TaxicabDistanceMixin, GameBoard):
                 [((i-1, j-1), (r-1, s-1)) for i,j,r,s in M]
         )
         nx.draw_networkx_edge_labels(
-            self._board,
+            self._grid,
             pos= pos,
             edge_labels=
                 {((i-1, j-1), (r-1, s-1)): "×" for i,j,r,s in O} |

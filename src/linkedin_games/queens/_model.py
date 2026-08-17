@@ -4,16 +4,16 @@ import pyomo.environ as pyo
 class QueensModel(pyo.ConcreteModel):
     """The Linear Optimization model for the Queens game."""
 
-    def __init__(self, board_dims: tuple[int, int], regions: dict[str, set[tuple[int, int]]]) -> object:
+    def __init__(self, grid_dims: tuple[int, int], regions: dict[str, set[tuple[int, int]]]) -> None:
         """
         Args:
-            board_dims: Board dimensionas as a `(rows, columns)` tuple.
-            regions: All colored regions on board as a dictionary of `color: {(row, column), ...}` items.
+            grid_dims: Grid dimensionas as a `(rows, columns)` tuple.
+            regions: All colored regions on grid as a dictionary of `color: {(row, column), ...}` items.
         """
         super().__init__()
 
         # BOARD DIMENSIONS
-        m, n = board_dims
+        m, n = grid_dims
         self.m = pyo.Param(initialize=m, domain=pyo.PositiveIntegers)
         self.n = pyo.Param(initialize=n, domain=pyo.PositiveIntegers)
 
@@ -23,7 +23,7 @@ class QueensModel(pyo.ConcreteModel):
         K = self.K = pyo.Set(initialize=regions.keys()) # Colored Regions
 
         # COMPOSITE SETS
-        S = self.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Board Squares
+        S = self.S = pyo.Set(initialize=lambda model: [(i, j) for i in I for j in J]) # Grid Squares
         R = self.R = pyo.Set(K, initialize=regions, dimen=2, domain=S) # Region Squares
         D = self.D = pyo.Set(initialize=lambda model: # Diagonals
             [((i, j), (i + 1, j + 1)) for (i, j) in S if (i + 1, j + 1) in S] +

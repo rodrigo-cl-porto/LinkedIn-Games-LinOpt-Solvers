@@ -37,21 +37,21 @@ project:
     - title: Getting Started
       children:
       - title: What is Optimization?
-        file: ./1-getting-started/1-what-is-optimization.md
+        file: ./chapters/getting-started/what-is-optimization.md
       - title: LinkedIn Games Library
-        file: ./1-getting-started/2-linkedin-games-library.md
+        file: ./chapters/getting-started/linkedin-games-library.md
     - title: How to Solve
       children:
-      - title: Queens
-        file: ./2-how-to-solve/1-queens.ipynb
-      - title: Tango
-        file: ./2-how-to-solve/2-tango.ipynb
-      - title: Zip
-        file: ./2-how-to-solve/3-zip.ipynb
       - title: Mini Sudoku
-        file: ./2-how-to-solve/4-mini-sudoku.ipynb
+        file: ./chapters/how-to-solve/mini-sudoku.ipynb
       - title: Patches
-        file: ./2-how-to-solve/5-patches.ipynb
+        file: ./chapters/how-to-solve/patches.ipynb
+      - title: Queens
+        file: ./chapters/how-to-solve/queens.ipynb
+      - title: Tango
+        file: ./chapters/how-to-solve/tango.ipynb
+      - title: Zip
+        file: ./chapters/how-to-solve/zip.ipynb
   abbreviations:
     BLO: Binary Linear Optimization
     BLOP: Binary Linear Optimization Problem
@@ -75,13 +75,13 @@ project:
       title: Solving LinkedIn Games by Linear Optimization
       articles:
         - ./home.md
-        - ./1-getting-started/1-what-is-optimization.md
-        - ./1-getting-started/2-linkedin-games-library.md
-        - ./2-how-to-solve/1-queens.ipynb
-        - ./2-how-to-solve/2-tango.ipynb
-        - ./2-how-to-solve/3-zip.ipynb
-        - ./2-how-to-solve/4-mini-sudoku.ipynb
-        - ./2-how-to-solve/5-patches.ipynb
+        - ./chapters/getting-started/what-is-optimization.md
+        - ./chapters/getting-started/linkedin-games-python-package.md
+        - ./chapters/how-to-solve/mini-sudoku.ipynb
+        - ./chapters/how-to-solve/patches.ipynb
+        - ./chapters/how-to-solve/queens.ipynb
+        - ./chapters/how-to-solve/tango.ipynb
+        - ./chapters/how-to-solve/zip.ipynb
 site:
   template: book-theme
   options:

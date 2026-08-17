@@ -5,13 +5,14 @@ class TangoModel(pyo.ConcreteModel):
     """The Linear Optimization Model for Tango game."""
 
     def __init__(self,
-            board_dims: tuple[int, int],
+            grid_dims: tuple[int, int],
             filled_squares: dict[tuple[int, int], int],
             matching_pairs: list[tuple[tuple[int, int], tuple[int, int]]] | None = None,
-            opposite_pairs: list[tuple[tuple[int, int], tuple[int, int]]] | None = None) -> object:
+            opposite_pairs: list[tuple[tuple[int, int], tuple[int, int]]] | None = None
+        ) -> None:
         """
         Args:
-            board_dims: Board dimensions as a `(row, column)` tuple.
+            grid_dims: Grid dimensions as a `(row, column)` tuple.
             filled_squares: Starting filled squares as a dictionary of `(row, column): 0 | 1` items.
             matching_pairs: Pairs of matching squares (separated by a `=` sign)
                 as a set of `((row1, column1), (row2, column2))` edges.
@@ -21,7 +22,7 @@ class TangoModel(pyo.ConcreteModel):
         super().__init__()
 
         # BOARD DIMENSIONS
-        m, n = board_dims
+        m, n = grid_dims
         self.m = pyo.Param(initialize=m, domain=pyo.PositiveIntegers)
         self.n = pyo.Param(initialize=n, domain=pyo.PositiveIntegers)
 
@@ -30,7 +31,7 @@ class TangoModel(pyo.ConcreteModel):
         J = self.J = pyo.RangeSet(m) # Columns
 
         # COMPOSITE SETS
-        S = self.S = pyo.Set(initialize=lambda model: [(i,j) for i in I for j in J]) # Board Squares
+        S = self.S = pyo.Set(initialize=lambda model: [(i,j) for i in I for j in J]) # Grid Squares
         K = self.K = pyo.Set(initialize=filled_squares.keys(), dimen=2)
         M = self.M = pyo.Set(initialize=matching_pairs)
         O = self.O = pyo.Set(initialize=opposite_pairs)

@@ -3,9 +3,8 @@ title: What is Optimization?
 short_title: What is Optimization
 date: 2026-06-08
 downloads:
-    - file: 1-what-is-optimization.ipynb
-      title: This Notebook
-      filename: what-is-optimization.ipynb
+    - file: what-is-optimization.md
+      title: This Article
 ---
 
 The mathematical optimization process consists of modeling a problem with the goal of minimizing (or maximizing) a function, e.g., minimizing the total cost of a transportation system (or maximizing the expected total profit of a project). Mathematical optimization modeling fundamentally involves formulating the **objective function** $f(\mathbf{x})$ that one seeks to optimize, and a set of **constraints** that translates the limitations, specifications, assumptions and rules a problem may present and delimits the **feasible set** $D$ of solutions to the problem. Thus, the most general and abstract formulation for an optimization model is as follows.
@@ -39,7 +38,7 @@ To better illustrate how the application of an optimization model works, let's c
 :::{note} Optimization of the usable area
 A homeowner decided to raise a building on a semicircular plot of land with a radius of 10 meters, in order to make the most use of the land area. The building plan will intended to be a rectangle with base $w$ and height $h$. The question is: what are the dimensions $w$ and $h$ that maximize its area?
 
-:::{figure} ../assets/1-getting-started/1-what-is-optimization/semicircular-terrain.mp4
+:::{figure} ../../assets/getting-started/what-is-optimization/semicircular-terrain.mp4
 :label: semicircular-terrain
 :alt: Semicircular Terrain
 :align: center
@@ -66,7 +65,7 @@ The terrain in the presented situation can be represented on a Cartesian plane $
 
 From this model, it is possible to discover, by applying the [KKT Conditions](https://en.wikipedia.org/wiki/Karush%E2%80%93Kuhn%E2%80%93Tucker_conditions) (see more on [Appendix](#appendix)), that the pair $(x, y)$ that maximizes the building's area and satisfies the specified constraints is given by $(x^*, y^*) = (\frac{\sqrt{2}}{2}r, \frac{\sqrt{2}}{2}r)$, which results in the optimal plot of $A(x^*,y^*)=\frac{r^2}{2}$. Since $r = 10$, the optimal dimensions are $(w^*, h^*) = (10\sqrt{2}, 5\sqrt{2})$ and the optimal area $A^*$ is 50 m{sup}`2`.
 
-:::{figure} ../assets/1-getting-started/1-what-is-optimization/semicircular-terrains-solution.png
+:::{figure} ../../assets/getting-started/what-is-optimization/semicircular-terrains-solution.png
 :label: semicircular-terrains-solution
 :alt: Semicircular Terrain's Solution
 :align: center
@@ -193,7 +192,7 @@ uv add pyomo networkx matplotlib gurobipy highspy
 
 ## How to solve the Semicircle Terrain Problem with KKT Conditions
 
-:::{figure} ../assets/1-getting-started/1-what-is-optimization/semicircular-terrain.mp4
+:::{figure} ../../assets/getting-started/what-is-optimization/semicircular-terrain.mp4
 :label: semicircular-terrain2
 :alt: Semicircular Terrain
 :align: center

@@ -2,12 +2,12 @@ from .._core._color import Color
 
 
 class Region:
-    """A colored region on a Queens board."""
+    """A colored region on a Queens grid."""
     
-    def __init__(self, squares:set[tuple[int, int]], color:str="white") -> object:
+    def __init__(self, squares:set[tuple[int, int]], color:str="white") -> None:
         """
         Args:
-            squares: All board squares that make up the region as a set of `(row, column)`.
+            squares: All grid squares that make up the region as a set of `(row, column)`.
             color: The region's color's name or its hex code as a `#RRGGBB` string.
         """
         self.squares = squares
@@ -50,7 +50,7 @@ class Region:
         Squares in the region.
         
         Returns:
-            All board squares that make up the region as a set of `(row, column)`.
+            All grid squares that make up the region as a set of `(row, column)`.
         """
         return self.__squares
 

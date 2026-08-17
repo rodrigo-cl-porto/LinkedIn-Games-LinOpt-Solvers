@@ -14,7 +14,7 @@ class PatchSeed(IsPerfectSquareMixin, RectangleSeed):
             color: str | None = "#FFFFFF",
             area: int | None = None,
             shape: str | None = PatchShape.ANY,
-        ) -> object:
+        ) -> None:
         """
         Args:
             square: The board position of the seed as a `(row, column)` tuple.
@@ -129,7 +129,6 @@ class PatchSeed(IsPerfectSquareMixin, RectangleSeed):
             raise ValueError(msg)
 
         self._area = value
-
 
 
     @property

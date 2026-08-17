@@ -4,15 +4,15 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-from .._core._game_board import GameBoard
+from .._core._game_grid import GameGrid
 from ._model import SudokuModel
 
 
-class GeneralSudoku(GameBoard):
+class GeneralSudoku(GameGrid):
     """
     A general Sudoku game.
 
-    A `n`x`n` Sudoku board with `p`x`q` grid block (where is expected that `p * q = n`).
+    A `n`x`n` Sudoku grid with `p`x`q` grid block (where is expected that `p * q = n`).
     
     Objective:
         Fill all the empty spaces in the game grid with digits from 1 to `n`.
@@ -21,27 +21,27 @@ class GeneralSudoku(GameBoard):
         Each row, column, and block must be filled with a digit from 1 to `n`,
         without repetition in each row, column, or `p`x`q` block.
     """
-    def __init__(self, size: int, block_dims: tuple[int, int], filled_squares: dict[tuple[int, int], int]) -> object:
+    def __init__(self, size: int, block_dims: tuple[int, int], filled_squares: dict[tuple[int, int], int]) -> None:
         """
         Args:
             size: The Sudoku's number of rows (or columns).
-            block_dims: Board dimensions as a `(rows, columns)` tuple.
+            block_dims: Grid dimensions as a `(rows, columns)` tuple.
             filled_squares: The starting filled squares as a dictionary of `(row, column): digit` items.
 
         Raises:
             TypeError: if the input types are not respected.
             ValueError: if `p * q = n` is not respected
                 or if the quantity of `filled_squares` is smaller than 2
-                or greater than the number of board squares.
+                or greater than the number of grid squares.
         """
         super().__init__((size, size))
         self.__set_block_dims(block_dims)
         self.__set_filled_squares(filled_squares)
-        self._model = SudokuModel(self.board_dims, self.block_dims, self.filled_squares)
+        self._model = SudokuModel(self.grid_dims, self.block_dims, self.filled_squares)
 
 
     def __hash__(self) -> int:
-        return hash((self._board_dims, self.__block_dims, self.__filled_squares))
+        return hash((self._grid_dims, self.__block_dims, self.__filled_squares))
 
 
     def __eq__(self, other: object) -> bool:
@@ -66,15 +66,15 @@ class GeneralSudoku(GameBoard):
         The size of Sudoku game.
 
         Returns:
-            The number of rows (or columns) on the board.
+            The number of rows (or columns) on the grid.
         """
-        return self.board_dims[0]
+        return self.grid_dims[0]
 
 
     @property
     def block_dims(self) -> tuple[int, int]:
         """
-        The dimensions of the grid blocks in the Sudoku board
+        The dimensions of the grid blocks in the Sudoku grid
         
         Returns:
             The block dimensions as `(rows, columns)` tuple.
@@ -84,15 +84,15 @@ class GeneralSudoku(GameBoard):
     def __set_block_dims(self, value:tuple[int, int] = (2, 2)) -> None:
         
         if len(value) != 2:
-            msg = f"Board dimensions must be a pair (m,n). Got {value!r} instead."
+            msg = f"Grid dimensions must be a pair (m,n). Got {value!r} instead."
             raise TypeError(msg)
         
         if any(not isinstance(dim, int) or isinstance(dim, bool) for dim in value):
-            msg = f"Board dimensions must be integers. Got {value!r} instead."
+            msg = f"Grid dimensions must be integers. Got {value!r} instead."
             raise TypeError(msg)
         
         if any(dim < 1 for dim in value):
-            msg = f"Board dimensions must be positive. Got {value!r} instead."
+            msg = f"Grid dimensions must be positive. Got {value!r} instead."
             raise ValueError(msg)
         
         p, q = value
@@ -140,8 +140,8 @@ class GeneralSudoku(GameBoard):
 
         if len(values) > len(self):
             msg = (
-                "The number of filled squares exceeds the amount of board squares."
-                f" Got {len(values)} squares, but the board has {len(self)} squares."
+                "The number of filled squares exceeds the amount of grid squares."
+                f" Got {len(values)} squares, but the grid has {len(self)} squares."
             )
             raise ValueError(msg)
         
@@ -153,7 +153,7 @@ class GeneralSudoku(GameBoard):
             raise ValueError(msg)
 
         self.__filled_squares = values
-        nx.set_node_attributes(self.board, name="value", values=self.filled_squares)
+        nx.set_node_attributes(self.grid, name="value", values=self.filled_squares)
 
 
     def _set_solution(self, verbose:bool=False) -> None:
@@ -162,7 +162,7 @@ class GeneralSudoku(GameBoard):
         K = self.model.K
         x = self.model.x
         nx.set_node_attributes(
-            self.board,
+            self.grid,
             name="value",
             values= {(i-1, j-1): k for (i, j) in S for k in K if round(pyo.value(x[i, j, k])) == 1}
         )
@@ -172,17 +172,17 @@ class GeneralSudoku(GameBoard):
 
 
     def show(self) -> None:
-        """Show the Sudoku's board."""
+        """Show the Sudoku's grid."""
         width = height = self.size * 0.5
         plt.figure(figsize=(width, height))
         nx.draw(
-            self.board,
-            pos= {(i, j): (j, -i) for (i, j) in self.board.nodes()},
+            self.grid,
+            pos= {(i, j): (j, -i) for (i, j) in self.grid.nodes()},
             with_labels= True,
             arrows=False,
             labels= {
                 node: data.get("value") if data.get("value") is not None else ""
-                for node, data in self.board.nodes(data=True)
+                for node, data in self.grid.nodes(data=True)
             },
             font_color="white",
             node_size= 1100,
