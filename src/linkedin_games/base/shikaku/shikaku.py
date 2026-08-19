@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-from .._core._game_grid import GameGrid
-from .._mixin._color_generator_mixin import ColorGeneratorMixin
+from ..._core._game_grid import GameGrid
+from ..._mixin._color_generator_mixin import ColorGeneratorMixin
 from ._model import ShikakuModel
 from ._rectangle_seed import RectangleSeed
 

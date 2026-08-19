@@ -11,15 +11,16 @@ repo_url = "https://github.com/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers"
 nav = [
     {"Home" = "index.md"},
     {"API" = [
-        "api/patches.md",
-        "api/queens.md",
-        {"Mini Sudoku" = "api/mini-sudoku.md"},
-        "api/tango.md",
-        "api/zip.md",
+        {"Games" = [
+            "api/patches.md",
+            "api/queens.md",
+            {"Mini Sudoku" = "api/mini-sudoku.md"},
+            "api/tango.md",
+            "api/zip.md",
+        ]},
         {"Misc" = [
-            {"General Sudoku" = "api/general-sudoku.md"},
-            "api/sudoku.md",
-            "api/shikaku.md"
+            "api/shikaku.md",
+            "api/sudoku.md"
         ]},
     ]},
     {"Jupyter Book" = "https://rodrigo-cl-porto.github.io/LinkedIn-Games-LinOpt-Solvers/"}

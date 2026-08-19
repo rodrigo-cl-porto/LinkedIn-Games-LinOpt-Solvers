@@ -1,6 +1,6 @@
 from typing import Any
 
-from ..shikaku.shikaku import Shikaku
+from ..base.shikaku.shikaku import Shikaku
 from ._model import PatchesModel
 from ._patch_seed import PatchSeed
 
@@ -52,7 +52,7 @@ class Patches(Shikaku):
 
 
     @staticmethod
-    def _build_seeds(seeds: dict[tuple[int, int], int | dict | None]) -> list[PatchSeed]:
+    def _build_seeds(seeds: dict[tuple[int, int], int | dict[str, Any] | None]) -> list[PatchSeed]:
         return [
             PatchSeed(
                 square=square,

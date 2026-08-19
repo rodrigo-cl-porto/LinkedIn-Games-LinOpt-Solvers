@@ -1,6 +1,6 @@
 from typing import Any
 import pyomo.environ as pyo
-from ..shikaku._model import ShikakuModel
+from ..base.shikaku._model import ShikakuModel
 from ._patch_shape import PatchShape
 
 
@@ -12,7 +12,7 @@ class PatchesModel(ShikakuModel):
         Args:
             grid_dims: Grid dimensionas as `(rows, columns)` tuple.
             seeds: Patch seeds on the grid as a dictionary of
-                `(row, column): {"color": color, "area": area, "shape": shape}`.
+                `(row, column): {"color": str, "area": int, "shape": str}`.
         """
         super().__init__(grid_dims, seeds)
 

@@ -1,6 +1,6 @@
 from typing import Any
 
-from .._core._color import Color
+from ..._core._color import Color
 from ._rectangle import Rectangle
 
 

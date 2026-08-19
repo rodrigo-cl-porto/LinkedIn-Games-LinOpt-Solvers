@@ -1,8 +1,8 @@
 from typing import Any
 
 from .._mixin._is_perfect_square_mixin import IsPerfectSquareMixin
-from ..shikaku._rectangle import Rectangle
-from ..shikaku._rectangle_seed import RectangleSeed
+from ..base.shikaku._rectangle import Rectangle
+from ..base.shikaku._rectangle_seed import RectangleSeed
 from ._patch_shape import PatchShape
 
 

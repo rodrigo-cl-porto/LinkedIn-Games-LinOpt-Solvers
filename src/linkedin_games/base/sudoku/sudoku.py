@@ -1,7 +1,7 @@
-from .general_sudoku import GeneralSudoku
+from ._base import BaseSudoku
 
 
-class Sudoku(GeneralSudoku):
+class Sudoku(BaseSudoku):
     """
     The classic Sudoku game.
     

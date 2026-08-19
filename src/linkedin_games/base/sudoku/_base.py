@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pyomo.environ as pyo
 
-from .._core._game_grid import GameGrid
+from ..._core._game_grid import GameGrid
 from ._model import SudokuModel
 
 
-class GeneralSudoku(GameGrid):
+class BaseSudoku(GameGrid):
     """
     A general Sudoku game.
 
@@ -46,7 +46,7 @@ class GeneralSudoku(GameGrid):
 
     def __eq__(self, other: object) -> bool:
 
-        if not isinstance(other, GeneralSudoku):
+        if not isinstance(other, BaseSudoku):
             return False
         
         return (
@@ -164,7 +164,7 @@ class GeneralSudoku(GameGrid):
         nx.set_node_attributes(
             self.grid,
             name="value",
-            values= {(i-1, j-1): k for (i, j) in S for k in K if round(pyo.value(x[i, j, k])) == 1}
+            values= {(i-1, j-1): k for (i, j) in S for k in K if round(pyo.value(x[i,j,k])) == 1}
         )
         if verbose:
             print("These are the digits for each square:")

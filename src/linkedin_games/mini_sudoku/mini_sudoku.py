@@ -1,7 +1,7 @@
-from ..sudoku.general_sudoku import GeneralSudoku
+from ..base.sudoku._base import BaseSudoku
 
 
-class MiniSudoku(GeneralSudoku):
+class MiniSudoku(BaseSudoku):
     """
     The [LinkedIn Mini Sudoku](https://www.linkedin.com/games/mini-sudoku/) game.
     
@@ -9,7 +9,7 @@ class MiniSudoku(GeneralSudoku):
 
     Objective:
         Fill all the empty spaces in the game grid with digits from 1 to 6.
-
+    
     Rules:
         Each row, column, and 2x3 block must be filled with a digit from 1 to 6,
         without repetition in each row, column, or block.
