@@ -2,8 +2,9 @@
 *.env
 
 # Folders from main branch
-src/
+book/
 docs/
+src/
 tests/
 binder/
 
