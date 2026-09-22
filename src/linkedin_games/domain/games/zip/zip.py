@@ -1,16 +1,8 @@
-from pprint import pprint
-
-import matplotlib.pyplot as plt
-import networkx as nx
-import pyomo.environ as pyo
-
-from .._core._game_grid import GameGrid
-from .._mixin._color_generator_mixin import ColorGeneratorMixin
-from .._mixin._taxicab_distance_mixin import TaxicabDistanceMixin
-from ._model import ZipModel
+from ..._game_grid import GameGrid
+from ...utils.taxicab_distance import TaxicabDistance
 
 
-class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameGrid):
+class Zip(GameGrid):
     """
     The [LinkedIn Zip](https://www.linkedin.com/games/zip/) game.
     
@@ -43,7 +35,6 @@ class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameGrid):
         super().__init__(grid_dims=(size,size))
         self.__set_numbered_squares(numbered_squares)
         self.__set_walls(walls)
-        self._model = ZipModel(self.grid_dims, self.numbered_squares, self.walls)
 
 
     def __hash__(self) -> int:
@@ -118,10 +109,13 @@ class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameGrid):
             All the grid edges blocked by a wall as a tuple of `((row1, column1), (row2, column2))`.
         """
         return self.__walls
+
     
     def __set_walls(self,
-            values: set[tuple[tuple[int, int], tuple[int, int]]]
-            | list[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
+            values:
+                set[tuple[tuple[int, int], tuple[int, int]]]
+                | list[tuple[tuple[int, int], tuple[int, int]]] | None
+        ) -> None:
         
         if values is None:
             self.__walls = None
@@ -139,111 +133,9 @@ class Zip(ColorGeneratorMixin, TaxicabDistanceMixin, GameGrid):
             msg = f"Walls must be a tuple, list or set of squares. Got a {type(values).__name__} instead."
             raise TypeError(msg)
 
-        invalid_items = [pair for pair in values if self._taxicab_distance(*pair) != 1]
+        invalid_items = [pair for pair in values if TaxicabDistance.calculate(*pair) != 1]
         if invalid_items:
             msg = f"Squares in a pair must be consecutive ones. Invalid pairs: {invalid_items!r}."
             raise ValueError(msg)
 
         self.__walls = list(set(values))
-
-
-    @property
-    def path(self) -> list[tuple[int, int]] | None:
-        """
-        The solving path of Zip game.
-        
-        The path that visits all the grid squares, starting from 1-numbered squared to the highest-numbered square.
-
-        Returns:
-            The solving path as a list of squares as `(row, column)`.
-        """
-        if not self.is_solved:
-            return None
-        return self.__path
-
-
-    def _set_solution(self, verbose:bool=False) -> None:
-
-        S = self.model.S
-        E = self.model.E
-        u = self.model.u
-        x = self.model.x
-
-        nx.set_node_attributes(
-            self.grid,
-            name="value",
-            values={(i-1, j-1): round(pyo.value(u[i,j])) for i, j in S}
-        )
-        nx.set_edge_attributes(
-            self.grid,
-            name="value",
-            values={((i-1, j-1), (r-1, s-1)): round(pyo.value(x[i,j,r,s])) for i, j, r, s in E}
-        )
-        path = nx.get_node_attributes(self.grid, "value")
-        path = sorted(path.keys(), key=path.get)
-        self.__path = [(i+1, j+1) for (i, j) in path]
-        if verbose:
-            print("This is the path that solves the games:")
-            pprint(self.path)
-
-
-    def show(self) -> None:
-        """Show Zip's grid."""
-
-        E = self.model.E
-        N = self.model.N
-        K = self.model.K
-        x = self.model.x
-
-        width = height = self.size * 0.7
-        plt.figure(figsize=(width, height))
-        path_color = super()._generate_hex_code()
-        labels = {N.at(k): k for k in K}
-        labels = {(i-1, j-1): k for (i,j), k in labels.items()}
-        pos={(i,j): (j,-i) for i, j in self.grid.nodes()}
-
-        if self.walls is not None:
-            walls = nx.draw_networkx_edges(
-                self.grid,
-                pos=pos,
-                edgelist=[((i-1, j-1), (r-1, s-1)) for (i,j),(r,s) in self.walls],
-                edge_color="#000000",
-                hide_ticks=True,
-                arrows=False,
-                width=30
-            )
-            walls.set_zorder(0)
-
-        grid_squares = nx.draw_networkx_nodes(
-            self.grid,
-            pos= pos,
-            node_shape="s",
-            node_size= 1100,
-            node_color= "#FFFFFF",
-            linewidths= 2,
-        )
-        grid_squares.set_zorder(1)
-
-        nx.draw( # Drawing the path
-            self.grid,
-            pos= pos,
-            with_labels= True,
-            labels=labels,
-            arrows=False,
-            node_shape="o" if self.is_solved else "s",
-            node_size= 800,
-            node_color= [
-                "white" if (i+1,j+1) in self.numbered_squares else path_color
-                for (i,j) in self.grid.nodes()
-            ],
-            edge_color= path_color,
-            edgecolors= path_color,
-            linewidths= 1,
-            width= 30,
-            edgelist= [
-                ((i-1, j-1), (r-1, s-1)) for i,j,r,s in E
-                if round(pyo.value(x[i, j, r, s])) == 1
-            ]
-        )
-
-        plt.show()

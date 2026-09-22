@@ -1,16 +1,8 @@
-from pprint import pprint
-
-import matplotlib.pyplot as plt
-import networkx as nx
-import pyomo.environ as pyo
-
-from .._core._game_grid import GameGrid
-from .._mixin._color_generator_mixin import ColorGeneratorMixin
-from ._model import QueensModel
+from ..._game_grid import GameGrid
 from ._region import Region
 
 
-class Queens(ColorGeneratorMixin, GameGrid):
+class Queens(GameGrid):
     """
     The [LinkedIn Queens](https://www.linkedin.com/games/queens/) game.
     
@@ -31,9 +23,7 @@ class Queens(ColorGeneratorMixin, GameGrid):
             regions: Regions as a dictionary of `color: {(row, column), ...}` items.
         """
         super().__init__(grid_dims=(size, size))
-        self.__crowns: nx.Graph
         self.__set_regions(regions)
-        self._model = QueensModel(self.grid_dims, self.regions)
 
 
     def __hash__(self) -> int:
@@ -72,7 +62,7 @@ class Queens(ColorGeneratorMixin, GameGrid):
             raise ValueError(msg)
 
         if isinstance(regions, list):
-            colors = super()._generate_hex_codes(len(regions))
+            colors = generate_hex_codes(len(regions))
             regions = dict(zip(colors, regions, strict=True))
 
         all_region_squares = [square for squares in regions.values() for square in squares]
@@ -106,55 +96,3 @@ class Queens(ColorGeneratorMixin, GameGrid):
             name="color",
             values={(i-1, j-1): region.color for region in self.__regions for (i, j) in region.squares}
         )
-
-
-    @property
-    def crowns(self) -> list[tuple[int, int]] | None:
-        """
-        The crowned squares of Queens game.
-
-        Returns:
-            Locations of all crowns as a list of squares as `(row, column)`
-            or `None` if the game is not solved yet.
-        """
-        if not self.is_solved:
-            return None
-        return sorted((i+1, j+1) for (i, j) in self.__crowns.nodes())
-
-
-    def _set_solution(self, verbose:bool = False) -> None:
-
-        x = self.model.x
-        S = self.model.S
-        nx.set_node_attributes(
-            self.grid,
-            name="value",
-            values={(i-1, j-1): round(pyo.value(x[i, j])) for (i, j) in S}
-        )
-
-        crowns = [square for square, value in nx.get_node_attributes(self.grid, "value").items() if value == 1]
-        self.__crowns = self.grid.subgraph(crowns)
-        
-        if verbose:
-            print("These are the squares that contain a crown:")
-            pprint(self.crowns)
-
-
-    def show(self) -> None:
-        """Show the Queens' grid."""
-        width = height = self.size * 0.5
-        plt.figure(figsize=(width, height))
-        nx.draw(
-            self.grid,
-            pos={(i, j): (j, -i) for i, j in self.grid.nodes()},
-            with_labels=True,
-            arrows=False,
-            labels=dict.fromkeys(self.__crowns.nodes(), "O") if self.__crowns is not None else dict.fromkeys(self.grid.nodes(), ""),
-            node_size=1100,
-            node_color=list(nx.get_node_attributes(self.grid, "color").values()),
-            node_shape="s", # Squared-shape nodes
-            width=0,
-            edgecolors="black",
-            linewidths=.5
-        )
-        plt.show()
