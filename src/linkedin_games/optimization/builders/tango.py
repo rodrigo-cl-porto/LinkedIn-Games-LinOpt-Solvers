@@ -1,40 +1,45 @@
+from typing import Self
+
 import pyomo.environ as pyo
 
-from ..domain.games.tango.tango import Tango
-
-from ._optimization_model import OptimizationModelBuilder
+from ...domain.games.tango.tango import Tango
+from ._builder import OptimizationModelBuilder
 
 
 class TangoModelBuilder(OptimizationModelBuilder[Tango]):
     """The Linear Optimization Model for Tango game."""
 
-    def set_range_sets(self) -> None:
-        super().set_range_sets()
+    def set_range_sets(self) -> Self:
+        return super().set_range_sets()
 
 
-    def set_composite_sets(self) -> None:
+    def set_composite_sets(self) -> Self:
         super().set_composite_sets()
         self._model.K = pyo.Set(initialize=self._game.filled_squares.keys(), dimen=2)
         self._model.M = pyo.Set(initialize=self._game.matching_pairs)
         self._model.O = pyo.Set(initialize=self._game.opposite_pairs)
+        return self
 
 
-    def set_decision_variables(self) -> None:
+    def set_decision_variables(self) -> Self:
         self._model.x = pyo.Var(self._model.S, domain=pyo.Binary, initialize=0)
+        return self
 
 
-    def set_parameters(self) -> None:
+    def set_parameters(self) -> Self:
         self._model.k = pyo.Param( # Filled values
             self._model.K,
             initialize=self._game.filled_squares, domain=pyo.Binary
         )
+        return self
 
 
-    def set_objective_function(self) -> None:
+    def set_objective_function(self) -> Self:
         self._model.obj = pyo.Objective(expr=0) # feasibility problem
+        return self
 
 
-    def set_constraints(self) -> None:
+    def set_constraints(self) -> Self:
         self._model.equal_moons_suns_per_row_constraints = pyo.Constraint(
             self._model.I,
             rule=lambda model, i: pyo.quicksum(model.x[i,j] for j in model.J) == model.n / 2
@@ -71,3 +76,4 @@ class TangoModelBuilder(OptimizationModelBuilder[Tango]):
             self._model.O,
             rule=lambda model, i, j, r, s: model.x[i,j] + model.x[r, s] == 1
         )
+        return self

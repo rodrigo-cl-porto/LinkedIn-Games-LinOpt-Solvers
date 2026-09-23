@@ -1,5 +1,6 @@
-from typing import ClassVar
 import re
+from typing import ClassVar
+
 from matplotlib.colors import CSS4_COLORS
 
 

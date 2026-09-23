@@ -1,15 +1,15 @@
-from typing import TypeVar
-from abc import abstractmethod, ABC
-from linkedin_games._core._game_grid import GameGrid
+from abc import ABC, abstractmethod
+
 import networkx as nx
 
-G = TypeVar("G", bound=GameGrid)
+from ...domain._game_grid import GameGrid
 
-class GameRenderer[G](ABC):
+
+class GameRenderer[G: GameGrid](ABC):
 
     def __init__(self, game: G) -> None:
         m, n = game.grid_dims
-        self.height, self.width = m, n
+        self._height, self._width = m * .5, n * .5
         self.__set_grid(game)
 
 
@@ -18,6 +18,16 @@ class GameRenderer[G](ABC):
         nx.set_node_attributes(grid, name="value", values=None)
         nx.set_edge_attributes(grid, name="value", values=None)
         self._grid = grid
+
+
+    @property
+    def height(self) -> float:
+        return self._height
+
+
+    @property
+    def width(self) -> float:
+        return self._width
 
 
     @property
@@ -43,7 +53,7 @@ class GameRenderer[G](ABC):
         """
         return {(i+1, j+1): data["value"] for (i, j), data in self.grid.nodes(data=True)}
 
-    
+
     @property
     def grid_edges(self) -> dict[tuple[tuple[int, int], tuple[int, int]], int]:
         """

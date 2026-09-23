@@ -1,4 +1,4 @@
-from ..base.sudoku._base import BaseSudoku
+from ..sudoku._base import BaseSudoku
 
 
 class MiniSudoku(BaseSudoku):

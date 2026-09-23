@@ -1,7 +1,6 @@
 from typing import Any
 
-from ..base.shikaku.shikaku import Shikaku
-from ._model import PatchesModel
+from ..shikaku.shikaku import Shikaku
 from ._patch_seed import PatchSeed
 
 
@@ -22,6 +21,7 @@ class Patches(Shikaku):
         - A rectangle must cover only one seed;
         - The area of all rectangles must be greater than 1 square on the grid.
     """
+    
     def __init__(self, size:int, seeds: dict[tuple[int, int], int | dict[str, Any] | None]) -> object:
         """
         Args:
@@ -45,10 +45,6 @@ class Patches(Shikaku):
             ValueError: If there are some seeds with the same color.
         """
         super().__init__(size, seeds)
-
-
-    def _set_model(self) -> None:
-        self._model = PatchesModel(self.grid_dims, self.seeds)
 
 
     @staticmethod

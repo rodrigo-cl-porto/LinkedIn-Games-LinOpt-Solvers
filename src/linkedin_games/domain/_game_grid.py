@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 
 import networkx as nx
 import pyomo.environ as pyo
-from pyomo.opt import SolverStatus, TerminationCondition
 
 
 class GameGrid(ABC):
@@ -143,44 +142,6 @@ class GameGrid(ABC):
             `True` if the game has been solved. `False` otherwise.
         """
         return self.__is_solved
-
-
-    @property
-    def solution(self) -> dict[tuple[int, int], int] | dict[tuple[int, int], str] | None:
-        """
-        The solved game grid.
-        
-        Returns:
-            A dictionary of squares as `(row, column): value` or `None` if game's not solved yet.
-        """
-        if not self.is_solved:
-            return None
-        return self.grid_squares
-
-
-    def solve(self, solver:str="highs", verbose:bool=False) -> None:
-        """
-        Solve the game grid using the specified solver.
-        
-        Args:
-            solver: The solver's name to be used to solve the game.
-            verbose: If `True`, prints the solver output.
-        """
-        result = pyo.SolverFactory(solver).solve(self.model)
-        self.__is_solved = (
-            result.Solver.status == SolverStatus.ok # Checks if solver is finished with normal termination and if...
-            and(
-                result.Solver.termination_condition == TerminationCondition.optimal # ended with an optimal solution...
-                or result.Solver.termination_condition == TerminationCondition.feasible # or with a feasible one.
-            )
-        )
-        if self.__is_solved:
-            print(f"{type(self).__name__} game solved successfully!")
-            self._set_solution(verbose=verbose)
-        else:
-            print("No feasible solution was found!")
-            if verbose:
-                print(result.Solver)
 
 
     @abstractmethod

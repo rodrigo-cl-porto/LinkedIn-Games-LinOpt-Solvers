@@ -1,11 +1,4 @@
-from pprint import pprint
-
-import matplotlib.pyplot as plt
-import networkx as nx
-import pyomo.environ as pyo
-
-from ..._core._game_grid import GameGrid
-from ._model import SudokuModel
+from ..._game_grid import GameGrid
 
 
 class BaseSudoku(GameGrid):
@@ -21,6 +14,7 @@ class BaseSudoku(GameGrid):
         Each row, column, and block must be filled with a digit from 1 to `n`,
         without repetition in each row, column, or `p`x`q` block.
     """
+    
     def __init__(self, size: int, block_dims: tuple[int, int], filled_squares: dict[tuple[int, int], int]) -> None:
         """
         Args:
@@ -37,7 +31,6 @@ class BaseSudoku(GameGrid):
         super().__init__((size, size))
         self.__set_block_dims(block_dims)
         self.__set_filled_squares(filled_squares)
-        self._model = SudokuModel(self.grid_dims, self.block_dims, self.filled_squares)
 
 
     def __hash__(self) -> int:
@@ -81,6 +74,7 @@ class BaseSudoku(GameGrid):
         """
         return self.__block_dims
 
+
     def __set_block_dims(self, value:tuple[int, int] = (2, 2)) -> None:
         
         if len(value) != 2:
@@ -115,6 +109,7 @@ class BaseSudoku(GameGrid):
             The starting filled squares as a dictionary of `(row, column): digit` items.
         """
         return self.__filled_squares
+
     
     def __set_filled_squares(self, values: dict[tuple[int, int], int]) -> None:
 
@@ -154,42 +149,3 @@ class BaseSudoku(GameGrid):
 
         self.__filled_squares = values
         nx.set_node_attributes(self.grid, name="value", values=self.filled_squares)
-
-
-    def _set_solution(self, verbose:bool=False) -> None:
-
-        S = self.model.S
-        K = self.model.K
-        x = self.model.x
-        nx.set_node_attributes(
-            self.grid,
-            name="value",
-            values= {(i-1, j-1): k for (i, j) in S for k in K if round(pyo.value(x[i,j,k])) == 1}
-        )
-        if verbose:
-            print("These are the digits for each square:")
-            pprint(self.solution)
-
-
-    def show(self) -> None:
-        """Show the Sudoku's grid."""
-        width = height = self.size * 0.5
-        plt.figure(figsize=(width, height))
-        nx.draw(
-            self.grid,
-            pos= {(i, j): (j, -i) for (i, j) in self.grid.nodes()},
-            with_labels= True,
-            arrows=False,
-            labels= {
-                node: data.get("value") if data.get("value") is not None else ""
-                for node, data in self.grid.nodes(data=True)
-            },
-            font_color="white",
-            node_size= 1100,
-            node_shape="s",
-            node_color= "#1B1F22",
-            width= 0,
-            edgecolors="#999999",
-            linewidths= 1,
-        )
-        plt.show()

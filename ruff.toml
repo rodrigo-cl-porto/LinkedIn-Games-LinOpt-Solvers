@@ -52,7 +52,6 @@ ignore = [
     "FBT001", # Boolean-typed positional argument in function definition
     "FBT002", # Boolean-typed positional argument in function definition
     "COM812",
-    "I001",
     "E741",
     "RUF001", # ambiguous-unicode-character-string
     "RUF002", # ambiguous-unicode-character-docstring

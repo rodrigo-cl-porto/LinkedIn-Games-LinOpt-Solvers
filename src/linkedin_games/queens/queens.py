@@ -149,7 +149,9 @@ class Queens(ColorGeneratorMixin, GameGrid):
             pos={(i, j): (j, -i) for i, j in self.grid.nodes()},
             with_labels=True,
             arrows=False,
-            labels=dict.fromkeys(self.__crowns.nodes(), "O") if self.__crowns is not None else dict.fromkeys(self.grid.nodes(), ""),
+            labels= dict.fromkeys(self.__crowns.nodes(), "O")
+                if self.__crowns
+                else dict.fromkeys(self.grid.nodes(), ""),
             node_size=1100,
             node_color=list(nx.get_node_attributes(self.grid, "color").values()),
             node_shape="s", # Squared-shape nodes

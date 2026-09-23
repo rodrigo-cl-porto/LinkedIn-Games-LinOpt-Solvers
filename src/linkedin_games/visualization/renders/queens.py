@@ -1,15 +1,15 @@
-from linkedin_games import Queens
-
-from .renderer import GameRenderer
 import matplotlib.pyplot as plt
 import networkx as nx
 
+from ...domain.games.queens.queens import Queens
+from ._renderer import GameRenderer
+
 
 class QueensRenderer(GameRenderer[Queens]):
+
     def render(self, game: Queens) -> None:
         """Show the Queens' grid."""
-        width = height = game.size * 0.5
-        plt.figure(figsize=(width, height))
+        plt.figure(figsize=(self._width, self._height))
         nx.draw(
             game.grid,
             pos={(i, j): (j, -i) for i, j in game.grid.nodes()},

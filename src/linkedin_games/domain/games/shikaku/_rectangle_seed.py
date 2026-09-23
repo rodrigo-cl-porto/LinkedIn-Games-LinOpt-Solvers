@@ -1,6 +1,6 @@
 from typing import Any
 
-from ..._core._color import Color
+from ..._color import Color
 from ._rectangle import Rectangle
 
 
@@ -87,6 +87,7 @@ class RectangleSeed:
         """
         return self.__square
 
+
     def __set_square(self, value: tuple[int, int]) -> None:
 
         if not isinstance(value, tuple):
@@ -113,6 +114,7 @@ class RectangleSeed:
             The rectangle's area required by the seed or `None` if the seed doesn't claim it.
         """
         return self._area
+
 
     def _set_area(self, value: int=1) -> None:
 
@@ -141,6 +143,7 @@ class RectangleSeed:
             The color's name of the rectangle.
         """
         return self.__color.name
+
     
     @color.setter
     def color(self, value:str) -> None:
@@ -156,6 +159,7 @@ class RectangleSeed:
             Hex code color as a `"#RRGGBB"` string.
         """
         return self.__color.hex_code
+
     
     @color_code.setter
     def color_code(self, value:str) -> None:
@@ -171,6 +175,7 @@ class RectangleSeed:
             The rectangle created by the seed after solving the game.
         """
         return self._rectangle
+
 
     @rectangle.setter
     def rectangle(self, value: dict[str, int]) -> None:
