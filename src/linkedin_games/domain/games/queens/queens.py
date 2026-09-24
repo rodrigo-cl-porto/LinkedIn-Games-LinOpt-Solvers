@@ -1,4 +1,5 @@
-from ..._game_grid import GameGrid
+from ...utils.color_generator import ColorGenerator
+from ..game_grid import GameGrid
 from ._region import Region
 
 
@@ -51,6 +52,15 @@ class Queens(GameGrid):
         """
         return {region.color_code: region.squares for region in self.__regions}
 
+
+    @property
+    def crowns(self) -> list[tuple[int, int] | None]:
+        if not self._solution:
+            return []
+        squares = self._solution.get("grid_squares")
+        return [square for square, value in squares.items() if value == 1]
+
+
     def __set_regions(self, regions:dict[str, set[tuple[int, int]]] | list[set[tuple[int, int]]]) -> None:
 
         if not isinstance(regions, (dict, list)):
@@ -62,7 +72,7 @@ class Queens(GameGrid):
             raise ValueError(msg)
 
         if isinstance(regions, list):
-            colors = generate_hex_codes(len(regions))
+            colors = ColorGenerator.generate_hex_codes(len(regions))
             regions = dict(zip(colors, regions, strict=True))
 
         all_region_squares = [square for squares in regions.values() for square in squares]
@@ -90,9 +100,3 @@ class Queens(GameGrid):
                 raise ValueError(msg)
 
         self.__regions = [Region(color=color, squares=squares) for color, squares in regions.items()]
-
-        nx.set_node_attributes( # Adding a color for each square on the grid
-            self._grid,
-            name="color",
-            values={(i-1, j-1): region.color for region in self.__regions for (i, j) in region.squares}
-        )

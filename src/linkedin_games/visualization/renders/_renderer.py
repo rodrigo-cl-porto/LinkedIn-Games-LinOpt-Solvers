@@ -2,22 +2,30 @@ from abc import ABC, abstractmethod
 
 import networkx as nx
 
-from ...domain._game_grid import GameGrid
+from ...domain.games.game_grid import GameGrid
 
 
 class GameRenderer[G: GameGrid](ABC):
 
     def __init__(self, game: G) -> None:
+        self._game = game
         m, n = game.grid_dims
         self._height, self._width = m * .5, n * .5
-        self.__set_grid(game)
+        self._set_grid()
 
 
-    def __set_grid(self, game: G) -> None:
-        grid = nx.grid_2d_graph(*game.grid_dims).to_directed()
-        nx.set_node_attributes(grid, name="value", values=None)
-        nx.set_edge_attributes(grid, name="value", values=None)
-        self._grid = grid
+    @abstractmethod
+    def _set_grid(self) -> None:
+        self._grid = nx.grid_2d_graph(*self._game.grid_dims).to_directed()
+        nx.set_edge_attributes(self._grid, name="value", values=None)
+        if self._game.solution:
+            nx.set_node_attributes(
+                self._grid,
+                name="value",
+                values={(i-1, j-1): k for (i, j), k in self._game.grid_squares.items()}
+            )
+        else:
+            nx.set_node_attributes(self._grid, name="value", values=None)
 
 
     @property
@@ -51,7 +59,7 @@ class GameRenderer[G: GameGrid](ABC):
         Returns:
             Grid squares as a dictionary of `(row, column): value` items.
         """
-        return {(i+1, j+1): data["value"] for (i, j), data in self.grid.nodes(data=True)}
+        return {(i+1, j+1): data["value"] for (i, j), data in self._grid.nodes(data=True)}
 
 
     @property
@@ -62,10 +70,10 @@ class GameRenderer[G: GameGrid](ABC):
         Returns:
             All edges as a dictionary of `((row1, column1), (row2, column2)): value` items.
         """
-        edges = nx.get_edge_attributes(self.grid, "value").items()
+        edges = nx.get_edge_attributes(self._grid, "value").items()
         return {((i+1, j+1), (r+1, s+1)): value for ((i, j), (r, s)), value in edges}
 
 
     @abstractmethod
-    def render(self, game: G) -> None:
+    def show(self, game: G) -> None:
         ...

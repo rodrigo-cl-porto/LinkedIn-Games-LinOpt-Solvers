@@ -1,7 +1,6 @@
 class TaxicabDistance:
-
     @staticmethod
-    def calculate(square1:tuple[int, int], square2:tuple[int, int]) -> int:
+    def calculate(square1: tuple[int, int], square2: tuple[int, int]) -> int:
         """
         Calculate the Taxicab distance between two points.
         

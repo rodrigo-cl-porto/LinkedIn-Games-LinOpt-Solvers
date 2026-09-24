@@ -1,26 +1,15 @@
-from abc import ABC, abstractmethod
+from pyomo.environ import ConcreteModel
 
-import pyomo.environ as pyo
-
-from ...domain._game_grid import GameGrid
-from ..builders._builder import OptimizationModelBuilder
+from ...domain.games.game_grid import GameGrid
+from ._factory import OptimizationModelBuilderFactory
 
 
-class OptimizationModelDirector[G: GameGrid](ABC):
-
-    def __init__(self, game: G) -> None:
-        self._builder: OptimizationModelBuilder[G]
-        self._set_builder(game)
-
-
-    @abstractmethod
-    def _set_builder(self, game: G) -> None:
-        ...
-
-
-    def build(self) -> pyo.ConcreteModel:
+class OptimizationModelDirector:
+    @staticmethod
+    def build_opt_model(game: GameGrid) -> ConcreteModel:
+        builder = OptimizationModelBuilderFactory.create(game)
         return (
-            self._builder
+            builder
             .set_board_dimensions()
             .set_range_sets()
             .set_composite_sets()

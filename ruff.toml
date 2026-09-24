@@ -59,6 +59,9 @@ ignore = [
     "W293"
 ]
 
+[lint.flake8-annotations]
+allow-star-arg-any = true
+
 [lint.per-file-ignores]
 "tests/**/*.py" = ["ANN201", "S101"]
 

@@ -1,4 +1,4 @@
-from ..._game_grid import GameGrid
+from ..game_grid import GameGrid
 
 
 class BaseSudoku(GameGrid):

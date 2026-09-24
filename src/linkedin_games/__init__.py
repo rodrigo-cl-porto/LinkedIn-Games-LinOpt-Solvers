@@ -1,7 +1,7 @@
-from .patches.patches import Patches
-from .queens.queens import Queens
-from .mini_sudoku.mini_sudoku import MiniSudoku
-from .tango.tango import Tango
-from .zip.zip import Zip
+from .old.patches.patches import Patches
+from .old.queens.queens import Queens
+from .old.mini_sudoku.mini_sudoku import MiniSudoku
+from .old.tango.tango import Tango
+from .old.zip.zip import Zip
 
 __all__ = ["MiniSudoku", "Patches", "Queens", "Tango", "Zip"]

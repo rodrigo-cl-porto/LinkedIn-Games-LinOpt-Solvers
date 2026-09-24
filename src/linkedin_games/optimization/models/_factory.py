@@ -1,42 +1,41 @@
-from pyomo.environ import ConcreteModel
-
-from ...domain._game_grid import GameGrid
+from ...domain.games.game_grid import GameGrid
 from ...domain.games.patches.patches import Patches
 from ...domain.games.queens.queens import Queens
 from ...domain.games.shikaku.shikaku import Shikaku
 from ...domain.games.sudoku._base import BaseSudoku
 from ...domain.games.tango.tango import Tango
 from ...domain.games.zip.zip import Zip
-from .patches import PatchesModel
-from .queens import QueensModel
-from .shikaku import ShikakuModel
-from .sudoku import SudokuModel
-from .tango import TangoModel
-from .zip import ZipModel
+from ._builder import OptimizationModelBuilder
+from .patches import PatchesModelBuilder
+from .queens import QueensModelBuilder
+from .shikaku import ShikakuModelBuilder
+from .sudoku import SudokuModelBuilder
+from .tango import TangoModelBuilder
+from .zip import ZipModelBuilder
 
 
-class OptimizationModelFactory:
+class OptimizationModelBuilderFactory:
 
     @staticmethod
-    def create(game: GameGrid) -> ConcreteModel:
+    def create(game: GameGrid) -> OptimizationModelBuilder:
 
         if isinstance(game, Patches):
-            return PatchesModel(game).build()
+            return PatchesModelBuilder(game)
         
         if isinstance(game, Queens):
-            return QueensModel(game).build()
+            return QueensModelBuilder(game)
 
         if isinstance(game, Shikaku):
-            return ShikakuModel(game).build()
+            return ShikakuModelBuilder(game)
 
         if isinstance(game, BaseSudoku):
-            return SudokuModel(game).build()
+            return SudokuModelBuilder(game)
         
         if isinstance(game, Tango):
-            return TangoModel(game).build()
+            return TangoModelBuilder(game)
 
         if isinstance(game, Zip):
-            return ZipModel(game).build()
+            return ZipModelBuilder(game)
 
-        msg = f"Game is invalid. Got {type(game).__name__}"
+        msg = f"Invalid game. Got {type(game).__name__} instead."
         raise TypeError(msg)

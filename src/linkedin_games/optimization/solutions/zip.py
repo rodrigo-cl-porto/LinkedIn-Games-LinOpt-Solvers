@@ -1,34 +1,19 @@
-from pyomo.environ import ConcreteModel
+import pyomo.environ as pyo
 
-from ._game_solution import GameSolution
-
-
-class ZipSolution(GameSolution):
-
-    def __init__(self, model: ConcreteModel) -> None:
-        ...
+from ._builder import GameSolutionBuilder
 
 
-    def _set_solution(self, verbose:bool=False) -> None:
-
-        S = self.model.S
-        E = self.model.E
-        u = self.model.u
-        x = self.model.x
-
-        nx.set_node_attributes(
-            self.grid,
-            name="value",
-            values={(i-1, j-1): round(pyo.value(u[i,j])) for i, j in S}
+class ZipSolutionBuilder(GameSolutionBuilder):
+    def _set_solution(self) -> None:
+        self._solution.add(
+            grid_squares = {
+                (i, j): round(pyo.value(self._opt_model.u[i,j]))
+                for i, j in self._opt_model.S
+            },
+            grid_edges = {
+                ((i,j), (r,s)): round(pyo.value(self._opt_model.x[i,j,r,s]))
+                for i, j, r, s in self._opt_model.E
+            }
         )
-        nx.set_edge_attributes(
-            self.grid,
-            name="value",
-            values={((i-1, j-1), (r-1, s-1)): round(pyo.value(x[i,j,r,s])) for i, j, r, s in E}
-        )
-        path = nx.get_node_attributes(self.grid, "value")
-        path = sorted(path.keys(), key=path.get)
-        self.__path = [(i+1, j+1) for (i, j) in path]
-        if verbose:
-            print("This is the path that solves the games:")
-            pprint(self.path)
+        squares = self._solution.get("grid_squares")
+        self._solution.add(path=sorted(squares.keys(), key=squares.get))
