@@ -53,15 +53,7 @@ class Queens(GameGrid):
         return {region.color_code: region.squares for region in self.__regions}
 
 
-    @property
-    def crowns(self) -> list[tuple[int, int] | None]:
-        if not self._solution:
-            return []
-        squares = self._solution.get("grid_squares")
-        return [square for square, value in squares.items() if value == 1]
-
-
-    def __set_regions(self, regions:dict[str, set[tuple[int, int]]] | list[set[tuple[int, int]]]) -> None:
+    def __set_regions(self, regions: dict[str, set[tuple[int, int]]] | list[set[tuple[int, int]]]) -> None:
 
         if not isinstance(regions, (dict, list)):
             msg = f"regions must be a dict or list. Got {type(regions).__name__} instead."
@@ -100,3 +92,11 @@ class Queens(GameGrid):
                 raise ValueError(msg)
 
         self.__regions = [Region(color=color, squares=squares) for color, squares in regions.items()]
+
+
+    @property
+    def crowns(self) -> list[tuple[int, int] | None]:
+        if not self._solution:
+            return []
+        squares = self._solution.get("grid_squares")
+        return [square for square, value in squares.items() if value == 1]

@@ -1,4 +1,4 @@
-from .._core._color import Color
+from ...color import Color
 
 
 class Region:
@@ -54,6 +54,7 @@ class Region:
         """
         return self.__squares
 
+
     @squares.setter
     def squares(self, value: set[tuple[int, int]]) -> None:
 
@@ -80,6 +81,7 @@ class Region:
 
         self.__squares = value
 
+
     @property
     def color(self) -> str:
         """
@@ -89,10 +91,12 @@ class Region:
             The color's name of the region.
         """
         return self.__color.name
+
     
     @color.setter
     def color(self, value:str) -> None:
         self.__color.color = value
+
 
     @property
     def color_code(self) -> str:
@@ -103,6 +107,7 @@ class Region:
             Hex code color as a `"#RRGGBB"` string.
         """
         return self.__color.hex_code
+
     
     @color_code.setter
     def color_code(self, value:str) -> None:

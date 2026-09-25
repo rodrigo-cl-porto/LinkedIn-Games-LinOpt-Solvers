@@ -1,5 +1,5 @@
-from ..game_grid import GameGrid
 from ...utils.taxicab_distance import TaxicabDistance
+from ..game_grid import GameGrid
 
 
 class Zip(GameGrid):
@@ -59,7 +59,9 @@ class Zip(GameGrid):
         Returns:
             The total number of edges on game grid.
         """
-        return self.grid.number_of_edges() / 2
+        m = self._height
+        n = self._width
+        return 2*m*n - m - n
 
 
     @property
@@ -71,6 +73,7 @@ class Zip(GameGrid):
             The numbered squares as a dictionary of `(row, column): number` items.
         """
         return self.__numbered_squares
+
     
     def __set_numbered_squares(self, values:list[tuple[int, int]]) -> None:
 
@@ -93,11 +96,6 @@ class Zip(GameGrid):
             raise TypeError(msg)
 
         self.__numbered_squares = values
-        nx.set_node_attributes(
-            self.grid,
-            name="value",
-            values= {square: index for index, square in enumerate(values)}
-        )
 
 
     @property
@@ -110,7 +108,7 @@ class Zip(GameGrid):
         """
         return self.__walls
 
-    
+
     def __set_walls(self,
             values:
                 set[tuple[tuple[int, int], tuple[int, int]]]
@@ -139,3 +137,32 @@ class Zip(GameGrid):
             raise ValueError(msg)
 
         self.__walls = list(set(values))
+
+
+    @property
+    def grid_edges(self) -> dict[tuple[tuple[int, int], tuple[int, int]], int]:
+        if not self._solution:
+            I = range(1, self._height+1)
+            J = range(1, self._width+1)
+            edges = [((i,j), (i+1, j)) for i in I for j in J if i+1 in I]
+            edges += [((i,j), (i-1, j)) for i in I for j in J if i-1 in I]
+            edges += [((i,j), (i, j+1)) for i in I for j in J if j+1 in J]
+            edges += [((i,j), (i, j-1)) for i in I for j in J if j-1 in J]
+            return dict.fromkeys(edges, 0)
+        return self._solution.get("grid_edges")
+
+
+    @property
+    def path(self) -> list[tuple[int, int] | None]:
+        """
+        The solving path of Zip game.
+        
+        The path that visits all the grid squares, starting from 1-numbered squared to the highest-numbered square.
+
+        Returns:
+            The solving path as a list of squares as `(row, column)`.
+        """
+        if not self._solution:
+            return []
+        squares = self._solution.get("grid_squares")
+        return sorted(squares.keys(), key=squares.get)

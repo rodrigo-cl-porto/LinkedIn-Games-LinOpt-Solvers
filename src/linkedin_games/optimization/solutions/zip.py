@@ -15,5 +15,3 @@ class ZipSolutionBuilder(GameSolutionBuilder):
                 for i, j, r, s in self._opt_model.E
             }
         )
-        squares = self._solution.get("grid_squares")
-        self._solution.add(path=sorted(squares.keys(), key=squares.get))

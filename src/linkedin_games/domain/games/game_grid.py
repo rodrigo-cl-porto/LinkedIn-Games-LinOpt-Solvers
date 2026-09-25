@@ -47,8 +47,7 @@ class GameGrid:
             Grid squares as a dictionary of `(row, column): value` items.
         """
         if not self._solution:
-            return {(i, j): None for i in range(1, self._height) for j in range(1, self._width+1)}
-
+            return {(i, j): None for i in range(1, self._height+1) for j in range(1, self._width+1)}
         return self._solution.get("grid_squares")
 
 

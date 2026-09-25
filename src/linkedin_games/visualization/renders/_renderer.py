@@ -7,10 +7,13 @@ from ...domain.games.game_grid import GameGrid
 
 class GameRenderer[G: GameGrid](ABC):
 
+    _SCALE_FACTOR = .5
+
     def __init__(self, game: G) -> None:
         self._game = game
         m, n = game.grid_dims
-        self._height, self._width = m * .5, n * .5
+        self._height = m * self._SCALE_FACTOR
+        self._width = n * self._SCALE_FACTOR
         self._set_grid()
 
 
@@ -75,5 +78,5 @@ class GameRenderer[G: GameGrid](ABC):
 
 
     @abstractmethod
-    def show(self, game: G) -> None:
+    def show(self) -> None:
         ...
