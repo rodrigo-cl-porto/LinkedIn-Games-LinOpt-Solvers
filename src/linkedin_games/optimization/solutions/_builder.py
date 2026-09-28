@@ -11,8 +11,8 @@ class GameSolutionBuilder(ABC):
         self._solution = GameSolution()
 
 
-    def build(self, opt_model: ConcreteModel) -> GameSolution:
-        self._opt_model = opt_model
+    def build(self, model: ConcreteModel) -> GameSolution:
+        self._model = model
         self._set_solution()
         return self._solution
 

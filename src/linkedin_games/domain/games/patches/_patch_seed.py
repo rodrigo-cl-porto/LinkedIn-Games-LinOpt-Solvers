@@ -1,12 +1,11 @@
 from typing import Any
 
-from .._mixin._is_perfect_square_mixin import IsPerfectSquareMixin
-from ..base.shikaku._rectangle import Rectangle
-from ..base.shikaku._rectangle_seed import RectangleSeed
+from ...utils.is_perfect_square import IsPerfectSquare
+from ..shikaku._rectangle_seed import RectangleSeed
 from ._patch_shape import PatchShape
 
 
-class PatchSeed(IsPerfectSquareMixin, RectangleSeed):
+class PatchSeed(RectangleSeed):
     """A seed that creates a patch in the Patches game."""
 
     def __init__(self,
@@ -22,8 +21,12 @@ class PatchSeed(IsPerfectSquareMixin, RectangleSeed):
             shape: The patch's required shape.
             color: The seed's color name or its hex code as a `#RRGGBB` string.
         """
-        self.__set_shape(shape)
-        super().__init__(square, color, area)
+        self._set_shape(shape)
+        if area is None:
+            super().__init__(square, color)
+            self._set_area(None)
+        else:
+            super().__init__(square, color, area)
 
 
     def __repr__(self) -> str:
@@ -82,7 +85,8 @@ class PatchSeed(IsPerfectSquareMixin, RectangleSeed):
         """
         return str(self.__shape)
 
-    def __set_shape(self, value:str|None) -> None:
+
+    def _set_shape(self, value: str | None = PatchShape.ANY) -> None:
 
         if value is None:
             self.__shape = PatchShape.ANY
@@ -110,7 +114,8 @@ class PatchSeed(IsPerfectSquareMixin, RectangleSeed):
         """
         return self._area
 
-    def _set_area(self, value: int | None) -> None:
+
+    def _set_area(self, value: int | None = None) -> None:
 
         if value is None:
             self._area = None
@@ -124,57 +129,8 @@ class PatchSeed(IsPerfectSquareMixin, RectangleSeed):
             msg = f"The required area must be a positive integer. Got {value!r} instead."
             raise ValueError(msg)
 
-        if self.shape == PatchShape.SQUARE and not PatchSeed._is_perfect_square(value):
+        if self.shape == PatchShape.SQUARE and not IsPerfectSquare.check(value):
             msg = f"The required area ({value!r}) is not a perfect square."
             raise ValueError(msg)
 
         self._area = value
-
-
-    @property
-    def patch(self) -> Rectangle:
-        """
-        The created patch.
-        
-        Returns:
-            The patch created by the seed after solving the game.
-        """
-        return self._rectangle
-
-    @patch.setter
-    def patch(self, value: dict[str, int]) -> None:
-
-        patch_area =  value["height"] * value["width"]
-        if self.area is not None and patch_area != self.area:
-            msg = f"The patch's area ({patch_area}) doesn't attend to the required area ({self.area})."
-            raise ValueError(msg)
-        
-        match self.shape:
-            case PatchShape.VERTICAL:
-                if value["height"] <= value["width"]:
-                    msg = (
-                        f"The patch doesn't have {self.shape.lower} shape."
-                        f" Its height ({value["height"]!r}) should be greater than its width ({value["width"]!r})."
-                    )
-                    raise ValueError(msg)
-            
-            case PatchShape.HORIZONTAL:
-                if value["height"] >= value["width"]:
-                    msg = (
-                        f"The patch doesn't have {self.shape.lower} shape."
-                        f" Its width ({value["width"]!r}) should be greater than its height ({value["height"]!r})."
-                    )
-                    raise ValueError(msg)
-            
-            case PatchShape.SQUARE:
-                if value["height"] != value["width"]:
-                    msg = (
-                        f"The patch doesn't have {self.shape.lower} shape."
-                        f" Its height ({value["height"]!r}) should be equal to its width ({value["width"]!r})."
-                    )
-                    raise ValueError(msg)
-
-        self._rectangle = Rectangle(
-            top_left=(value["top"], value["left"]),
-            dims=(value["height"], value["width"])
-        )

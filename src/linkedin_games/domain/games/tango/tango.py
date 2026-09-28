@@ -1,5 +1,5 @@
-from ..game_grid import GameGrid
 from ...utils.taxicab_distance import TaxicabDistance
+from ..game_grid import GameGrid
 
 
 class Tango(GameGrid):
@@ -18,6 +18,7 @@ class Tango(GameGrid):
         - Squares separated by the `=` sign must contain the same symbol;
         - Squares separated by the `×` sign must contain opposite symbols.
     """
+
     def __init__(self,
             filled_squares: dict[tuple[int, int], int],
             matching_pairs:
@@ -79,7 +80,7 @@ class Tango(GameGrid):
 
 
     @property
-    def matching_pairs(self) -> list[tuple[tuple[int, int], tuple[int, int]]] | None:
+    def matching_pairs(self) -> list[tuple[tuple[int, int], tuple[int, int]]]:
         """
         Pairs of matching squares.
 
@@ -99,7 +100,7 @@ class Tango(GameGrid):
         ) -> None:
 
         if values is None:
-            self.__matching_pairs = None
+            self.__matching_pairs = []
             return
 
         invalid_items = [pair for pair in values if not isinstance(pair, tuple) or len(pair) != 2]
@@ -129,7 +130,7 @@ class Tango(GameGrid):
 
 
     @property
-    def opposite_pairs(self) -> list[tuple[tuple[int, int], tuple[int, int]]] | None:
+    def opposite_pairs(self) -> list[tuple[tuple[int, int], tuple[int, int]]]:
         """
         Pairs of opposite squares.
 
@@ -148,7 +149,7 @@ class Tango(GameGrid):
         ) -> None:
 
         if values is None:
-            self.__opposite_pairs = None
+            self.__opposite_pairs = []
             return
 
         invalid_items = [pair for pair in values if not isinstance(pair, tuple) or len(pair) != 2]
@@ -169,9 +170,43 @@ class Tango(GameGrid):
             msg = f"Coordinates must be positive integers. Invalid squares: {invalid_items!r}."
             raise ValueError(msg)
 
-        invalid_items = [pair for pair in values if self._taxicab_distance(*pair) != 1]
+        invalid_items = [pair for pair in values if TaxicabDistance.calculate(*pair) != 1]
         if invalid_items:
             msg = f"Squares in a pair must be consecutive ones. Invalid pairs: {invalid_items!r}."
             raise ValueError(msg)
         
         self.__opposite_pairs = list(set(values))
+
+
+    @property
+    def grid_squares(self) -> dict[tuple[int, int], int | None]:
+        """
+        All the grid squares and their respective assigned values (if any).
+        
+        Returns:
+            Grid squares as a dictionary of `(row, column): value` items.
+        """
+        if self._solution:
+            return self._solution.get("grid_squares")
+        
+        return {
+            (i, j): self.filled_squares.get((i, j))
+            for i in range(1, self._height+1)
+            for j in range(1, self._width+1)
+        }
+
+
+    @property
+    def moons(self) -> list[tuple[int, int]]:
+        if not self._solution:
+            return []
+        squares: dict[tuple[int, int], int] = self._solution.get("grid_squares")
+        return [square for square, value in squares.items() if value == 1]
+
+
+    @property
+    def suns(self) -> list[tuple[int, int]]:
+        if not self._solution:
+            return []
+        squares: dict[tuple[int, int], int] = self._solution.get("grid_squares")
+        return [square for square, value in squares.items() if value == 0]

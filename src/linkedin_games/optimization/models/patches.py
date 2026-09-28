@@ -11,15 +11,24 @@ class PatchesModelBuilder(ShikakuModelBuilder):
     def set_composite_sets(self) -> Self:
         super().set_composite_sets()
         self._model.V = pyo.Set( # Vertical rectangles
-            initialize=[seed["color_code"] for seed in self._game.seeds if seed["shape"] == PatchShape.VERTICAL],
+            initialize=[
+                seed["color_code"] for seed in self._game.seeds.values()
+                if seed["shape"] == PatchShape.VERTICAL
+            ],
             domain=self._model.K
         )
         self._model.H = pyo.Set( # Horizontal rectangles
-            initialize=[seed["color_code"] for seed in self._game.seeds if seed["shape"] == PatchShape.HORIZONTAL],
+            initialize=[
+                seed["color_code"] for seed in self._game.seeds.values()
+                if seed["shape"] == PatchShape.HORIZONTAL
+            ],
             domain=self._model.K
         )
         self._model.Q = pyo.Set( # Squared rectangles
-            initialize=[seed["color_code"] for seed in self._game.seeds if seed["shape"] == PatchShape.SQUARE],
+            initialize=[
+                seed["color_code"] for seed in self._game.seeds.values()
+                if seed["shape"] == PatchShape.SQUARE
+            ],
             domain=self._model.K
         )
         return self

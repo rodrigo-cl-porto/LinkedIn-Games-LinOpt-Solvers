@@ -4,7 +4,7 @@ from ...optimization.solutions._solution import GameSolution
 class GameGrid:
     """An Abstract Base Class for any LinkedIn game grid."""
 
-    def __init__(self, grid_dims:tuple[int, int]) -> None:
+    def __init__(self, grid_dims: tuple[int, int]) -> None:
         """
         Args:
             `grid_dims`: Grid dimensions as a `(rows, columns)` tuple.
@@ -39,16 +39,17 @@ class GameGrid:
 
 
     @property
-    def grid_squares(self) -> dict[tuple[int, int], int | None]:
+    def grid_squares(self) -> dict[tuple[int, int], int | str | None]:
         """
         All the grid squares and their respective assigned values (if any).
         
         Returns:
             Grid squares as a dictionary of `(row, column): value` items.
         """
-        if not self._solution:
-            return {(i, j): None for i in range(1, self._height+1) for j in range(1, self._width+1)}
-        return self._solution.get("grid_squares")
+        if self._solution:
+            return self._solution.get("grid_squares")
+        
+        return {(i, j): None for i in range(1, self._height+1) for j in range(1, self._width+1)}
 
 
     @property
@@ -102,4 +103,13 @@ class GameGrid:
 
     @solution.setter
     def solution(self, value: GameSolution) -> None:
+
+        if not isinstance(value, GameSolution):
+            raise TypeError(f"Invalid input. Got {type(value).__name__} instead of GameSolution.")
+        
         self._solution = value
+
+
+    @property
+    def is_solved(self) -> bool:
+        return self._solution is not None

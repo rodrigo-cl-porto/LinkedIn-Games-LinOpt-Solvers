@@ -1,7 +1,7 @@
 class Rectangle:
     """A Patches rectangle, used as part of the game's solution."""
     
-    def __init__(self, top_left:tuple[int, int], dims:tuple[int, int]) -> object:
+    def __init__(self, top_left: tuple[int, int], dims: tuple[int, int]) -> None:
         """
         Args:
             top_left: Grid position of the rectangle's top-left square as a `(row, column)` tuple.
@@ -35,7 +35,7 @@ class Rectangle:
 
 
     def __len__(self) -> int:
-        return self.width * self.height
+        return self.area
 
 
     def __eq__(self, other: object) -> bool:
@@ -56,7 +56,7 @@ class Rectangle:
         Returns:
             Total quantity of squares in the rectangle.
         """
-        return len(self)
+        return self.width * self.height
 
 
     @property
@@ -68,9 +68,10 @@ class Rectangle:
             Rectangle dimensions as a `(height, width)` tuple.
         """
         return (self.height, self.width)
-    
+
+
     @dims.setter
-    def dims(self, value:tuple[int, int]) -> None:
+    def dims(self, value: tuple[int, int]) -> None:
         self.height, self.width  = value
 
 
@@ -83,7 +84,8 @@ class Rectangle:
             Rectangle dimensions as a `(row, column)` tuple.
         """
         return (self.top, self.left)
-    
+
+
     @top_left.setter
     def top_left(self, value:tuple[int, int]) -> None:
         self.top, self.left = value
@@ -98,6 +100,7 @@ class Rectangle:
             Index position of the rectangle's first row.
         """
         return self.__top
+
 
     @top.setter
     def top(self, value:int) -> None:
@@ -122,6 +125,7 @@ class Rectangle:
             Index position of the rectangle's first column.
         """
         return self.__left
+
 
     @left.setter
     def left(self, value:int) -> None:
@@ -171,6 +175,7 @@ class Rectangle:
         """
         return self.__height
 
+
     @height.setter
     def height(self, value:int) -> None:
 
@@ -195,7 +200,7 @@ class Rectangle:
         The grid squares occupied by the rectangle.
         
         Returns:
-            All the squares as a tuple of `(row, column)`.
+            All the squares as a tuple of `(row, column)` tuples.
         """
         return tuple(
             (i, j)

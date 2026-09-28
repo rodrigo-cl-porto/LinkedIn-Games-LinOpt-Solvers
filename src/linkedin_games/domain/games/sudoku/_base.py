@@ -148,4 +148,21 @@ class BaseSudoku(GameGrid):
             raise ValueError(msg)
 
         self.__filled_squares = values
-        nx.set_node_attributes(self.grid, name="value", values=self.filled_squares)
+
+
+    @property
+    def grid_squares(self) -> dict[tuple[int, int], int | None]:
+        """
+        All the grid squares and their respective assigned values (if any).
+        
+        Returns:
+            Grid squares as a dictionary of `(row, column): value` items.
+        """
+        if self._solution:
+            return self._solution.get("grid_squares")
+        
+        return {
+            (i, j): self.filled_squares.get((i, j))
+            for i in range(1, self._height+1)
+            for j in range(1, self._width+1)
+        }

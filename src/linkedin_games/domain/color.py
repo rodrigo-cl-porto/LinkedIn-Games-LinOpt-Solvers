@@ -11,7 +11,8 @@ class Color:
     __COLOR_HEXES = CSS4_COLORS
     __COLOR_NAMES: ClassVar = {hex_code: name for name, hex_code in CSS4_COLORS.items()}
 
-    def __init__(self, color: str|None="#FFFFFF") -> None:
+
+    def __init__(self, color: str | None="#FFFFFF") -> None:
         """
         Args:
             color: Color name or its hex code as a "#RRGGBB" string.
@@ -62,6 +63,7 @@ class Color:
     @property
     def color(self) -> str:
         return self.__name
+
 
     @color.setter
     def color(self, value: str|None) -> None:
@@ -114,6 +116,7 @@ class Color:
     @property
     def name(self) -> str:
         return self.__name
+
 
     @name.setter
     def name(self, value: str| None) -> None:

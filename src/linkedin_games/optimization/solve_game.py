@@ -17,7 +17,7 @@ class SolveGame(UseCase):
 
     def execute(self, solver: str="highs", verbose: bool=False) -> GameGrid:
         result = SolverFactory(solver).solve(self._opt_model)
-        is_solved: bool = (
+        self._is_solved: bool = (
             result.Solver.status == SolverStatus.ok # Checks if solver is finished with normal termination and if...
             and (
                 result.Solver.termination_condition == TerminationCondition.optimal # ended with an optimal solution...
@@ -25,7 +25,7 @@ class SolveGame(UseCase):
             )
         )
 
-        if is_solved:
+        if self._is_solved:
             print(f"{type(self._game).__name__} game solved successfully!")
             self._game.solution = GameSolutionBuilderFactory.create_builder(self._game).build(self._opt_model)
             return self._game

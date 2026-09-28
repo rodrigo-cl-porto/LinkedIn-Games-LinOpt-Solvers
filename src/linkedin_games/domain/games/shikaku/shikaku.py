@@ -1,17 +1,12 @@
 from typing import Any
-from pprint import pprint
 
-import matplotlib.pyplot as plt
-import networkx as nx
-import pyomo.environ as pyo
-
-from ..._core._game_grid import GameGrid
-from ..._mixin._color_generator_mixin import ColorGeneratorMixin
-from ....optimization.models.shikaku import ShikakuModel
+from ....optimization.solutions._solution import GameSolution
+from ...games.game_grid import GameGrid
+from ...utils.color_generator import ColorGenerator
 from ._rectangle_seed import RectangleSeed
 
 
-class Shikaku(ColorGeneratorMixin, GameGrid):
+class Shikaku(GameGrid):
     """
     The Shikaku game.
     
@@ -26,7 +21,8 @@ class Shikaku(ColorGeneratorMixin, GameGrid):
         - Each numbered square (seed) must be covered by only one rectangle that has a area equal to its number;
         - A rectangle must cover only one seed;
     """
-    def __init__(self, size:int, seeds: dict[tuple[int, int], int | dict[str, Any] | None]) -> None:
+
+    def __init__(self, size: int, seeds: dict[tuple[int, int], dict[str, Any] | int | None]) -> None:
         """
         Args:
             size: The side length of the game.
@@ -39,7 +35,6 @@ class Shikaku(ColorGeneratorMixin, GameGrid):
         """
         super().__init__(grid_dims=(size, size))
         self._set_seeds(seeds)
-        self._set_model()
 
 
     def __hash__(self) -> int:
@@ -58,20 +53,20 @@ class Shikaku(ColorGeneratorMixin, GameGrid):
 
 
     @property
-    def seeds(self) -> list[dict[str, Any]]:
+    def seeds(self) -> dict[str, dict[str, Any]]:
         """
         The seeds of the game.
         
         Returns:
             All the information about the seeds.
         """
-        return [seed.to_dict() for seed in self._seeds]
+        return {color: seed.to_dict() for color, seed in self._seeds.items()}
 
 
-    def _set_seeds(self, seeds: dict[tuple[int, int], int | dict[str, Any] | None]) -> None:
+    def _set_seeds(self, seeds: dict[tuple[int, int], Any]) -> None:
     
         if not isinstance(seeds, dict):
-            msg = f"seeds must be a dictionary. Got {type(seeds).__name__} instead."
+            msg = f"Seeds must be a dictionary. Got {type(seeds).__name__} instead."
             raise TypeError(msg)
 
         if len(seeds) < 1:
@@ -79,21 +74,12 @@ class Shikaku(ColorGeneratorMixin, GameGrid):
             raise ValueError(msg)
 
         rectangle_seeds = self._build_seeds(seeds)
-        self._seeds = self.__set_seed_colors(rectangle_seeds)
-
-        nx.set_node_attributes(self._grid, "#FFFFFF", name="value")
-        nx.set_node_attributes( # Adding a color for each square on the grid
-            self._grid,
-            name="value",
-            values={
-                tuple(i-1 for i in seed.square): seed.color
-                for seed in self._seeds
-            }
-        )
+        rectangle_seeds = self.__set_seed_colors(rectangle_seeds)
+        self._seeds = {seed.color_code: seed for seed in rectangle_seeds}
 
 
     @staticmethod
-    def _build_seeds(seeds: dict[tuple[int, int], int | dict[str, Any] | None]) -> list[RectangleSeed]:
+    def _build_seeds(seeds: dict[tuple[int, int], dict[str, Any] | int | None]) -> list[RectangleSeed]:
         return [
             RectangleSeed(
                 square=square,
@@ -113,21 +99,25 @@ class Shikaku(ColorGeneratorMixin, GameGrid):
         if len(colors) < len(seeds):
             for seed in seeds:
                 if seed.color_code == "#FFFFFF":
-                    random_color = self._generate_hex_code()
+                    random_color = ColorGenerator.generate_hex_code()
                     while random_color in colors:
-                        random_color = self._generate_hex_code()
+                        random_color = ColorGenerator.generate_hex_code()
                     seed.color = random_color
                     colors.append(random_color)
         
         return seeds
 
 
-    def _set_model(self) -> None:
-        self._model = ShikakuModel(self.grid_dims, self.seeds)
+    @property
+    def grid_squares(self) -> dict[tuple[int, int], str | None]:
+        if self._solution:
+            return self._solution.get("grid_squares")
+        seed_squares = {seed.square : seed.color_code for seed in self._seeds.values()}
+        return {(i, j): seed_squares.get((i, j)) for i in range(1, self._height+1) for j in range(1, self._width+1)}
 
 
     @property
-    def rectangles(self) -> list[dict[str, tuple[int, int]]] | None:
+    def rectangles(self) -> list[dict[str, tuple[int, int]] | None]:
         """
         All rectangles that solves the Patches game.
 
@@ -135,53 +125,26 @@ class Shikaku(ColorGeneratorMixin, GameGrid):
             The solving rectangles as a list of dictionaries in the format
                 `{"color_code": color_code, "top_left": (top, left), "dims": (height, width)}`.
         """
-        if not self.is_solved:
-            return None
-        return sorted([seed.rectangle.to_dict() for seed in self._seeds], key=lambda rect: rect["top_left"])
+        if not self._solution:
+            return []
 
-
-    def _set_solution(self, verbose:bool = False) -> None:
-        t = self.model.t
-        l = self.model.l
-        h = self.model.h
-        w = self.model.w
-
-        for seed in self._seeds:
-            k = seed.color_code
-            seed.rectangle = {
-                "top": round(pyo.value(t[k])),
-                "left": round(pyo.value(l[k])),
-                "height": round(pyo.value(h[k])),
-                "width": round(pyo.value(w[k]))
-            }
-        
-        nx.set_node_attributes(
-            self.grid,
-            name="value",
-            values={
-                (i-1, j-1): seed.color_code
-                for seed in self._seeds for (i,j) in seed.rectangle.squares
-            }
+        return sorted(
+            [rectangle.to_dict() for rectangle in self._solution.get("rectangles")],
+            key=lambda rectangle: rectangle["top_left"]
         )
 
-        if verbose:
-            print("These are the rectagles that solves the game:")
-            pprint(self.rectangles)
 
+    @GameGrid.solution.setter
+    def solution(self, value: GameSolution) -> None:
 
-    def show(self) -> None:
-        """Show Patches' grid."""
-        width = height = self.size * 0.5
-        plt.figure(figsize=(width, height))
-        nx.draw(
-            self.grid,
-            pos={(i, j): (j, -i) for (i, j) in self.grid.nodes()},
-            node_size=1100,
-            node_shape="s",
-            node_color= list(nx.get_node_attributes(self.grid, "value").values()),
-            width=0,
-            arrows=False,
-            edgecolors="black",
-            linewidths=1
-        )
-        plt.show()
+        if not isinstance(value, GameSolution):
+            raise TypeError(f"Invalid input. Got {type(value).__name__} instead of GameSolution.")
+
+        for seed_color, rectangle in value.get("rectangles").items():
+            seed= self._seeds[seed_color].to_dict()
+            rectangle_area =  rectangle.height * rectangle.width
+            if seed["area"] is not None and rectangle_area != seed["area"]:
+                msg = f"The patch's area ({rectangle_area}) doesn't attend to the required area ({seed["area"]})."
+                raise ValueError(msg)
+
+        self._solution = value

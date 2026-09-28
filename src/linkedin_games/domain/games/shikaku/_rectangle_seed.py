@@ -1,17 +1,12 @@
 from typing import Any
 
 from ...color import Color
-from ._rectangle import Rectangle
 
 
 class RectangleSeed:
     """A seed that creates a rectangle in the Patches game."""
 
-    def __init__(self,
-            square: tuple[int, int],
-            color: str | None = "#FFFFFF",
-            area: int = 1
-        ) -> object:
+    def __init__(self, square: tuple[int, int], color: str | None = "#FFFFFF", area: int = 1) -> None:
         """
         Args:
             square: The grid position of the seed as a `(row, column)` tuple.
@@ -21,7 +16,6 @@ class RectangleSeed:
         self.__set_square(square)
         self.__color = Color(color)
         self._set_area(area)
-        self._rectangle: Rectangle
 
 
     def __repr__(self) -> str:
@@ -116,7 +110,7 @@ class RectangleSeed:
         return self._area
 
 
-    def _set_area(self, value: int=1) -> None:
+    def _set_area(self, value: int | None = 1) -> None:
 
         if value is None:
             self._area = 1
@@ -144,7 +138,7 @@ class RectangleSeed:
         """
         return self.__color.name
 
-    
+
     @color.setter
     def color(self, value:str) -> None:
         self.__color.color = value
@@ -164,28 +158,3 @@ class RectangleSeed:
     @color_code.setter
     def color_code(self, value:str) -> None:
         self.__color.hex_code = value
-
-
-    @property
-    def rectangle(self) -> Rectangle:
-        """
-        The seed's created rectangle.
-        
-        Returns:
-            The rectangle created by the seed after solving the game.
-        """
-        return self._rectangle
-
-
-    @rectangle.setter
-    def rectangle(self, value: dict[str, int]) -> None:
-
-        rectangle_area =  value["height"] * value["width"]
-        if self.area is not None and rectangle_area != self.area:
-            msg = f"The rectangle's area ({rectangle_area}) doesn't attend to the required area ({self.area})."
-            raise ValueError(msg)
-
-        self._rectangle = Rectangle(
-            top_left=(value["top"], value["left"]),
-            dims=(value["height"], value["width"])
-        )

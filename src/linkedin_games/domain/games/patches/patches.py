@@ -1,7 +1,9 @@
 from typing import Any
 
+from ....optimization.solutions._solution import GameSolution
 from ..shikaku.shikaku import Shikaku
 from ._patch_seed import PatchSeed
+from ._patch_shape import PatchShape
 
 
 class Patches(Shikaku):
@@ -22,7 +24,7 @@ class Patches(Shikaku):
         - The area of all rectangles must be greater than 1 square on the grid.
     """
     
-    def __init__(self, size:int, seeds: dict[tuple[int, int], int | dict[str, Any] | None]) -> object:
+    def __init__(self, size:int, seeds: dict[tuple[int, int], dict[str, Any] | int | None]) -> None:
         """
         Args:
             size: The side length of the game.
@@ -48,7 +50,7 @@ class Patches(Shikaku):
 
 
     @staticmethod
-    def _build_seeds(seeds: dict[tuple[int, int], int | dict[str, Any] | None]) -> list[PatchSeed]:
+    def _build_seeds(seeds: dict[tuple[int, int], dict[str, Any] | int | None]) -> list:
         return [
             PatchSeed(
                 square=square,
@@ -57,3 +59,47 @@ class Patches(Shikaku):
                 shape=seed.get("shape") if isinstance(seed, dict) else None
             ) for square, seed in seeds.items()
         ]
+
+
+    @Shikaku.solution.setter
+    def solution(self, value: GameSolution) -> None:
+
+        if not isinstance(value, GameSolution):
+            raise TypeError(f"Invalid input. Got {type(value).__name__} instead of GameSolution.")
+
+        for seed_color, rectangle in value.get("rectangles").items():
+            seed= self._seeds[seed_color].to_dict()
+            patch_area =  rectangle.height * rectangle.width
+            if seed["area"] is not None and patch_area != seed["area"]:
+                msg = f"The patch's area ({patch_area}) doesn't attend to the required area ({seed["area"]})."
+                raise ValueError(msg)
+            
+            match seed["shape"]:
+                case PatchShape.VERTICAL:
+                    if rectangle.height <= rectangle.width:
+                        msg = (
+                            f"The patch doesn't have {seed["shape"].lower} shape."
+                            f" Its height ({rectangle.height!r}) should be"
+                            f" greater than its width ({rectangle.width!r})."
+                        )
+                        raise ValueError(msg)
+                
+                case PatchShape.HORIZONTAL:
+                    if rectangle.height >= rectangle.width:
+                        msg = (
+                            f"The patch doesn't have {seed["shape"].lower} shape."
+                            f" Its width ({rectangle.width!r}) should be"
+                            f" greater than its height ({rectangle.height!r})."
+                        )
+                        raise ValueError(msg)
+                
+                case PatchShape.SQUARE:
+                    if rectangle.height != rectangle.width:
+                        msg = (
+                            f"The patch doesn't have {seed["shape"].lower} shape."
+                            f" Its height ({rectangle.height!r}) should be"
+                            f" equal to its width ({rectangle.width!r})."
+                        )
+                        raise ValueError(msg)
+        
+        self._solution = value

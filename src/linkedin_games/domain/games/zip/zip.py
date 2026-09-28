@@ -16,7 +16,7 @@ class Zip(GameGrid):
         starting from square number 1 to the one with the highest number.
     """
     def __init__(self,
-            size:int,
+            size: int,
             numbered_squares: list[tuple[int, int]],
             walls: list[tuple[tuple[int, int], tuple[int, int]]] | None = None
         ) -> None:
@@ -99,7 +99,7 @@ class Zip(GameGrid):
 
 
     @property
-    def walls(self) -> list[tuple[tuple[int, int], tuple[int, int]]] | None:
+    def walls(self) -> list[tuple[tuple[int, int], tuple[int, int]]]:
         """
         The pairs of squares separated by a wall.
         
@@ -109,14 +109,10 @@ class Zip(GameGrid):
         return self.__walls
 
 
-    def __set_walls(self,
-            values:
-                set[tuple[tuple[int, int], tuple[int, int]]]
-                | list[tuple[tuple[int, int], tuple[int, int]]] | None
-        ) -> None:
+    def __set_walls(self, values: list[tuple[tuple[int, int], tuple[int, int]]] | None) -> None:
         
         if values is None:
-            self.__walls = None
+            self.__walls = []
             return
 
         if len(values) > self.number_of_edges:
@@ -136,7 +132,7 @@ class Zip(GameGrid):
             msg = f"Squares in a pair must be consecutive ones. Invalid pairs: {invalid_items!r}."
             raise ValueError(msg)
 
-        self.__walls = list(set(values))
+        self.__walls = sorted(set(values))
 
 
     @property
@@ -153,6 +149,25 @@ class Zip(GameGrid):
 
 
     @property
+    def grid_squares(self) -> dict[tuple[int, int], int | None]:
+        """
+        All the grid squares and their respective assigned values (if any).
+        
+        Returns:
+            Grid squares as a dictionary of `(row, column): value` items.
+        """
+        if self._solution:
+            return self._solution.get("grid_squares")
+
+        numbered_squares = {square: i for i, square in enumerate(self.__numbered_squares)}
+        return {
+            (i, j): numbered_squares.get(i, j)
+            for i in range(1, self._height+1)
+            for j in range(1, self._width+1)
+        }
+
+
+    @property
     def path(self) -> list[tuple[int, int] | None]:
         """
         The solving path of Zip game.
@@ -164,5 +179,6 @@ class Zip(GameGrid):
         """
         if not self._solution:
             return []
+        
         squares = self._solution.get("grid_squares")
         return sorted(squares.keys(), key=squares.get)
