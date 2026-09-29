@@ -1,4 +1,4 @@
-from linkedin_games.domain.utils.taxicab_distance import TaxicabDistance
+from linkedin_games._shared.utils.taxicab_distance import TaxicabDistance
 
 
 def test_taxicab_distance():
