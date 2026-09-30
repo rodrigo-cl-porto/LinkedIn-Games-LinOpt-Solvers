@@ -16,6 +16,8 @@ class Zip(GameFacade):
         starting from square number 1 to the one with the highest number.
     """
 
+    _game: ZipGrid
+
     def __init__(self,
             size: int,
             numbered_squares: list[tuple[int, int]],
@@ -33,8 +35,54 @@ class Zip(GameFacade):
                 or if the number of walls exceeds the total number of edges on the grid,
                 or if any pair of squares in walls are not adjacent.
         """
-        super().__init__()
         self._game = ZipGrid(
             grid_dims=(size, size),
-            numbered_squares=numbered_squares, walls=walls
+            numbered_squares=numbered_squares,
+            walls=walls
         )
+
+
+    @property
+    def numbered_squares(self) -> list[tuple[int, int]]:
+        """
+        The squares with a assigned number.
+
+        Returns:
+            The numbered squares as a dictionary of `(row, column): number` items.
+        """
+        return self._game.numbered_squares
+
+
+    @property
+    def walls(self) -> list[tuple[tuple[int, int], tuple[int, int]]]:
+        """
+        The pairs of squares separated by a wall.
+        
+        Returns:
+            All the grid edges blocked by a wall as a tuple of `((row1, column1), (row2, column2))`.
+        """
+        return self._game.walls
+
+
+    @property
+    def grid_edges(self) -> dict[tuple[tuple[int, int], tuple[int, int]], int]:
+        """
+        All the grid edges and their respective assigned values (if any).
+        
+        Returns:
+            All edges as a dictionary of `((row1, column1), (row2, column2)): value` items.
+        """
+        return self._game.grid_edges
+
+
+    @property
+    def path(self) -> list[tuple[int, int]]:
+        """
+        The solving path of Zip game.
+        
+        The path that visits all the grid squares, starting from 1-numbered squared to the highest-numbered square.
+
+        Returns:
+            The solving path as a list of squares as `(row, column)`.
+        """
+        return self._game.path

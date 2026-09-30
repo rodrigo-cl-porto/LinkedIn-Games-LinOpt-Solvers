@@ -1,16 +1,15 @@
 import pyomo.environ as pyo
 
-from .._shared.optimization.models.builder import OptimizationModelBuilder
+from .._shared.optimization.modeler._opt_modeler import OptModeler
 from .._shared.utils.taxicab_distance import TaxicabDistance
 from ._game_grid import ZipGrid
 
 
-class ZipModelBuilder(OptimizationModelBuilder[ZipGrid]):
+class ZipOptModeler(OptModeler[ZipGrid]):
 
     def _set_range_sets(self) -> None:
         super()._set_range_sets()
         self._model.K = pyo.RangeSet(len(self._game.numbered_squares))
-
 
     def _set_composite_sets(self) -> None:
         super()._set_composite_sets()
@@ -30,10 +29,8 @@ class ZipModelBuilder(OptimizationModelBuilder[ZipGrid]):
             domain=self._model.S
         )
 
-
     def _set_parameters(self) -> None:
         self._model.BigM = self._model.m * self._model.n
-
 
     def _set_decision_variables(self) -> None:
         self._model.x = pyo.Var( # Decision to go from square (i,j) to (r,s)
@@ -48,17 +45,14 @@ class ZipModelBuilder(OptimizationModelBuilder[ZipGrid]):
             bounds=(1, self._model.BigM)
         )
 
-
     def _set_objective_function(self) -> None:
         self._model.obj = pyo.Objective(expr=0) # feasibility problem
-
 
     def _set_constraints(self) -> None:
         self.__set_edge_constraints()
         self.__set_blocked_path_contraints()
         self.__set_subroute_elimination_constraints()
         self.__set_visitation_order_constraints()
-
 
     def __set_edge_constraints(self) -> None:
         neighbors = { # This dictionary is important to access all neighbors of a square quickly.
@@ -85,13 +79,11 @@ class ZipModelBuilder(OptimizationModelBuilder[ZipGrid]):
                 pyo.quicksum(model.x[s, (i,j)] for s in neighbors[(i,j)]) == 1
         )
 
-
     def __set_blocked_path_contraints(self) -> None:
         self._model.wall_constraints = pyo.Constraint(
             self._model.W,
             rule=lambda model, i, j, r, s: model.x[i,j,r,s] + model.x[r,s,i,j] == 0
         )
-
 
     def __set_subroute_elimination_constraints(self) -> None:
         self._model.miller_tucker_zemlin_constraints = pyo.Constraint(
@@ -100,7 +92,6 @@ class ZipModelBuilder(OptimizationModelBuilder[ZipGrid]):
                 model.u[r,s] >= model.u[i,j] + 1
                     - model.BigM * (1 - model.x[i,j,r,s]) + (model.BigM - 2) * model.x[r,s,i,j]
         )
-
 
     def __set_visitation_order_constraints(self) -> None:
         self._model.visitation_order_constraints = pyo.Constraint(

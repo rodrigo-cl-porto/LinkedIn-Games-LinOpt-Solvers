@@ -20,6 +20,8 @@ class Shikaku(GameFacade):
         - A rectangle must cover only one seed;
     """
 
+    _game: ShikakuGrid
+
     def __init__(self,
             size: int,
             seeds: dict[tuple[int, int], dict[str, Any] | int | None]
@@ -34,5 +36,27 @@ class Shikaku(GameFacade):
             TypeError: if type inputs are not respected.
             ValueError: If there are some seeds with the same color.
         """
-        super().__init__()
         self._game = ShikakuGrid(grid_dims=(size, size), seeds=seeds)
+
+
+    @property
+    def seeds(self) -> dict[str, dict[str, Any]]:
+        """
+        The seeds of the game.
+
+        Returns:
+            All the information about the seeds.
+        """
+        return self._game.seeds
+
+
+    @property
+    def rectangles(self) -> list[dict[str, tuple[int, int]] | None]:
+        """
+        All rectangles that solves the Patches game.
+
+        Returns:
+            The solving rectangles as a list of dictionaries in the format
+                `{"color_code": color_code, "top_left": (top, left), "dims": (height, width)}`.
+        """
+        return self._game.rectangles

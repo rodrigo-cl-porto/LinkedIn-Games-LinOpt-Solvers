@@ -12,17 +12,17 @@ class GameSolutionFactory:
     @staticmethod
     def create(game: GameGrid) -> GameSolution:
         match type(game).__name__:
-            case "Patches":
+            case "PatchesGrid":
                 return PatchesSolution()
-            case "Queens":
+            case "QueensGrid":
                 return QueensSolution()
-            case "Shikaku":
+            case "ShikakuGrid":
                 return ShikakuSolution()
-            case "BaseSudoku":
+            case "SudokuGrid":
                 return SudokuSolution()
-            case "Tango":
+            case "TangoGrid":
                 return TangoSolution()
-            case "Zip":
+            case "ZipGrid":
                 return ZipSolution()
             case _:
                 msg = f"Invalid game. Got {type(game).__name__} instead."

@@ -1,5 +1,5 @@
 from .._shared.domain.game_grid import GameGrid
-from .._shared.optimization.solutions._solution import GameSolution
+from .._shared.optimization.solution._solution import GameSolution
 from .._shared.utils.color_generator import ColorGenerator
 from ._region import Region
 from ._solution import QueensSolution
@@ -22,13 +22,6 @@ class QueensGrid(GameGrid):
 
     @property
     def regions(self) -> dict[str, set[tuple[int, int]]]:
-        """All colored regions on the grid.
-
-        It's assumed that the regions are non-overlapping and cover the entire grid.
-
-        Returns:
-            The set of all colored regions on the grid.
-        """
         return {region.color_code: region.squares for region in self.__regions}
 
 
@@ -74,11 +67,9 @@ class QueensGrid(GameGrid):
 
 
     def set_solution(self, value: GameSolution) -> None:
-
         if not isinstance(value, QueensSolution):
             msg = f"Invalid input. Got a {type(value).__name__} object."
             raise TypeError(msg)
-        
         self._solution = value
 
 

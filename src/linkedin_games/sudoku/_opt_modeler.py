@@ -1,10 +1,10 @@
 import pyomo.environ as pyo
 
-from .._shared.optimization.models.builder import OptimizationModelBuilder
+from .._shared.optimization.modeler._opt_modeler import OptModeler
 from ._game_grid import SudokuGrid
 
 
-class SudokuModelBuilder(OptimizationModelBuilder[SudokuGrid]):
+class SudokuOptModeler(OptModeler[SudokuGrid]):
 
     def _set_board_dimensions(self) -> None:
         super()._set_board_dimensions()
@@ -12,13 +12,11 @@ class SudokuModelBuilder(OptimizationModelBuilder[SudokuGrid]):
         self._model.p = pyo.Param(initialize=p, domain=pyo.PositiveIntegers)
         self._model.q = pyo.Param(initialize=q, domain=pyo.PositiveIntegers)
 
-
     def _set_range_sets(self) -> None:
         super()._set_range_sets()
         self._model.K = pyo.RangeSet(self._model.n) # Digits
         self._model.U = pyo.RangeSet(self._model.p) # Rows per block
         self._model.V = pyo.RangeSet(self._model.q) # Columns per block
-
 
     def _set_composite_sets(self) -> None:
         super()._set_composite_sets()
@@ -36,6 +34,8 @@ class SudokuModelBuilder(OptimizationModelBuilder[SudokuGrid]):
             dimen=3
         )
 
+    def _set_parameters(self) -> None:
+        super()._set_parameters()
 
     def _set_decision_variables(self) -> None:
         self._model.x = pyo.Var(
@@ -44,10 +44,8 @@ class SudokuModelBuilder(OptimizationModelBuilder[SudokuGrid]):
             initialize=0
         )
 
-
     def _set_objective_function(self) -> None:
         self._model.obj = pyo.Objective(expr=0) # feasibility problem
-
 
     def _set_constraints(self) -> None:
         self._model.unique_digits_per_row_constraints = pyo.Constraint(

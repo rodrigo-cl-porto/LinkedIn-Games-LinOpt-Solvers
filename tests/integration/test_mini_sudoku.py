@@ -15,7 +15,7 @@ def test_mini_sudoku_60():
         (5,1): 6, (5,2): 4, (5,3): 2, (5,4): 3, (5,5): 5, (5,6): 1,
         (6,1): 3, (6,2): 5, (6,3): 1, (6,4): 2, (6,5): 4, (6,6): 6,
     }
-    assert mini_sudoku.solution == solution
+    assert mini_sudoku.grid_squares == solution
 
 
 def test_mini_sudoku_104():
@@ -32,7 +32,7 @@ def test_mini_sudoku_104():
         (5,1): 6, (5,2): 4, (5,3): 2, (5,4): 5, (5,5): 1, (5,6): 3,
         (6,1): 1, (6,2): 5, (6,3): 3, (6,4): 6, (6,5): 4, (6,6): 2
     }
-    assert mini_sudoku.solution == solution
+    assert mini_sudoku.grid_squares == solution
 
 
 def test_mini_sudoku_197():
@@ -50,7 +50,7 @@ def test_mini_sudoku_197():
         (5,1): 2, (5,2): 1, (5,3): 5, (5,4): 4, (5,5): 6, (5,6): 3,
         (6,1): 4, (6,2): 3, (6,3): 6, (6,4): 5, (6,5): 1, (6,6): 2
     }
-    assert mini_sudoku.solution == solution
+    assert mini_sudoku.grid_squares == solution
 
 
 def test_mini_sudoku_288():
@@ -67,7 +67,7 @@ def test_mini_sudoku_288():
         (5,1): 3, (5,2): 6, (5,3): 2, (5,4): 5, (5,5): 4, (5,6): 1,
         (6,1): 5, (6,2): 4, (6,3): 1, (6,4): 2, (6,5): 3, (6,6): 6,
     }
-    assert mini_sudoku.solution == solution
+    assert mini_sudoku.grid_squares == solution
 
 
 def test_mini_sudoku_359():
@@ -84,4 +84,4 @@ def test_mini_sudoku_359():
         (5,1): 3, (5,2): 2, (5,3): 4, (5,4): 1, (5,5): 6, (5,6): 5,
         (6,1): 5, (6,2): 1, (6,3): 6, (6,4): 3, (6,5): 4, (6,6): 2,
     }
-    assert mini_sudoku.solution == solution
+    assert mini_sudoku.grid_squares == solution

@@ -1,5 +1,5 @@
 from .._shared.domain.game_grid import GameGrid
-from .._shared.optimization.solutions._solution import GameSolution
+from .._shared.optimization.solution._solution import GameSolution
 from ._solution import SudokuSolution
 
 
@@ -45,10 +45,8 @@ class SudokuGrid(GameGrid):
 
 
     def __eq__(self, other: object) -> bool:
-
         if not isinstance(other, SudokuGrid):
             return False
-        
         return (
             self.size == other.size
             and self.block_dims == other.block_dims
@@ -73,12 +71,6 @@ class SudokuGrid(GameGrid):
 
     @property
     def block_dims(self) -> tuple[int, int]:
-        """
-        The dimensions of the grid blocks in the Sudoku grid
-        
-        Returns:
-            The block dimensions as `(rows, columns)` tuple.
-        """
         return self.__block_dims
 
 
@@ -110,11 +102,6 @@ class SudokuGrid(GameGrid):
 
     @property
     def filled_squares(self) -> dict[tuple[int, int], int]:
-        """The starting filled squares in the Sudoku game.
-        
-        Returns:
-            The starting filled squares as a dictionary of `(row, column): digit` items.
-        """
         return self.__filled_squares
 
     
@@ -158,25 +145,16 @@ class SudokuGrid(GameGrid):
 
 
     def set_solution(self, value: GameSolution) -> None:
-            
         if not isinstance(value, SudokuSolution):
             msg = f"Invalid input. Got a {type(value).__name__} object."
             raise TypeError(msg)
-
         self._solution = value
 
 
     @property
     def grid_squares(self) -> dict[tuple[int, int], int | None]:
-        """
-        All the grid squares and their respective assigned values (if any).
-        
-        Returns:
-            Grid squares as a dictionary of `(row, column): value` items.
-        """
         if self._solution:
             return self._solution.grid_squares
-        
         return {
             (i, j): self.filled_squares.get((i, j))
             for i in range(1, self._height+1)

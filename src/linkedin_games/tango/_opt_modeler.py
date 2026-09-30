@@ -1,15 +1,13 @@
 import pyomo.environ as pyo
 
-from .._shared.optimization.models.builder import OptimizationModelBuilder
+from .._shared.optimization.modeler._opt_modeler import OptModeler
 from ._game_grid import TangoGrid
 
 
-class TangoModelBuilder(OptimizationModelBuilder[TangoGrid]):
-    """The Linear Optimization Model for Tango game."""
+class TangoOptModeler(OptModeler[TangoGrid]):
 
     def _set_range_sets(self) -> None:
         super()._set_range_sets()
-
 
     def _set_composite_sets(self) -> None:
         super()._set_composite_sets()
@@ -17,21 +15,17 @@ class TangoModelBuilder(OptimizationModelBuilder[TangoGrid]):
         self._model.M = pyo.Set(initialize=self._game.matching_pairs)
         self._model.O = pyo.Set(initialize=self._game.opposite_pairs)
 
-
-    def _set_decision_variables(self) -> None:
-        self._model.x = pyo.Var(self._model.S, domain=pyo.Binary, initialize=0)
-
-
     def _set_parameters(self) -> None:
         self._model.k = pyo.Param( # Filled values
             self._model.K,
             initialize=self._game.filled_squares, domain=pyo.Binary
         )
 
+    def _set_decision_variables(self) -> None:
+        self._model.x = pyo.Var(self._model.S, domain=pyo.Binary, initialize=0)
 
     def _set_objective_function(self) -> None:
         self._model.obj = pyo.Objective(expr=0) # feasibility problem
-
 
     def _set_constraints(self) -> None:
         self._model.equal_moons_suns_per_row_constraints = pyo.Constraint(

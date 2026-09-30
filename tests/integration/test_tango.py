@@ -19,7 +19,7 @@ def test_tango_151():
         (5,1): 1, (5,2): 0, (5,3): 0, (5,4): 1, (5,5): 1, (5,6): 0,
         (6,1): 0, (6,2): 0, (6,3): 1, (6,4): 1, (6,5): 0, (6,6): 1
     }
-    assert tango.solution == solution
+    assert tango.grid_squares == solution
 
 
 def test_tango_290():
@@ -37,7 +37,7 @@ def test_tango_290():
         (5,1): 1, (5,2): 0, (5,3): 0, (5,4): 1, (5,5): 1, (5,6): 0,
         (6,1): 0, (6,2): 1, (6,3): 0, (6,4): 1, (6,5): 0, (6,6): 1
     }
-    assert tango.solution == solution
+    assert tango.grid_squares == solution
 
 
 def test_tango_411():
@@ -55,7 +55,7 @@ def test_tango_411():
         (5,1): 0, (5,2): 0, (5,3): 1, (5,4): 0, (5,5): 1, (5,6): 1,
         (6,1): 0, (6,2): 1, (6,3): 0, (6,4): 0, (6,5): 1, (6,6): 1
     }
-    assert tango.solution == solution
+    assert tango.grid_squares == solution
 
 
 def test_tango_524():
@@ -73,7 +73,7 @@ def test_tango_524():
         (5,1): 0, (5,2): 1, (5,3): 1, (5,4): 0, (5,5): 1, (5,6): 0,
         (6,1): 0, (6,2): 0, (6,3): 1, (6,4): 1, (6,5): 0, (6,6): 1
     }
-    assert tango.solution == solution
+    assert tango.grid_squares == solution
 
 
 def test_tango_667():
@@ -91,4 +91,4 @@ def test_tango_667():
         (5,1): 1, (5,2): 1, (5,3): 0, (5,4): 0, (5,5): 1, (5,6): 0,
         (6,1): 0, (6,2): 0, (6,3): 1, (6,4): 1, (6,5): 0, (6,6): 1
     }
-    assert tango.solution == solution
+    assert tango.grid_squares == solution

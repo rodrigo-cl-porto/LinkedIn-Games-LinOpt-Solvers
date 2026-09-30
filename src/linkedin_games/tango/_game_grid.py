@@ -1,5 +1,5 @@
 from .._shared.domain.game_grid import GameGrid
-from .._shared.optimization.solutions._solution import GameSolution
+from .._shared.optimization.solution._solution import GameSolution
 from .._shared.utils.taxicab_distance import TaxicabDistance
 from ._solution import TangoSolution
 
@@ -31,12 +31,6 @@ class TangoGrid(GameGrid):
 
     @property
     def filled_squares(self) -> dict[tuple[int, int], int]:
-        """
-        Squares that are already filled with a symbol.
-        
-        Returns:
-            Starting filled squares as a dictionary of `(row, column): 0 | 1` items.
-        """
         return self.__filled_squares
 
 
@@ -56,14 +50,6 @@ class TangoGrid(GameGrid):
 
     @property
     def matching_pairs(self) -> list[tuple[tuple[int, int], tuple[int, int]]]:
-        """
-        Pairs of matching squares.
-
-        Pairs of squares that are separated by a `=` sign, i.e., that must have the same symbols.
-
-        Returns:
-            Pairs of matching squares as a set of `((row1, column1), (row2, column2))`.
-        """
         return self.__matching_pairs
     
     
@@ -106,14 +92,6 @@ class TangoGrid(GameGrid):
 
     @property
     def opposite_pairs(self) -> list[tuple[tuple[int, int], tuple[int, int]]]:
-        """
-        Pairs of opposite squares.
-
-        Pairs of squares that are separated by a `×` sign, i.e., that must have opposite symbols.
-
-        Returns:
-            Pairs of opposite squares as a set of `((row1, column1), (row2, column2))` items.
-        """
         return self.__opposite_pairs
 
 
@@ -164,15 +142,8 @@ class TangoGrid(GameGrid):
 
     @property
     def grid_squares(self) -> dict[tuple[int, int], int | None]:
-        """
-        All the grid squares and their respective assigned values (if any).
-        
-        Returns:
-            Grid squares as a dictionary of `(row, column): value` items.
-        """
         if self._solution:
             return self._solution.grid_squares
-        
         return {
             (i, j): self.filled_squares.get((i, j))
             for i in range(1, self._height+1)
@@ -184,11 +155,11 @@ class TangoGrid(GameGrid):
     def moons(self) -> list[tuple[int, int]]:
         if self._solution:
             return self._solution.moons
-        return []
+        return [square for square, value in self.filled_squares.items() if value == 1]
 
 
     @property
     def suns(self) -> list[tuple[int, int]]:
         if self._solution:
             return self._solution.suns
-        return []
+        return [square for square, value in self.filled_squares.items() if value == 0]

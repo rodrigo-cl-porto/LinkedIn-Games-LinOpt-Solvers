@@ -1,4 +1,4 @@
-from linkedin_games.old.base import Shikaku
+from linkedin_games import Shikaku
 import pytest
 
 def test_shikaku_2026_08_10_easy():

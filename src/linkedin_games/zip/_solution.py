@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Self, cast
 
 import pyomo.environ as pyo
 
-from .._shared.optimization.solutions._solution import GameSolution
+from .._shared.optimization.solution._solution import GameSolution
 
 if TYPE_CHECKING:
     from collections.abc import Iterable

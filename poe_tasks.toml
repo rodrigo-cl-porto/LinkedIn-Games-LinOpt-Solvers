@@ -37,6 +37,11 @@ help = "Run all the automatic tests."
 cmd = "pytest --maxfail=1 -vv --durations=0"
 cwd = "tests"
 
+[tasks.test_unit]
+help = "Run all the automatic unit tests."
+cmd = "pytest --maxfail=1 -vv --durations=0"
+cwd = "tests/unit"
+
 [tasks.lint]
 help = "Lint the code using Ruff linter."
 cmd = "ruff check"

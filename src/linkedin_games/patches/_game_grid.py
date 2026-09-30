@@ -1,6 +1,6 @@
 from typing import Any
 
-from .._shared.optimization.solutions._solution import GameSolution
+from .._shared.optimization.solution._solution import GameSolution
 from ..shikaku._game_grid import ShikakuGrid
 from ._seed import PatchSeed
 from ._shape import PatchShape

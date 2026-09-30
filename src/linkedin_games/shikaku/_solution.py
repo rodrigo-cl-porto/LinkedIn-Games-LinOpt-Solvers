@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Self, cast
 
 import pyomo.environ as pyo
 
-from .._shared.optimization.solutions._solution import GameSolution
+from .._shared.optimization.solution._solution import GameSolution
 from ._rectangle import Rectangle
 
 if TYPE_CHECKING:
@@ -12,7 +12,6 @@ if TYPE_CHECKING:
 
 
 class ShikakuSolution(GameSolution):
-
 
     def build(self, opt_model: pyo.ConcreteModel) -> Self:
         super().build(opt_model)
@@ -29,16 +28,14 @@ class ShikakuSolution(GameSolution):
             if round(pyo.value(x[i, j, k])) == 1
         }
 
-
     @property
     def rectangles(self) -> dict[str, Rectangle]:
         return self._rectangles
 
-
     def _set_rectangles(self) -> None:
         seed_colors = cast("Iterable[str]", self._model.K)
         top = cast("pyo.Var", self._model.t)
-        left = cast("pyo.Var", self._model.left)
+        left = cast("pyo.Var", self._model.l)
         height = cast("pyo.Var", self._model.h)
         width = cast("pyo.Var", self._model.w)
 

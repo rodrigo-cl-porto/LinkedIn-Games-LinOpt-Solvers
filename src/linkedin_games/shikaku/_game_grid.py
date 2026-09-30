@@ -1,7 +1,7 @@
 from typing import Any
 
 from .._shared.domain.game_grid import GameGrid
-from .._shared.optimization.solutions._solution import GameSolution
+from .._shared.optimization.solution._solution import GameSolution
 from .._shared.utils.color_generator import ColorGenerator
 from ._seed import RectangleSeed
 from ._solution import ShikakuSolution
@@ -21,12 +21,6 @@ class ShikakuGrid(GameGrid):
 
     @property
     def seeds(self) -> dict[str, dict[str, Any]]:
-        """
-        The seeds of the game.
-
-        Returns:
-            All the information about the seeds.
-        """
         return {color: seed.to_dict() for color, seed in self._seeds.items()}
 
 
@@ -58,7 +52,6 @@ class ShikakuGrid(GameGrid):
 
 
     def __set_seed_colors(self, seeds: list[RectangleSeed]) -> list[RectangleSeed]:
-
         colors = [seed.color_code for seed in seeds if seed.color_code != "#FFFFFF"]
         if len(colors) != len(set(colors)):
             msg = "There must not be two or more seeds with the same color."
@@ -77,7 +70,6 @@ class ShikakuGrid(GameGrid):
 
 
     def set_solution(self, value: GameSolution) -> None:
-    
         if not isinstance(value, ShikakuSolution):
             msg = f"Invalid input. Got {type(value).__name__} instead of GameSolution."
             raise TypeError(msg)
@@ -102,13 +94,6 @@ class ShikakuGrid(GameGrid):
 
     @property
     def rectangles(self) -> list[dict[str, tuple[int, int]] | None]:
-        """
-        All rectangles that solves the Patches game.
-
-        Returns:
-            The solving rectangles as a list of dictionaries in the format
-                `{"color_code": color_code, "top_left": (top, left), "dims": (height, width)}`.
-        """
         if self._solution:
             return sorted(
                 [rectangle.to_dict() for rectangle in self._solution.rectangles.values()],

@@ -18,6 +18,9 @@ class Tango(GameFacade):
         - Squares separated by the `=` sign must contain the same symbol;
         - Squares separated by the `×` sign must contain opposite symbols.
     """
+
+    _game: TangoGrid
+
     def __init__(self,
             filled_squares: dict[tuple[int, int], int],
             matching_pairs:
@@ -50,3 +53,57 @@ class Tango(GameFacade):
             matching_pairs=matching_pairs,
             opposite_pairs=opposite_pairs
         )
+
+
+    @property
+    def filled_squares(self) -> dict[tuple[int, int], int]:
+        """Squares that are already filled with a symbol.
+        
+        Returns:
+            Starting filled squares as a dictionary of `(row, column): 0 | 1` items.
+        """
+        return self._game.filled_squares
+
+
+    @property
+    def matching_pairs(self) -> list[tuple[tuple[int, int], tuple[int, int]]]:
+        """Pairs of matching squares.
+
+        Pairs of squares that are separated by a `=` sign, i.e., that must have the same symbols.
+
+        Returns:
+            Pairs of matching squares as a set of `((row1, column1), (row2, column2))`.
+        """
+        return self._game.matching_pairs
+
+
+    @property
+    def opposite_pairs(self) -> list[tuple[tuple[int, int], tuple[int, int]]]:
+        """Pairs of opposite squares.
+
+        Pairs of squares that are separated by a `×` sign, i.e., that must have opposite symbols.
+
+        Returns:
+            Pairs of opposite squares as a set of `((row1, column1), (row2, column2))` items.
+        """
+        return self._game.opposite_pairs
+
+
+    @property
+    def moons(self) -> list[tuple[int, int]]:
+        """All the squares filled with moons.
+
+        Returns:
+            A list of all moon squares as `(row, column)`.
+        """
+        return self._game.moons
+
+
+    @property
+    def suns(self) -> list[tuple[int, int]]:
+        """All the squares filled with suns.
+        
+        Returns:
+            A list of all sun squares as `(row, column)`.
+        """
+        return self._game.suns

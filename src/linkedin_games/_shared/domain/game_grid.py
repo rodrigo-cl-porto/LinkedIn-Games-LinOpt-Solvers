@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from ..optimization.solutions._solution import GameSolution
+from ..optimization.solution._solution import GameSolution
 
 
 class GameGrid(ABC):

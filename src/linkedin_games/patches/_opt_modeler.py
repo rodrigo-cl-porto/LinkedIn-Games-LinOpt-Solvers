@@ -1,35 +1,34 @@
 import pyomo.environ as pyo
 
-from ..shikaku._opt_model import ShikakuModelBuilder
+from ..shikaku._opt_modeler import ShikakuOptModeler
 from ._shape import PatchShape
 
 
-class PatchesModelBuilder(ShikakuModelBuilder):
+class PatchesOptModeler(ShikakuOptModeler):
 
     def _set_composite_sets(self) -> None:
         super()._set_composite_sets()
         self._model.V = pyo.Set( # Vertical rectangles
             initialize=[
-                seed["color_code"] for seed in self._game.seeds.values()
+                color for color, seed in self._game.seeds.items()
                 if seed["shape"] == PatchShape.VERTICAL
             ],
             domain=self._model.K
         )
         self._model.H = pyo.Set( # Horizontal rectangles
             initialize=[
-                seed["color_code"] for seed in self._game.seeds.values()
+                color for color, seed in self._game.seeds.items()
                 if seed["shape"] == PatchShape.HORIZONTAL
             ],
             domain=self._model.K
         )
         self._model.Q = pyo.Set( # Squared rectangles
             initialize=[
-                seed["color_code"] for seed in self._game.seeds.values()
+                color for color, seed in self._game.seeds.items()
                 if seed["shape"] == PatchShape.SQUARE
             ],
             domain=self._model.K
         )
-
 
     def _set_rectangle_seed_constraints(self) -> None:
         super()._set_rectangle_seed_constraints()

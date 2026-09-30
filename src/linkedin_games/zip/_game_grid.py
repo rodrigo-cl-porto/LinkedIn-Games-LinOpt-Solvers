@@ -1,11 +1,12 @@
+from PIL.ImageChops import duplicate
 from .._shared.domain.game_grid import GameGrid
-from .._shared.optimization.solutions._solution import GameSolution
+from .._shared.optimization.solution._solution import GameSolution
 from .._shared.utils.taxicab_distance import TaxicabDistance
 from ._solution import ZipSolution
 
 
 class ZipGrid(GameGrid):
-    
+
     def __init__(self,
             grid_dims: tuple[int, int],
             numbered_squares: list[tuple[int, int]],
@@ -36,16 +37,14 @@ class ZipGrid(GameGrid):
 
     @property
     def numbered_squares(self) -> list[tuple[int, int]]:
-        """
-        The squares with a assigned number.
-
-        Returns:
-            The numbered squares as a dictionary of `(row, column): number` items.
-        """
         return self.__numbered_squares
 
     
     def __set_numbered_squares(self, values: list[tuple[int, int]]) -> None:
+
+        if not isinstance(values, list):
+            msg = f"The numbered squares must be a list of tuples. Got a {type(values).__name__} instead."
+            raise TypeError(msg)
 
         if len(values) > len(self):
             msg = (
@@ -61,21 +60,15 @@ class ZipGrid(GameGrid):
             )
             raise ValueError(msg)
 
-        if not isinstance(values, list):
-            msg = f"The numbered squares must be a list of tuples. Got a {type(values).__name__} instead."
-            raise TypeError(msg)
+        if len(values) != len(set(values)):
+            msg = "The numbered squares list has duplicated squares."
+            raise ValueError(msg)
 
         self.__numbered_squares = values
 
 
     @property
     def walls(self) -> list[tuple[tuple[int, int], tuple[int, int]]]:
-        """
-        The pairs of squares separated by a wall.
-        
-        Returns:
-            All the grid edges blocked by a wall as a tuple of `((row1, column1), (row2, column2))`.
-        """
         return self.__walls
 
 
@@ -106,22 +99,14 @@ class ZipGrid(GameGrid):
 
 
     def set_solution(self, value: GameSolution) -> None:
-    
         if not isinstance(value, ZipSolution):
             msg = f"Invalid input. Got a {type(value).__name__} object."
             raise TypeError(msg)
-
         self._solution = value
 
 
     @property
     def grid_squares(self) -> dict[tuple[int, int], int | None]:
-        """
-        All the grid squares and their respective assigned values (if any).
-        
-        Returns:
-            Grid squares as a dictionary of `(row, column): value` items.
-        """
         if self._solution:
             return self._solution.grid_squares
 
@@ -149,15 +134,6 @@ class ZipGrid(GameGrid):
 
     @property
     def path(self) -> list[tuple[int, int]]:
-        """
-        The solving path of Zip game.
-        
-        The path that visits all the grid squares, starting from 1-numbered squared to the highest-numbered square.
-
-        Returns:
-            The solving path as a list of squares as `(row, column)`.
-        """
         if self._solution:
             return self._solution.path
-        
         return []

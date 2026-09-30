@@ -3,15 +3,15 @@ from pyomo.opt import SolverStatus, TerminationCondition
 
 from ..domain.game_grid import GameGrid
 from ..domain.use_case import UseCase
-from .models.factory import OptimizationModelBuilderFactory
-from .solutions._factory import GameSolutionFactory
+from .modeler.factory import OptModelerFactory
+from .solution._factory import GameSolutionFactory
 
 
 class SolveGame(UseCase):
 
     def __init__(self, game: GameGrid) -> None:
         self._game = game
-        self._opt_model = OptimizationModelBuilderFactory.create(game).build()
+        self._opt_model = OptModelerFactory.create_modeler(game).build_model(game)
 
 
     def execute(self, solver: str="highs", verbose: bool=False) -> GameGrid:

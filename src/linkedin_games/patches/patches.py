@@ -1,10 +1,10 @@
 from typing import Any
 
-from .._shared.domain.game_facade import GameFacade
+from ..shikaku.shikaku import Shikaku
 from ._game_grid import PatchesGrid
 
 
-class Patches(GameFacade):
+class Patches(Shikaku):
     """
     The [LinkedIn Patches](https://www.linkedin.com/games/patches/) game.
     
@@ -47,5 +47,4 @@ class Patches(GameFacade):
             TypeError: if type inputs are not respected.
             ValueError: If there are some seeds with the same color.
         """
-        super().__init__()
         self._game = PatchesGrid(grid_dims=(size, size), seeds=seeds)
