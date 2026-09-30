@@ -13,7 +13,6 @@ class Region:
         self.squares = squares
         self.__color = Color(color)
 
-
     def __repr__(self) -> str:
         return (
             "Region(\n\t"
@@ -21,28 +20,22 @@ class Region:
             f"squares={self.squares!r}\n)"
         )
 
-
     def __str__(self) -> str:
         return f"A {self.color} Queens Region on squares {self.squares!r}."
 
-
     def __len__(self) -> int:
         return len(self.squares)
-
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Region):
             return False
         return self.squares == other.squares
 
-
     def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
-
     def __hash__(self) -> int:
         return hash((frozenset(self.squares), self.color_code))
-
 
     @property
     def squares(self) -> set[tuple[int, int]]:
@@ -53,7 +46,6 @@ class Region:
             All grid squares that make up the region as a set of `(row, column)`.
         """
         return self.__squares
-
 
     @squares.setter
     def squares(self, value: set[tuple[int, int]]) -> None:
@@ -81,7 +73,6 @@ class Region:
 
         self.__squares = value
 
-
     @property
     def color(self) -> str:
         """
@@ -92,11 +83,9 @@ class Region:
         """
         return self.__color.name
 
-    
     @color.setter
     def color(self, value:str) -> None:
         self.__color.color = value
-
 
     @property
     def color_code(self) -> str:
@@ -108,7 +97,6 @@ class Region:
         """
         return self.__color.hex_code
 
-    
     @color_code.setter
     def color_code(self, value:str) -> None:
         self.__color.hex_code = value

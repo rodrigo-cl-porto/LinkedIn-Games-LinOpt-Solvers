@@ -18,12 +18,11 @@ class ShikakuSolution(GameSolution):
         self._set_rectangles()
         return self
 
-
-    def _set_grid_squares(self) -> None:
+    def _set_squares(self) -> None:
         colors = cast("Iterable[str]", self._model.K)
         squares = cast("Iterable[tuple[int, int]]", self._model.S)
         x = cast("pyo.Var", self._model.x)
-        self._grid_squares={
+        self._squares={
             (i, j): k for (i, j) in squares for k in colors
             if round(pyo.value(x[i, j, k])) == 1
         }
@@ -38,7 +37,6 @@ class ShikakuSolution(GameSolution):
         left = cast("pyo.Var", self._model.l)
         height = cast("pyo.Var", self._model.h)
         width = cast("pyo.Var", self._model.w)
-
         self._rectangles = {
             k: Rectangle(
                 (

@@ -36,7 +36,7 @@ class Zip(GameFacade):
                 or if any pair of squares in walls are not adjacent.
         """
         self._game = ZipGrid(
-            grid_dims=(size, size),
+            dims=(size, size),
             numbered_squares=numbered_squares,
             walls=walls
         )
@@ -62,14 +62,14 @@ class Zip(GameFacade):
         return self._game.walls
 
     @property
-    def grid_edges(self) -> dict[tuple[tuple[int, int], tuple[int, int]], int]:
+    def edges(self) -> dict[tuple[tuple[int, int], tuple[int, int]], int]:
         """
         All the grid edges and their respective assigned values (if any).
         
         Returns:
             All edges as a dictionary of `((row1, column1), (row2, column2)): value` items.
         """
-        return self._game.grid_edges
+        return self._game.edges
 
     @property
     def path(self) -> list[tuple[int, int]]:

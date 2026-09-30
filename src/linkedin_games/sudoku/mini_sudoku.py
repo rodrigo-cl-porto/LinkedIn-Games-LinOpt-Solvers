@@ -21,4 +21,4 @@ class MiniSudoku(Sudoku):
         Args:
             filled_squares: Starting filled squares as a dictionary of `(row, column): digit` items.
         """
-        self._game = SudokuGrid(grid_dims=(6,6), block_dims=(2,3), filled_squares=filled_squares)
+        self._game = SudokuGrid(dims=(6,6), block_dims=(2,3), filled_squares=filled_squares)

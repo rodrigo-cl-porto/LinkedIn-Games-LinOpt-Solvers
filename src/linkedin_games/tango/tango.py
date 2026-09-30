@@ -48,7 +48,7 @@ class Tango(GameFacade):
         """
         super().__init__()
         self._game = TangoGrid(
-            grid_dims=(6, 6),
+            dims=(6, 6),
             filled_squares=filled_squares,
             matching_pairs=matching_pairs,
             opposite_pairs=opposite_pairs

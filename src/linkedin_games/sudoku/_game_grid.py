@@ -18,7 +18,7 @@ class SudokuGrid(GameGrid):
     """
     
     def __init__(self,
-            grid_dims: tuple[int, int],
+            dims: tuple[int, int],
             block_dims: tuple[int, int],
             filled_squares: dict[tuple[int, int], int]
         ) -> None:
@@ -34,14 +34,14 @@ class SudokuGrid(GameGrid):
                 or if the quantity of `filled_squares` is smaller than 2
                 or greater than the number of grid squares.
         """
-        super().__init__(grid_dims)
+        super().__init__(dims)
         self.__set_block_dims(block_dims)
         self.__set_filled_squares(filled_squares)
         self._solution: SudokuSolution
 
 
     def __hash__(self) -> int:
-        return hash((self._grid_dims, self.__block_dims, self.__filled_squares))
+        return hash((self._dims, self.__block_dims, self.__filled_squares))
 
 
     def __eq__(self, other: object) -> bool:
@@ -66,7 +66,7 @@ class SudokuGrid(GameGrid):
         Returns:
             The number of rows (or columns) on the grid.
         """
-        return self.grid_dims[0]
+        return self.dims[0]
 
 
     @property
@@ -152,9 +152,9 @@ class SudokuGrid(GameGrid):
 
 
     @property
-    def grid_squares(self) -> dict[tuple[int, int], int | None]:
+    def squares(self) -> dict[tuple[int, int], int | None]:
         if self._solution:
-            return self._solution.grid_squares
+            return self._solution.squares
         return {
             (i, j): self.filled_squares.get((i, j))
             for i in range(1, self._height+1)

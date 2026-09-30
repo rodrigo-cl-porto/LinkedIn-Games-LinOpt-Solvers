@@ -1,40 +1,38 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 
-from .._shared.visualization.renderers._renderer import GameRenderer
+from .._shared.visualization._renderer import GameRenderer
 from ._game_grid import ShikakuGrid
 
 
 class ShikakuRenderer(GameRenderer[ShikakuGrid]):
 
     def _set_grid(self) -> None:
-        self._grid = nx.grid_2d_graph(*self._game.grid_dims)
-        if not self._game.is_solved:
-            nx.set_node_attributes(self._grid, "#FFFFFF", name="value")
-            nx.set_node_attributes( # Adding a color for each square on the grid
-                self._grid,
-                name="value",
-                values={
-                    tuple(i-1 for i in seed["square"]): seed["color"]
-                    for seed in self._game.seeds.values()
-                }
-            )
-        else:
-            nx.set_node_attributes(
-                self._grid,
-                name="value",
-                values={(i-1, j-1): k for (i, j), k in self._game.grid_squares.items()}
-            )
+        self._grid = nx.grid_2d_graph(*self._game.dims)
+        nx.set_node_attributes(
+            self._grid,
+            name="color",
+            values={(i-1, j-1): k for (i, j), k in self._game.squares.items()}
+        )
+        nx.set_node_attributes(
+            self._grid,
+            name="seed_area",
+            values={
+                tuple(i-1 for i in seed["square"]): seed["area"]
+                for seed in self._game.seeds.values()
+            }
+        )
 
-
-    def show(self) -> None:
+    def display(self) -> None:
         plt.figure(figsize=(self._width, self._height))
         nx.draw(
             self._grid,
             pos={(i, j): (j, -i) for (i, j) in self._grid.nodes()},
+            with_labels=True,
+            labels=nx.get_node_attributes(self._grid, "seed_area"),
             node_size=1100,
             node_shape="s",
-            node_color= list(nx.get_node_attributes(self._grid, "value").values()),
+            node_color= list(nx.get_node_attributes(self._grid, "color").values()),
             width=0,
             arrows=False,
             edgecolors="black",

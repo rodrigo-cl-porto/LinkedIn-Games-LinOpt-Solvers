@@ -11,7 +11,6 @@ class Rectangle:
         self.top_left = top_left
         self.dims = dims
 
-
     def __repr__(self) -> str:
         return (
             f"{type(self).__name__}(\n\t"
@@ -21,32 +20,26 @@ class Rectangle:
             f"width={self.width},\n)"
         )
 
-
     def __str__(self) -> str:
         return (
             f"A {type(self).__name__}"
             f" with top-left square at ({self.top_left})"
             f" with dimensions of {self.dims}"
         )
-    
 
     def __hash__(self) -> int:
         return hash((self.top, self.left, self.width, self.height))
 
-
     def __len__(self) -> int:
         return self.area
-
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Rectangle):
             return False
         return self.top_left == other.top_left and self.dims == other.dims
 
-
     def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
-
 
     @property
     def area(self) -> int:
@@ -58,7 +51,6 @@ class Rectangle:
         """
         return self.width * self.height
 
-
     @property
     def dims(self) -> tuple[int, int]:
         """
@@ -69,11 +61,9 @@ class Rectangle:
         """
         return (self.height, self.width)
 
-
     @dims.setter
     def dims(self, value: tuple[int, int]) -> None:
         self.height, self.width  = value
-
 
     @property
     def top_left(self) -> tuple[int, int]:
@@ -85,11 +75,9 @@ class Rectangle:
         """
         return (self.top, self.left)
 
-
     @top_left.setter
     def top_left(self, value:tuple[int, int]) -> None:
         self.top, self.left = value
-
 
     @property
     def top(self) -> int:
@@ -101,20 +89,15 @@ class Rectangle:
         """
         return self.__top
 
-
     @top.setter
     def top(self, value:int) -> None:
-
         if not isinstance(value, int):
             msg = f"The top row's position must be an integer. Got {value!r} instead."
             raise TypeError(msg)
-        
         if value < 1:
             msg = f"The top row's position must be positive. Got {value!r} instead."
             raise ValueError(msg)
-        
         self.__top = value
-
 
     @property
     def left(self) -> int:
@@ -126,20 +109,15 @@ class Rectangle:
         """
         return self.__left
 
-
     @left.setter
     def left(self, value:int) -> None:
-
         if not isinstance(value, int):
             msg = f"The leftmost column's position must be an integer. Got {value!r} instead."
             raise TypeError(msg)
-        
         if value < 1:
             msg = f"The leftmost column's position must be positive. Got {value!r} instead."
             raise ValueError(msg)
-        
         self.__left = value
-
 
     @property
     def width(self) -> int:
@@ -164,7 +142,6 @@ class Rectangle:
         
         self.__width = value
 
-
     @property
     def height(self) -> int:
         """
@@ -174,7 +151,6 @@ class Rectangle:
             The rectangle's number of rows.
         """
         return self.__height
-
 
     @height.setter
     def height(self, value:int) -> None:
@@ -189,10 +165,8 @@ class Rectangle:
         
         self.__height = value
 
-
     def to_dict(self) -> dict[str, tuple[int, int]]:
         return {"top_left": (self.top, self.left), "dims": (self.height, self.width)}
-
 
     @property
     def squares(self) -> tuple[tuple[int, int],...]:

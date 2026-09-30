@@ -47,4 +47,4 @@ class Patches(Shikaku):
             TypeError: if type inputs are not respected.
             ValueError: If there are some seeds with the same color.
         """
-        self._game = PatchesGrid(grid_dims=(size, size), seeds=seeds)
+        self._game = PatchesGrid(dims=(size, size), seeds=seeds)

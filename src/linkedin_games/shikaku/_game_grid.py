@@ -9,31 +9,25 @@ from ._solution import ShikakuSolution
 
 class ShikakuGrid(GameGrid):
 
-    def __init__(self, grid_dims: tuple[int, int], seeds: dict[tuple[int, int], dict[str, Any] | int | None]) -> None:
-        super().__init__(grid_dims)
+    def __init__(self, dims: tuple[int, int], seeds: dict[tuple[int, int], dict[str, Any] | int | None]) -> None:
+        super().__init__(dims)
         self._set_seeds(seeds)
         self._solution: ShikakuSolution
 
-
     def __hash__(self) -> int:
-        return hash((self._grid_dims, self._seeds))
-
+        return hash((self._dims, self._seeds))
 
     @property
     def seeds(self) -> dict[str, dict[str, Any]]:
         return {color: seed.to_dict() for color, seed in self._seeds.items()}
 
-
     def _set_seeds(self, seeds: dict[tuple[int, int], Any]) -> None:
-
         if not isinstance(seeds, dict):
             msg = f"Seeds must be a dictionary. Got {type(seeds).__name__} instead."
             raise TypeError(msg)
-
         if len(seeds) < 1:
             msg = "seeds cannot be empty!"
             raise ValueError(msg)
-
         rectangle_seeds = self._build_seeds(seeds)
         rectangle_seeds = self.__set_seed_colors(rectangle_seeds)
         self._seeds = {seed.color_code: seed for seed in rectangle_seeds}
@@ -50,13 +44,11 @@ class ShikakuGrid(GameGrid):
             for square, seed in seeds.items()
         ]
 
-
     def __set_seed_colors(self, seeds: list[RectangleSeed]) -> list[RectangleSeed]:
         colors = [seed.color_code for seed in seeds if seed.color_code != "#FFFFFF"]
         if len(colors) != len(set(colors)):
             msg = "There must not be two or more seeds with the same color."
             raise ValueError(msg)
-
         if len(colors) < len(seeds):
             for seed in seeds:
                 if seed.color_code == "#FFFFFF":
@@ -65,9 +57,7 @@ class ShikakuGrid(GameGrid):
                         random_color = ColorGenerator.generate_hex_code()
                     seed.color = random_color
                     colors.append(random_color)
-
         return seeds
-
 
     def set_solution(self, value: GameSolution) -> None:
         if not isinstance(value, ShikakuSolution):
@@ -83,14 +73,16 @@ class ShikakuGrid(GameGrid):
 
         self._solution = value
 
-
     @property
-    def grid_squares(self) -> dict[tuple[int, int], str | None]:
+    def squares(self) -> dict[tuple[int, int], str | None]:
         if self._solution:
-            return self._solution.grid_squares
+            return self._solution.squares
         seed_squares = {seed.square: seed.color_code for seed in self._seeds.values()}
-        return {(i, j): seed_squares.get((i, j)) for i in range(1, self._height + 1) for j in range(1, self._width + 1)}
-
+        return {
+            (i, j): seed_squares.get((i, j), "#FFFFFF")
+            for i in range(1, self._height + 1)
+            for j in range(1, self._width + 1)
+        }
 
     @property
     def rectangles(self) -> list[dict[str, tuple[int, int]] | None]:

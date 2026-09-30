@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 
-from .._shared.visualization.renderers._renderer import GameRenderer
+from .._shared.visualization._renderer import GameRenderer
 from ._game_grid import QueensGrid
 
 
@@ -19,18 +19,19 @@ class QueensRenderer(GameRenderer[QueensGrid]):
             }
         )
 
-
-    def show(self) -> None:
-        """Show the Queens' grid."""
+    def display(self) -> None:
         plt.figure(figsize=(self._width, self._height))
         nx.draw(
             self._grid,
             pos={(i, j): (j, -i) for i, j in self._grid.nodes()},
             with_labels=True,
             arrows=False,
-            labels=dict.fromkeys(self._game.crowns, "O") if self._game.crowns != [] else None,
+            labels={
+                (i-1, j-1): "" if not value else "O" if value == 1 else ""
+                for (i, j), value in self._game.squares.items()
+            },
             node_size=1100,
-            node_color=list(nx.get_node_attributes(self.grid, "color").values()),
+            node_color=list(nx.get_node_attributes(self._grid, "color").values()),
             node_shape="s", # Squared-shape nodes
             width=0,
             edgecolors="black",

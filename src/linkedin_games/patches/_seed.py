@@ -28,7 +28,6 @@ class PatchSeed(RectangleSeed):
         else:
             super().__init__(square, color, area)
 
-
     def __repr__(self) -> str:
         return (
             f"{type(self).__name__}(\n\t"
@@ -37,7 +36,6 @@ class PatchSeed(RectangleSeed):
             f"area={self.area},\n\t"
             f"color_code={self.color_code}\n)"
         )
-
 
     def __str__(self) -> str:
         return (
@@ -49,10 +47,8 @@ class PatchSeed(RectangleSeed):
             if self.area is not None else "out any required area"}."
         )
 
-
     def __hash__(self) -> int:
         return hash((self.color_code, self.square, self.shape, self.area))
-
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, PatchSeed):
@@ -64,7 +60,6 @@ class PatchSeed(RectangleSeed):
             and self.shape == other.shape
         )
 
-
     def to_dict(self) -> dict[str, Any]:
         return {
             "color": self.color,
@@ -73,7 +68,6 @@ class PatchSeed(RectangleSeed):
             "shape": self.shape,
             "area": self.area
         }
-
 
     @property
     def shape(self) -> str:
@@ -84,7 +78,6 @@ class PatchSeed(RectangleSeed):
             The patch shape's name required by the seed square.
         """
         return str(self.__shape)
-
 
     def _set_shape(self, value: str | None = PatchShape.ANY) -> None:
 
@@ -103,7 +96,6 @@ class PatchSeed(RectangleSeed):
             msg = f"'{value}' is not a valid rectangle shape. Please, input one of theses shapes: {valid_shapes}"
             raise ValueError(msg) from exc
 
-
     @property
     def area(self) -> int | None:
         """
@@ -113,7 +105,6 @@ class PatchSeed(RectangleSeed):
             The patch's area required by the seed or `None` if the seed doesn't claim it.
         """
         return self._area
-
 
     def _set_area(self, value: int | None = None) -> None:
 

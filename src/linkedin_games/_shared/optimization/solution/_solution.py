@@ -7,17 +7,15 @@ from pyomo.environ import ConcreteModel
 class GameSolution(ABC):
 
     @property
-    def grid_squares(self) -> dict[tuple[int, int], Any]:
-        return self._grid_squares
-
+    def squares(self) -> dict[tuple[int, int], Any]:
+        return self._squares
 
     @abstractmethod
     def build(self, opt_model: ConcreteModel) -> Self:
         self._model = opt_model
-        self._set_grid_squares()
+        self._set_squares()
         return self
 
-
     @abstractmethod
-    def _set_grid_squares(self) -> None:
-        self._grid_squares: dict[tuple[int, int], Any]
+    def _set_squares(self) -> None:
+        self._squares: dict[tuple[int, int], Any]

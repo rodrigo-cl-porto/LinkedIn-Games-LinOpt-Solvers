@@ -15,7 +15,7 @@ class OptModeler[G: GameGrid](ABC):
         self._model = pyo.ConcreteModel()
 
     def _set_board_dimensions(self) -> None:
-        m, n = self._game.grid_dims
+        m, n = self._game.dims
         self._model.m = pyo.Param(initialize=m, domain=pyo.PositiveIntegers)
         self._model.n = pyo.Param(initialize=n, domain=pyo.PositiveIntegers)
 

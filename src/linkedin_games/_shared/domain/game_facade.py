@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Self
 
 from ..optimization.solve_game import SolveGame
 from ..visualization.show_game import ShowGame
@@ -15,7 +15,7 @@ class GameFacade:
         Returns:
             The number of rows (or columns) on game's grid.
         """
-        return self._game.grid_dims[0]
+        return self._game.dims[0]
 
     @size.setter
     def size(self, value: int) -> None:
@@ -25,25 +25,29 @@ class GameFacade:
         self._size = value
 
     @property
-    def grid_dims(self) -> tuple[int, int]:
-        """The grid dimensions.
+    def dims(self) -> tuple[int, int]:
+        """The game grid dimensions.
 
         Returns:
-            Dimensions of the grid as a `(rows, columns)` tuple.
+            Dimensions of the game as a `(rows, columns)` tuple.
         """
-        return self._game.grid_dims
+        return self._game.dims
 
     @property
-    def grid_squares(self) -> dict[tuple[int, int], Any]:
+    def squares(self) -> dict[tuple[int, int], Any]:
         """All the grid squares and their respective assigned values (if any).
-
+        
         Returns:
             Grid squares as a dictionary of `(row, column): value` items.
         """
-        return self._game.grid_squares
+        return self._game.squares
 
-    def solve(self, solver: str = "highs", verbose: bool = False) -> None:
+    def solve(self, solver: str = "highs", verbose: bool = False) -> Self:
+        if self._game.is_solved:
+            msg = "The game is already solved."
+            raise RuntimeError(msg)
         self._game = SolveGame(self._game).execute(solver=solver, verbose=verbose)
+        return self
 
     def display(self) -> None:
         ShowGame(self._game).execute()

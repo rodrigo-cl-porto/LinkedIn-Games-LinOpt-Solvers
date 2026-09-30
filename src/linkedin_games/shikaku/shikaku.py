@@ -36,7 +36,7 @@ class Shikaku(GameFacade):
             TypeError: if type inputs are not respected.
             ValueError: If there are some seeds with the same color.
         """
-        self._game = ShikakuGrid(grid_dims=(size, size), seeds=seeds)
+        self._game = ShikakuGrid(dims=(size, size), seeds=seeds)
 
 
     @property

@@ -1,8 +1,6 @@
-# Old project
-_old
-
-# Binder folder
-binder/
+# Binder branch
+assets/
+notebooks/
 
 # Environment variables
 *.env

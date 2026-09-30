@@ -7,7 +7,7 @@ from ._solution import TangoSolution
 class TangoGrid(GameGrid):
 
     def __init__(self,
-            grid_dims: tuple[int, int],
+            dims: tuple[int, int],
             filled_squares: dict[tuple[int, int], int],
             matching_pairs:
                 set[tuple[tuple[int, int], tuple[int, int]]]
@@ -18,21 +18,18 @@ class TangoGrid(GameGrid):
                 | list[tuple[tuple[int, int], tuple[int, int]]]
                 | None = None,
         ) -> None:
-        super().__init__(grid_dims)
+        super().__init__(dims)
         self.__set_filled_squares(filled_squares)
         self.__set_matching_pairs(matching_pairs)
         self.__set_opposite_pairs(opposite_pairs)
         self._solution: TangoSolution
 
-
     def __hash__(self) -> int:
-        return hash((self._grid_dims, self.__matching_pairs, self.__opposite_pairs, self.__filled_squares))
-
+        return hash((self._dims, self.__matching_pairs, self.__opposite_pairs, self.__filled_squares))
 
     @property
     def filled_squares(self) -> dict[tuple[int, int], int]:
         return self.__filled_squares
-
 
     def __set_filled_squares(self, values: dict[tuple[int, int], int]) -> None:
     
@@ -47,11 +44,9 @@ class TangoGrid(GameGrid):
 
         self.__filled_squares = {square: (1 if value else 0) for square, value in values.items()}
 
-
     @property
     def matching_pairs(self) -> list[tuple[tuple[int, int], tuple[int, int]]]:
         return self.__matching_pairs
-    
     
     def __set_matching_pairs(self,
             values:
@@ -89,11 +84,9 @@ class TangoGrid(GameGrid):
         
         self.__matching_pairs = list(set(values))
 
-
     @property
     def opposite_pairs(self) -> list[tuple[tuple[int, int], tuple[int, int]]]:
         return self.__opposite_pairs
-
 
     def __set_opposite_pairs(self,
             values: set[tuple[tuple[int, int], tuple[int, int]]]
@@ -130,33 +123,27 @@ class TangoGrid(GameGrid):
         
         self.__opposite_pairs = list(set(values))
 
-
     def set_solution(self, value: GameSolution) -> None:
-    
         if not isinstance(value, TangoSolution):
             msg = f"Invalid input. Got a {type(value).__name__} object."
             raise TypeError(msg)
-
         self._solution = value
 
-
     @property
-    def grid_squares(self) -> dict[tuple[int, int], int | None]:
+    def squares(self) -> dict[tuple[int, int], int | None]:
         if self._solution:
-            return self._solution.grid_squares
+            return self._solution.squares
         return {
             (i, j): self.filled_squares.get((i, j))
             for i in range(1, self._height+1)
             for j in range(1, self._width+1)
         }
 
-
     @property
     def moons(self) -> list[tuple[int, int]]:
         if self._solution:
             return self._solution.moons
         return [square for square, value in self.filled_squares.items() if value == 1]
-
 
     @property
     def suns(self) -> list[tuple[int, int]]:

@@ -19,32 +19,28 @@ class GameGrid(ABC):
         self._set_grid_dims(grid_dims)
         self._solution: GameSolution | None = None
 
-
     def __len__(self) -> int:
         return self.area
-
 
     def __abs__(self) -> int:
         return self.area
 
-
     @property
     def area(self) -> int:
-        m, n = self._grid_dims
+        m, n = self._dims
         return m * n
 
-
     @property
-    def grid_squares(self) -> dict[tuple[int, int], int | str | None]:
+    def squares(self) -> dict[tuple[int, int], int | str | None]:
+        if self._solution:
+            return self._solution.squares
         return {(i, j): None for i in range(1, self._height+1) for j in range(1, self._width+1)}
 
-
     @property
-    def grid_dims(self) -> tuple[int, int]:
-        return self._grid_dims
+    def dims(self) -> tuple[int, int]:
+        return self._dims
 
-
-    def _set_grid_dims(self, value:tuple[int, int] = (2, 2)) -> None:
+    def _set_grid_dims(self, value: tuple[int, int] = (2, 2)) -> None:
 
         if len(value) != 2:
             msg = f"Grid dimensions must be a pair (m,n). Got {value!r} instead."
@@ -63,25 +59,21 @@ class GameGrid(ABC):
             msg = f"The grid is too small for the game. Got grid dimensions of {value!r}."
             raise ValueError(msg)
         
-        self._grid_dims = tuple(value)
+        self._dims = tuple(value)
         self._height = value[0]
         self._width = value[1]
-
 
     @property
     def height(self) -> int:
         return self._height
 
-
     @property
     def width(self) -> int:
         return self._width
 
-
     @abstractmethod
     def set_solution(self, value: GameSolution) -> None:
         ...
-
 
     @property
     def is_solved(self) -> bool:

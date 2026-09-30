@@ -27,8 +27,7 @@ class Queens(GameFacade):
             size: The side length of the game.
             regions: Regions as a dictionary of `color: {(row, column), ...}` items.
         """
-        self._game = QueensGrid(grid_dims=(size, size), regions=regions)
-
+        self._game = QueensGrid(dims=(size, size), regions=regions)
 
     @property
     def regions(self) -> dict[str, set[tuple[int, int]]]:
@@ -41,11 +40,10 @@ class Queens(GameFacade):
         """
         return self._game.regions
 
-
     @property
     def crowns(self) -> list[tuple[int, int]]:
         """The crowned squares of Queens game.
-
+        
         Returns:
             Locations of all crowns as a list of squares as `(row, column)`
             or an empty list if the game is not solved yet.

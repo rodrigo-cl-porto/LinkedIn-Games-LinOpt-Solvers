@@ -9,9 +9,8 @@ from ._solution import PatchesSolution
 
 class PatchesGrid(ShikakuGrid):
     
-    def __init__(self, grid_dims: tuple[int, int], seeds: dict[tuple[int, int], dict[str, Any] | int | None]) -> None:
-        super().__init__(grid_dims, seeds)
-
+    def __init__(self, dims: tuple[int, int], seeds: dict[tuple[int, int], dict[str, Any] | int | None]) -> None:
+        super().__init__(dims, seeds)
 
     @staticmethod
     def _build_seeds(seeds: dict[tuple[int, int], dict[str, Any] | int | None]) -> list:
@@ -23,7 +22,6 @@ class PatchesGrid(ShikakuGrid):
                 shape=seed.get("shape") if isinstance(seed, dict) else None
             ) for square, seed in seeds.items()
         ]
-
 
     def set_solution(self, value: GameSolution) -> None:
 

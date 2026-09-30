@@ -13,16 +13,14 @@ class QueensSolution(GameSolution):
     def build(self, opt_model: pyo.ConcreteModel) -> Self:
         return super().build(opt_model)
 
-
-    def _set_grid_squares(self) -> None:
+    def _set_squares(self) -> None:
         squares = cast("Iterable[tuple[int, int]]", self._model.S)
-        x = cast("pyo.Var", self._model.x)
-        self._grid_squares = {
+        x: pyo.Var = cast("pyo.Var", self._model.x)
+        self._squares = {
             (i, j): round(pyo.value(x[i,j]))
             for i, j in squares
         }
 
-
     @property
     def crowns(self) -> list[tuple[int, int]]:
-        return [square for square, value in self._grid_squares.items() if value == 1]
+        return [square for square, value in self._squares.items() if value == 1]

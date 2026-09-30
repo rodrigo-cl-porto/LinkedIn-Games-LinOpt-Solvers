@@ -11,7 +11,6 @@ class Color:
     __COLOR_HEXES = CSS4_COLORS
     __COLOR_NAMES: ClassVar = {hex_code: name for name, hex_code in CSS4_COLORS.items()}
 
-
     def __init__(self, color: str | None="#FFFFFF") -> None:
         """
         Args:
@@ -19,13 +18,11 @@ class Color:
         """
         self.color = color
 
-
     @staticmethod
     def __hex_code_to_rgb(hex_code: str) -> tuple[int,...]:
         """Convert '#RRGGBB' to an (R, G, B) tuple."""
         hex_code = hex_code.lstrip("#")
         return tuple(int(hex_code[i : i + 2], 16) for i in (0, 2, 4))
-
 
     @staticmethod
     def __get_closest_color_name(hex_code: str) -> str:
@@ -48,22 +45,18 @@ class Color:
 
         return closest_color
 
-
     @staticmethod
     def __is_color_name(value:str) -> bool:
         value = value.replace(" ", "")
         return value in Color.__COLOR_HEXES
 
-
     @staticmethod
     def __is_hex_code(value:str) -> bool:
         return Color.__HEX_PATTERN.fullmatch(value) is not None
 
-
     @property
     def color(self) -> str:
         return self.__name
-
 
     @color.setter
     def color(self, value: str|None) -> None:
@@ -93,7 +86,6 @@ class Color:
             msg = f"The color must be a valid color name or a hex code like '#RRGGBB'. Got {color!r} instead."
             raise ValueError(msg)
 
-
     @property
     def hex_code(self) -> str:
         return str(self.__hex_code)
@@ -112,11 +104,9 @@ class Color:
         self.__hex_code = str(value)
         self.__name = Color.__get_closest_color_name(value)
 
-
     @property
     def name(self) -> str:
         return self.__name
-
 
     @name.setter
     def name(self, value: str| None) -> None:

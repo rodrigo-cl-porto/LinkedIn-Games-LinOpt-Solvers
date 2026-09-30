@@ -22,7 +22,7 @@ class Sudoku(GameFacade):
         Args:
             filled_squares: Starting filled squares as a dictionary of `(row, column): digit` items.
         """
-        self._game = SudokuGrid(grid_dims=(9,9), block_dims=(3,3), filled_squares=filled_squares)
+        self._game = SudokuGrid(dims=(9,9), block_dims=(3,3), filled_squares=filled_squares)
 
     @property
     def block_dims(self) -> tuple[int, int]:

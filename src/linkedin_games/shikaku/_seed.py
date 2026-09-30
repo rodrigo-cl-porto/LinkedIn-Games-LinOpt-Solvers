@@ -17,7 +17,6 @@ class RectangleSeed:
         self.__color = Color(color)
         self._set_area(area)
 
-
     def __repr__(self) -> str:
         return (
             f"{type(self).__name__}(\n\t"
@@ -25,7 +24,6 @@ class RectangleSeed:
             f"area={self.area},\n\t"
             f"color_code={self.color_code}\n)"
         )
-
 
     def __str__(self) -> str:
         return (
@@ -35,18 +33,14 @@ class RectangleSeed:
             if self.area is not None else "out any required area"}."
         )
 
-
     def __hash__(self) -> int:
         return hash((self.color_code, self.square, self.area))
-
 
     def __len__(self) -> int:
         return 1
 
-
     def __abs__(self) -> int:
         return 1
-
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, RectangleSeed):
@@ -57,10 +51,8 @@ class RectangleSeed:
             and self.area == other.area
         )
 
-
     def __ne__(self, other:object) -> bool:
         return not self.__eq__(other)
-
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -69,7 +61,6 @@ class RectangleSeed:
             "square": self.square,
             "area": self.area
         }
-
 
     @property
     def square(self) -> tuple[int, int]:
@@ -80,7 +71,6 @@ class RectangleSeed:
             Board square of the rectangle seed as a `(row, column)` tuple.
         """
         return self.__square
-
 
     def __set_square(self, value: tuple[int, int]) -> None:
 
@@ -98,7 +88,6 @@ class RectangleSeed:
         
         self.__square = value
 
-
     @property
     def area(self) -> int:
         """
@@ -109,24 +98,18 @@ class RectangleSeed:
         """
         return self._area
 
-
     def _set_area(self, value: int | None = 1) -> None:
-
         if value is None:
             self._area = 1
             return
-        
         if not isinstance(value, int):
             msg = f"The required area must be an integer or None. Got {type(value).__name__} instead."
             raise TypeError(msg)
-
         if value < 1:
             msg = f"The required area must be a positive integer. Got {value!r} instead."
             raise ValueError(msg)
-
         self._area = value
         self._area = value
-
 
     @property
     def color(self) -> str:
@@ -138,23 +121,20 @@ class RectangleSeed:
         """
         return self.__color.name
 
-
     @color.setter
     def color(self, value:str) -> None:
         self.__color.color = value
-
 
     @property
     def color_code(self) -> str:
         """
         The code of seed's color.
-
+        
         Returns:
             Hex code color as a `"#RRGGBB"` string.
         """
         return self.__color.hex_code
 
-    
     @color_code.setter
     def color_code(self, value:str) -> None:
         self.__color.hex_code = value
