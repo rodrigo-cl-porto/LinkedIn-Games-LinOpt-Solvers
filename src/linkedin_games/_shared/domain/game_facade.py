@@ -26,8 +26,7 @@ class GameFacade:
 
     @property
     def grid_dims(self) -> tuple[int, int]:
-        """
-        The grid dimensions.
+        """The grid dimensions.
 
         Returns:
             Dimensions of the grid as a `(rows, columns)` tuple.
@@ -36,8 +35,7 @@ class GameFacade:
 
     @property
     def grid_squares(self) -> dict[tuple[int, int], Any]:
-        """
-        All the grid squares and their respective assigned values (if any).
+        """All the grid squares and their respective assigned values (if any).
 
         Returns:
             Grid squares as a dictionary of `(row, column): value` items.

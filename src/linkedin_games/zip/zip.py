@@ -41,7 +41,6 @@ class Zip(GameFacade):
             walls=walls
         )
 
-
     @property
     def numbered_squares(self) -> list[tuple[int, int]]:
         """
@@ -51,7 +50,6 @@ class Zip(GameFacade):
             The numbered squares as a dictionary of `(row, column): number` items.
         """
         return self._game.numbered_squares
-
 
     @property
     def walls(self) -> list[tuple[tuple[int, int], tuple[int, int]]]:
@@ -63,7 +61,6 @@ class Zip(GameFacade):
         """
         return self._game.walls
 
-
     @property
     def grid_edges(self) -> dict[tuple[tuple[int, int], tuple[int, int]], int]:
         """
@@ -73,7 +70,6 @@ class Zip(GameFacade):
             All edges as a dictionary of `((row1, column1), (row2, column2)): value` items.
         """
         return self._game.grid_edges
-
 
     @property
     def path(self) -> list[tuple[int, int]]:
