@@ -89,7 +89,7 @@ uv add linkedin-games
 In order to solve this Patches game:
 
 <div align="center">
-    <img src="./docs/assets/patches-121.jpg" alt="Patches No. 121" width="40%" loading="lazy">
+    <img src="https://cdn.jsdelivr.net/gh/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers/docs/assets/patches-121.jpg" alt="Patches No. 121" width="40%" loading="lazy">
 </div>
 
 One can run this simple code snippet.
@@ -114,13 +114,13 @@ patches.show()
 Which will return the following result:
 
 <div align="center">
-    <img src="./docs/assets/patches-121-solved.png" alt="Patches No. 121 solved" width="40%" loading="lazy" >
+    <img src="https://cdn.jsdelivr.net/gh/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers/docs/assets/patches-121-solved.png" alt="Patches No. 121 solved" width="40%" loading="lazy" >
 </div>
 
 Which, by its turn, matches the official solution of this game:
 
 <div align="center">
-    <img src="./docs/assets/patches-121-solution.jpg" alt="Solution of Patches No. 121" width="40%" loading="lazy" >
+    <img src="https://cdn.jsdelivr.net/gh/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers/docs/assets/patches-121-solution.jpg" alt="Solution of Patches No. 121" width="40%" loading="lazy" >
 </div>
 
 # 📙 Jupyter Book
