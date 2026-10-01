@@ -3,8 +3,7 @@ from ._game_grid import QueensGrid
 
 
 class Queens(GameFacade):
-    """
-    The [LinkedIn Queens](https://www.linkedin.com/games/queens/) game.
+    """The [LinkedIn Queens](https://www.linkedin.com/games/queens/) game.
     
     A game grid with colored regions intended to put crowns on it.
 
@@ -15,7 +14,6 @@ class Queens(GameFacade):
         - There can only be one crown in each row, column and colored region;
         - There cannot be adjacent crowns, not even along adjacent diagonals.
     """
-
     _game: QueensGrid
 
     def __init__(self,
@@ -27,7 +25,10 @@ class Queens(GameFacade):
             size: The side length of the game.
             regions: Regions as a dictionary of `color: {(row, column), ...}` items.
         """
-        self._game = QueensGrid(dims=(size, size), regions=regions)
+        super().__init__(size, regions)
+
+    def _set_game(self, regions: dict[str, set[tuple[int, int]]] | list[set[tuple[int, int]]]) -> None:
+        self._game = QueensGrid(dims=self.dims, regions=regions)
 
     @property
     def regions(self) -> dict[str, set[tuple[int, int]]]:
@@ -41,7 +42,7 @@ class Queens(GameFacade):
         return self._game.regions
 
     @property
-    def crowns(self) -> list[tuple[int, int]]:
+    def solution(self) -> list[tuple[int, int]]:
         """The crowned squares of Queens game.
         
         Returns:

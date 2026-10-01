@@ -1,19 +1,18 @@
-from typing import Any
-
 from .._shared.optimization.solution._solution import GameSolution
 from ..shikaku._game_grid import ShikakuGrid
 from ._seed import PatchSeed
+from ._seed_type import SeedType
 from ._shape import PatchShape
 from ._solution import PatchesSolution
 
 
 class PatchesGrid(ShikakuGrid):
     
-    def __init__(self, dims: tuple[int, int], seeds: dict[tuple[int, int], dict[str, Any] | int | None]) -> None:
+    def __init__(self, dims: tuple[int, int], seeds: dict[tuple[int, int], SeedType | int | None]) -> None:
         super().__init__(dims, seeds)
 
     @staticmethod
-    def _build_seeds(seeds: dict[tuple[int, int], dict[str, Any] | int | None]) -> list:
+    def _build_seeds(seeds: dict[tuple[int, int], SeedType | int | None]) -> list:
         return [
             PatchSeed(
                 square=square,
@@ -35,7 +34,6 @@ class PatchesGrid(ShikakuGrid):
             if seed["area"] is not None and patch_area != seed["area"]:
                 msg = f"The patch's area ({patch_area}) doesn't attend to the required area ({seed["area"]})."
                 raise ValueError(msg)
-            
             match seed["shape"]:
                 case PatchShape.VERTICAL:
                     if rectangle.height <= rectangle.width:
@@ -45,7 +43,6 @@ class PatchesGrid(ShikakuGrid):
                             f" greater than its width ({rectangle.width!r})."
                         )
                         raise ValueError(msg)
-                
                 case PatchShape.HORIZONTAL:
                     if rectangle.height >= rectangle.width:
                         msg = (
@@ -54,7 +51,6 @@ class PatchesGrid(ShikakuGrid):
                             f" greater than its height ({rectangle.height!r})."
                         )
                         raise ValueError(msg)
-                
                 case PatchShape.SQUARE:
                     if rectangle.height != rectangle.width:
                         msg = (
@@ -63,5 +59,4 @@ class PatchesGrid(ShikakuGrid):
                             f" equal to its width ({rectangle.width!r})."
                         )
                         raise ValueError(msg)
-        
         self._solution = value

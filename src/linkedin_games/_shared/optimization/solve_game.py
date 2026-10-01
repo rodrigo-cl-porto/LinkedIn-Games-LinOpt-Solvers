@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from pyomo.environ import SolverFactory
 from pyomo.opt import SolverStatus, TerminationCondition
 
@@ -13,7 +15,6 @@ class SolveGame(UseCase):
         self._game = game
         self._opt_model = OptModelerFactory.create_modeler(game).build_model(game)
 
-
     def execute(self, solver: str="highs", verbose: bool=False) -> GameGrid:
         result = SolverFactory(solver).solve(self._opt_model)
         is_solved: bool = (
@@ -25,9 +26,12 @@ class SolveGame(UseCase):
         )
 
         if is_solved:
-            print(f"{type(self._game).__name__} game solved successfully!")
+            print("Game solved successfully!")
             solution = GameSolutionFactory.create(self._game).build(self._opt_model)
             self._game.set_solution(solution)
+            if verbose:
+                print("SOLUTION:")
+                pprint(self._game.solution)
             return self._game
 
         msg = "No feasible solution was found!"

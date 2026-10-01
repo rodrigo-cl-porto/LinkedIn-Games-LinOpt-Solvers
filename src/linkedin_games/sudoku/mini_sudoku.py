@@ -1,10 +1,9 @@
+from ._facade import SudokuFacade
 from ._game_grid import SudokuGrid
-from .sudoku import Sudoku
 
 
-class MiniSudoku(Sudoku):
-    """
-    The [LinkedIn Mini Sudoku](https://www.linkedin.com/games/mini-sudoku/) game.
+class MiniSudoku(SudokuFacade):
+    """The [LinkedIn Mini Sudoku](https://www.linkedin.com/games/mini-sudoku/) game.
 
     A 6x6 Sudoku board with 2x3 grid blocks.
 
@@ -21,4 +20,7 @@ class MiniSudoku(Sudoku):
         Args:
             filled_squares: Starting filled squares as a dictionary of `(row, column): digit` items.
         """
-        self._game = SudokuGrid(dims=(6,6), block_dims=(2,3), filled_squares=filled_squares)
+        super().__init__(6, filled_squares)
+
+    def _set_game(self, filled_squares: dict[tuple[int, int], int]) -> None:
+        self._game = SudokuGrid(dims=self.dims, block_dims=(2,3), filled_squares=filled_squares)

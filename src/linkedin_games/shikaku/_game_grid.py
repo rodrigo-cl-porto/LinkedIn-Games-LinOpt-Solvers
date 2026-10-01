@@ -1,15 +1,14 @@
-from typing import Any
-
 from .._shared.domain.game_grid import GameGrid
 from .._shared.optimization.solution._solution import GameSolution
 from .._shared.utils.color_generator import ColorGenerator
 from ._seed import RectangleSeed
+from ._seed_type import SeedType
 from ._solution import ShikakuSolution
 
 
 class ShikakuGrid(GameGrid):
 
-    def __init__(self, dims: tuple[int, int], seeds: dict[tuple[int, int], dict[str, Any] | int | None]) -> None:
+    def __init__(self, dims: tuple[int, int], seeds: dict[tuple[int, int], SeedType | int | None]) -> None:
         super().__init__(dims)
         self._set_seeds(seeds)
         self._solution: ShikakuSolution
@@ -18,10 +17,10 @@ class ShikakuGrid(GameGrid):
         return hash((self._dims, self._seeds))
 
     @property
-    def seeds(self) -> dict[str, dict[str, Any]]:
+    def seeds(self) -> dict[str, dict[str, SeedType]]:
         return {color: seed.to_dict() for color, seed in self._seeds.items()}
 
-    def _set_seeds(self, seeds: dict[tuple[int, int], Any]) -> None:
+    def _set_seeds(self, seeds: dict[tuple[int, int], SeedType | int | None]) -> None:
         if not isinstance(seeds, dict):
             msg = f"Seeds must be a dictionary. Got {type(seeds).__name__} instead."
             raise TypeError(msg)
@@ -32,9 +31,8 @@ class ShikakuGrid(GameGrid):
         rectangle_seeds = self.__set_seed_colors(rectangle_seeds)
         self._seeds = {seed.color_code: seed for seed in rectangle_seeds}
 
-
     @staticmethod
-    def _build_seeds(seeds: dict[tuple[int, int], dict[str, Any] | int | None]) -> list[RectangleSeed]:
+    def _build_seeds(seeds: dict[tuple[int, int], SeedType | int | None]) -> list[RectangleSeed]:
         return [
             RectangleSeed(
                 square=square,
@@ -63,14 +61,12 @@ class ShikakuGrid(GameGrid):
         if not isinstance(value, ShikakuSolution):
             msg = f"Invalid input. Got {type(value).__name__} instead of GameSolution."
             raise TypeError(msg)
-
         for seed_color, rectangle in value.rectangles.items():
             seed = self._seeds[seed_color].to_dict()
             rectangle_area = rectangle.height * rectangle.width
             if seed["area"] is not None and rectangle_area != seed["area"]:
                 msg = f"The patch's area ({rectangle_area}) doesn't attend to the required area ({seed['area']})."
                 raise ValueError(msg)
-
         self._solution = value
 
     @property
@@ -85,10 +81,14 @@ class ShikakuGrid(GameGrid):
         }
 
     @property
-    def rectangles(self) -> list[dict[str, tuple[int, int]] | None]:
+    def rectangles(self) -> list[dict[str, tuple[int, int]]]:
         if self._solution:
             return sorted(
                 [rectangle.to_dict() for rectangle in self._solution.rectangles.values()],
                 key=lambda rectangle: rectangle["top_left"],
             )
         return []
+
+    @property
+    def solution(self) -> list[dict[str, tuple[int, int]]]:
+        return self.rectangles

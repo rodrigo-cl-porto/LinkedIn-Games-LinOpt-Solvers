@@ -2,11 +2,11 @@ from typing import Any
 
 from .._shared.domain.game_facade import GameFacade
 from ._game_grid import ShikakuGrid
+from ._seed_type import RectangleSeedType, SeedType
 
 
 class Shikaku(GameFacade):
-    """
-    The Shikaku game.
+    """The Shikaku game.
     
     A game grid with some numbered squares that states the rectangles' areas
         to be built on the grid.
@@ -19,12 +19,11 @@ class Shikaku(GameFacade):
         - Each numbered square (seed) must be covered by only one rectangle that has a area equal to its number;
         - A rectangle must cover only one seed;
     """
-
     _game: ShikakuGrid
 
     def __init__(self,
             size: int,
-            seeds: dict[tuple[int, int], dict[str, Any] | int | None]
+            seeds: dict[tuple[int, int], RectangleSeedType | int | None]
         ) -> None:
         """
         Args:
@@ -36,27 +35,26 @@ class Shikaku(GameFacade):
             TypeError: if type inputs are not respected.
             ValueError: If there are some seeds with the same color.
         """
-        self._game = ShikakuGrid(dims=(size, size), seeds=seeds)
+        super().__init__(size, seeds)
 
+    def _set_game(self, seeds: dict[tuple[int, int], SeedType | int | None]) -> None:
+        self._game = ShikakuGrid(dims=self.dims, seeds=seeds)
 
     @property
     def seeds(self) -> dict[str, dict[str, Any]]:
-        """
-        The seeds of the game.
+        """The seeds of the game.
 
         Returns:
             All the information about the seeds.
         """
         return self._game.seeds
 
-
     @property
-    def rectangles(self) -> list[dict[str, tuple[int, int]] | None]:
-        """
-        All rectangles that solves the Patches game.
+    def solution(self) -> list[dict[str, tuple[int, int]]]:
+        """All rectangles that solves the Patches game.
 
         Returns:
             The solving rectangles as a list of dictionaries in the format
                 `{"color_code": color_code, "top_left": (top, left), "dims": (height, width)}`.
         """
-        return self._game.rectangles
+        return self._game.solution

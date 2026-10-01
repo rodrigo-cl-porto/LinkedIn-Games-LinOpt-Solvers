@@ -125,3 +125,7 @@ class ZipGrid(GameGrid):
         if self._solution:
             return self._solution.path
         return []
+
+    @property
+    def solution(self) -> list[tuple[int, int]]:
+        return self.path

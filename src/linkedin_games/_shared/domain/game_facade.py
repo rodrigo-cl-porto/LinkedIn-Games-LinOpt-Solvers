@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from typing import Any, Self
 
 from ..optimization.solve_game import SolveGame
@@ -5,8 +6,12 @@ from ..visualization.show_game import ShowGame
 from .game_grid import GameGrid
 
 
-class GameFacade:
+class GameFacade(ABC):
     _game: GameGrid
+
+    def __init__(self, size: int, *args, **kwargs) -> None:
+        self._set_size(size)
+        self._set_game(*args, **kwargs)
 
     @property
     def size(self) -> int:
@@ -17,12 +22,15 @@ class GameFacade:
         """
         return self._game.dims[0]
 
-    @size.setter
-    def size(self, value: int) -> None:
+    def _set_size(self, value: int) -> None:
         if value < 1:
             msg = f"Game's size must be a positive integer. Got {value} instead."
             raise ValueError(msg)
         self._size = value
+
+    @abstractmethod
+    def _set_game(self, *args, **kwargs) -> None:
+        ...
 
     @property
     def dims(self) -> tuple[int, int]:
@@ -31,7 +39,7 @@ class GameFacade:
         Returns:
             Dimensions of the game as a `(rows, columns)` tuple.
         """
-        return self._game.dims
+        return (self._size, self._size)
 
     @property
     def squares(self) -> dict[tuple[int, int], Any]:
@@ -41,6 +49,15 @@ class GameFacade:
             Grid squares as a dictionary of `(row, column): value` items.
         """
         return self._game.squares
+
+    @property
+    def solution(self) -> dict[tuple[int, int], Any]:
+        """The game's solution.
+
+        Returns:
+            A dictionary of squares with a value as `(row, column): value` items.
+        """
+        return self._game.solution
 
     def solve(self, solver: str = "highs", verbose: bool = False) -> Self:
         if self._game.is_solved:

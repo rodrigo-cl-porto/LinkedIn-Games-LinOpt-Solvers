@@ -11,7 +11,7 @@ def test_shikaku_2026_08_10_easy():
     }
     shikaku = Shikaku(5, seeds)
     shikaku.solve()
-    rectangles = [
+    assert shikaku.solution == [
         {'dims': (2, 3), 'top_left': (1, 1)},
         {'dims': (2, 1), 'top_left': (1, 4)},
         {'dims': (1, 1), 'top_left': (1, 5)},
@@ -22,8 +22,6 @@ def test_shikaku_2026_08_10_easy():
         {'dims': (2, 1), 'top_left': (4, 2)},
         {'dims': (2, 2), 'top_left': (4, 3)}
     ]
-    assert shikaku.rectangles == rectangles
-
 
 def test_shikaku_2026_08_11_medium():
     seeds = {
@@ -39,7 +37,7 @@ def test_shikaku_2026_08_11_medium():
     }
     shikaku = Shikaku(10, seeds)
     shikaku.solve()
-    rectangles = [
+    assert shikaku.solution == [
         {'dims': (2, 1), 'top_left': (1, 1)},
         {'dims': (2, 8), 'top_left': (1, 2)},
         {'dims': (3, 1), 'top_left': (1, 10)},
@@ -61,8 +59,6 @@ def test_shikaku_2026_08_11_medium():
         {'dims': (1, 2), 'top_left': (9, 8)},
         {'dims': (1, 2), 'top_left': (10, 8)}
     ]
-    assert shikaku.rectangles == rectangles
-
 
 def test_shikaku_2026_08_12_hard():
     seeds = {
@@ -87,7 +83,7 @@ def test_shikaku_2026_08_12_hard():
     }
     shikaku = Shikaku(20, seeds)
     shikaku.solve()
-    rectangles = [
+    assert shikaku.solution == [
         {'dims': (4, 2), 'top_left': (1, 1)},
         {'dims': (11, 1), 'top_left': (1, 3)},
         {'dims': (8, 1), 'top_left': (1, 4)},
@@ -142,8 +138,6 @@ def test_shikaku_2026_08_12_hard():
         {'dims': (3, 6), 'top_left': (18, 15)},
         {'dims': (2, 2), 'top_left': (19, 3)}
     ]
-    assert shikaku.rectangles == rectangles
-
 
 @pytest.mark.skip(reason="Because takes too long")
 def test_shikaku_2026_08_13_expert():
@@ -174,7 +168,7 @@ def test_shikaku_2026_08_13_expert():
     }
     shikaku = Shikaku(30, seeds)
     shikaku.solve()
-    rectangles = [
+    assert shikaku.solution == [
         {'dims': (4, 13), 'top_left': (1, 1)},
         {'dims': (9, 5), 'top_left': (1, 14)},
         {'dims': (9, 3), 'top_left': (1, 19)},
@@ -242,8 +236,6 @@ def test_shikaku_2026_08_13_expert():
         {'dims': (2, 1), 'top_left': (29, 1)},
         {'dims': (2, 1), 'top_left': (29, 2)}
     ]
-    assert shikaku.rectangles == rectangles
-
 
 @pytest.mark.skip(reason="Because takes too long")
 def test_shikaku_2026_08_14_master():
@@ -281,7 +273,7 @@ def test_shikaku_2026_08_14_master():
     }
     shikaku = Shikaku(40, seeds)
     shikaku.solve()
-    rectangles = [
+    assert shikaku.solution == [
         {'dims': (2, 40), 'top_left': (1, 1)},
         {'dims': (2, 36), 'top_left': (3, 1)},
         {'dims': (13, 4), 'top_left': (3, 37)},
@@ -371,4 +363,3 @@ def test_shikaku_2026_08_14_master():
         {'dims': (3, 1), 'top_left': (34, 13)},
         {'dims': (4, 11), 'top_left': (37, 13)}
     ]
-    assert shikaku.rectangles == rectangles

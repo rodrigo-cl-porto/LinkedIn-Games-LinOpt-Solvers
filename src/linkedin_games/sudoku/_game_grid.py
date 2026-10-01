@@ -143,6 +143,9 @@ class SudokuGrid(GameGrid):
 
         self.__filled_squares = values
 
+    @property
+    def solution(self) -> dict[tuple[int, int], int]:
+        return super().solution
 
     def set_solution(self, value: GameSolution) -> None:
         if not isinstance(value, SudokuSolution):

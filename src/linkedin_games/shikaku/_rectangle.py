@@ -43,8 +43,7 @@ class Rectangle:
 
     @property
     def area(self) -> int:
-        """
-        The rectangle's area.
+        """The rectangle's area.
         
         Returns:
             Total quantity of squares in the rectangle.
@@ -53,8 +52,7 @@ class Rectangle:
 
     @property
     def dims(self) -> tuple[int, int]:
-        """
-        Dimensions of the rectangle.
+        """Dimensions of the rectangle.
 
         Returns:
             Rectangle dimensions as a `(height, width)` tuple.
@@ -67,8 +65,7 @@ class Rectangle:
 
     @property
     def top_left(self) -> tuple[int, int]:
-        """
-        Grid position of the rectangle's top-left square.
+        """Grid position of the rectangle's top-left square.
 
         Returns:
             Rectangle dimensions as a `(row, column)` tuple.
@@ -81,8 +78,7 @@ class Rectangle:
 
     @property
     def top(self) -> int:
-        """
-        The grid position of the rectangle's top row.
+        """The grid position of the rectangle's top row.
         
         Returns:
             Index position of the rectangle's first row.
@@ -101,8 +97,7 @@ class Rectangle:
 
     @property
     def left(self) -> int:
-        """
-        The grid position of the rectangle's leftmost column.
+        """The grid position of the rectangle's leftmost column.
         
         Returns:
             Index position of the rectangle's first column.
@@ -121,8 +116,7 @@ class Rectangle:
 
     @property
     def width(self) -> int:
-        """
-        The width of the rectangle.
+        """The width of the rectangle.
         
         Returns:
             The rectangle's number of columns.
@@ -144,8 +138,7 @@ class Rectangle:
 
     @property
     def height(self) -> int:
-        """
-        The height of the rectangle.
+        """The height of the rectangle.
 
         Returns:
             The rectangle's number of rows.
@@ -170,8 +163,7 @@ class Rectangle:
 
     @property
     def squares(self) -> tuple[tuple[int, int],...]:
-        """
-        The grid squares occupied by the rectangle.
+        """The grid squares occupied by the rectangle.
         
         Returns:
             All the squares as a tuple of `(row, column)` tuples.

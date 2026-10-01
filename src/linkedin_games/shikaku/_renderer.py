@@ -29,7 +29,10 @@ class ShikakuRenderer(GameRenderer[ShikakuGrid]):
             self._grid,
             pos={(i, j): (j, -i) for (i, j) in self._grid.nodes()},
             with_labels=True,
-            labels=nx.get_node_attributes(self._grid, "seed_area"),
+            labels= {
+                tuple(i-1 for i in seed["square"]): seed["area"] if seed.get("area") else ""
+                for seed in self._game.seeds.values()
+            },
             node_size=1100,
             node_shape="s",
             node_color= list(nx.get_node_attributes(self._grid, "color").values()),

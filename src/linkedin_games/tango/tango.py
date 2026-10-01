@@ -3,8 +3,7 @@ from ._game_grid import TangoGrid
 
 
 class Tango(GameFacade):
-    """
-    The [LinkedIn Tango](https://www.linkedin.com/games/tango/) game.
+    """The [LinkedIn Tango](https://www.linkedin.com/games/tango/) game.
     
     A 6x6 game grid with some squares already filled by moons and suns, and which
     can have some pairs of squares with an equal sign or cross sign in-between.
@@ -18,7 +17,6 @@ class Tango(GameFacade):
         - Squares separated by the `=` sign must contain the same symbol;
         - Squares separated by the `×` sign must contain opposite symbols.
     """
-
     _game: TangoGrid
 
     def __init__(self,
@@ -46,14 +44,25 @@ class Tango(GameFacade):
                 or if the number of walls exceeds the total number of edges on the grid,
                 or if any pair of squares in walls are not adjacent.
         """
-        super().__init__()
+        super().__init__(6, filled_squares, matching_pairs, opposite_pairs)
+
+    def _set_game(self,
+            filled_squares: dict[tuple[int, int], int],
+            matching_pairs:
+                set[tuple[tuple[int, int], tuple[int, int]]]
+                | list[tuple[tuple[int, int], tuple[int, int]]]
+                | None = None,
+            opposite_pairs:
+                set[tuple[tuple[int, int], tuple[int, int]]]
+                | list[tuple[tuple[int, int], tuple[int, int]]]
+                | None = None
+        ) -> None:
         self._game = TangoGrid(
-            dims=(6, 6),
+            dims=self.dims,
             filled_squares=filled_squares,
             matching_pairs=matching_pairs,
             opposite_pairs=opposite_pairs
         )
-
 
     @property
     def filled_squares(self) -> dict[tuple[int, int], int]:
@@ -63,7 +72,6 @@ class Tango(GameFacade):
             Starting filled squares as a dictionary of `(row, column): 0 | 1` items.
         """
         return self._game.filled_squares
-
 
     @property
     def matching_pairs(self) -> list[tuple[tuple[int, int], tuple[int, int]]]:
@@ -76,7 +84,6 @@ class Tango(GameFacade):
         """
         return self._game.matching_pairs
 
-
     @property
     def opposite_pairs(self) -> list[tuple[tuple[int, int], tuple[int, int]]]:
         """Pairs of opposite squares.
@@ -88,7 +95,6 @@ class Tango(GameFacade):
         """
         return self._game.opposite_pairs
 
-
     @property
     def moons(self) -> list[tuple[int, int]]:
         """All the squares filled with moons.
@@ -97,7 +103,6 @@ class Tango(GameFacade):
             A list of all moon squares as `(row, column)`.
         """
         return self._game.moons
-
 
     @property
     def suns(self) -> list[tuple[int, int]]:

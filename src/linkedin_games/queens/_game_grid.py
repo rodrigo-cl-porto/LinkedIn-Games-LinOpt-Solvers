@@ -71,5 +71,9 @@ class QueensGrid(GameGrid):
     @property
     def crowns(self) -> list[tuple[int, int]]:
         if self._solution:
-            return self._solution.crowns
+            return [square for square, value in self.squares.items() if value == 1]
         return []
+
+    @property
+    def solution(self) -> list[tuple[int, int]]:
+        return self.crowns

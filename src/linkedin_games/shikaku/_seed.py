@@ -64,8 +64,7 @@ class RectangleSeed:
 
     @property
     def square(self) -> tuple[int, int]:
-        """
-        Board square where the seed lies.
+        """Board square where the seed lies.
         
         Returns:
             Board square of the rectangle seed as a `(row, column)` tuple.
@@ -90,8 +89,7 @@ class RectangleSeed:
 
     @property
     def area(self) -> int:
-        """
-        The required rectangle's area.
+        """The required rectangle's area.
         
         Returns:
             The rectangle's area required by the seed or `None` if the seed doesn't claim it.
@@ -113,8 +111,7 @@ class RectangleSeed:
 
     @property
     def color(self) -> str:
-        """
-        The name of the seed's color.
+        """The name of the seed's color.
 
         Returns:
             The color's name of the rectangle.
@@ -127,8 +124,7 @@ class RectangleSeed:
 
     @property
     def color_code(self) -> str:
-        """
-        The code of seed's color.
+        """The code of seed's color.
         
         Returns:
             Hex code color as a `"#RRGGBB"` string.

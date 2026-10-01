@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any
 
 from ..optimization.solution._solution import GameSolution
 
@@ -70,6 +71,13 @@ class GameGrid(ABC):
     @property
     def width(self) -> int:
         return self._width
+
+    @property
+    @abstractmethod
+    def solution(self) -> dict[tuple[int, int], Any]:
+        if self.is_solved:
+            return self.squares
+        return {}
 
     @abstractmethod
     def set_solution(self, value: GameSolution) -> None:

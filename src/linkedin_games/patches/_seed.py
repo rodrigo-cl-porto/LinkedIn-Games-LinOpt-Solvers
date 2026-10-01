@@ -71,8 +71,7 @@ class PatchSeed(RectangleSeed):
 
     @property
     def shape(self) -> str:
-        """
-        The patch's required shape.
+        """The patch's required shape.
 
         Returns:
             The patch shape's name required by the seed square.
@@ -98,8 +97,7 @@ class PatchSeed(RectangleSeed):
 
     @property
     def area(self) -> int | None:
-        """
-        The required rectangle's area.
+        """The required rectangle's area.
         
         Returns:
             The patch's area required by the seed or `None` if the seed doesn't claim it.

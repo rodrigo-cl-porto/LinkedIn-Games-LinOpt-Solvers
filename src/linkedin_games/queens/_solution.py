@@ -20,7 +20,3 @@ class QueensSolution(GameSolution):
             (i, j): round(pyo.value(x[i,j]))
             for i, j in squares
         }
-
-    @property
-    def crowns(self) -> list[tuple[int, int]]:
-        return [square for square, value in self._squares.items() if value == 1]

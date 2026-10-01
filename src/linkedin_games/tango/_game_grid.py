@@ -140,6 +140,10 @@ class TangoGrid(GameGrid):
         }
 
     @property
+    def solution(self) -> dict[tuple[int, int], int]:
+        return super().solution
+
+    @property
     def moons(self) -> list[tuple[int, int]]:
         if self._solution:
             return self._solution.moons
