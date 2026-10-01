@@ -15,7 +15,7 @@ class SolveGame(UseCase):
         self._game = game
         self._opt_model = OptModelerFactory.create_modeler(game).build_model(game)
 
-    def execute(self, solver: str="highs", verbose: bool=False) -> GameGrid:
+    def execute(self, solver: str="highs", verbose: bool=False) -> None:
         result = SolverFactory(solver).solve(self._opt_model)
         is_solved: bool = (
             result.Solver.status == SolverStatus.ok # Checks if solver is finished with normal termination and if...
@@ -24,7 +24,6 @@ class SolveGame(UseCase):
                 or result.Solver.termination_condition == TerminationCondition.feasible # or with a feasible one.
             )
         )
-
         if is_solved:
             print("Game solved successfully!")
             solution = GameSolutionFactory.create(self._game).build(self._opt_model)
@@ -32,10 +31,8 @@ class SolveGame(UseCase):
             if verbose:
                 print("SOLUTION:")
                 pprint(self._game.solution)
-            return self._game
-
+            return
         msg = "No feasible solution was found!"
         if verbose:
             msg += f"\n\n{result.Solver}"
-        
         raise RuntimeError(msg)

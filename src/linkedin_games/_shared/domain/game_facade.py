@@ -9,7 +9,7 @@ from .game_grid import GameGrid
 class GameFacade(ABC):
     _game: GameGrid
 
-    def __init__(self, size: int, *args, **kwargs) -> None:
+    def __init__(self, size: int, *args: Any, **kwargs: Any) -> None:
         self._set_size(size)
         self._set_game(*args, **kwargs)
 
@@ -29,7 +29,7 @@ class GameFacade(ABC):
         self._size = value
 
     @abstractmethod
-    def _set_game(self, *args, **kwargs) -> None:
+    def _set_game(self, *args: Any, **kwargs: Any) -> None:
         ...
 
     @property
@@ -63,7 +63,7 @@ class GameFacade(ABC):
         if self._game.is_solved:
             msg = "The game is already solved."
             raise RuntimeError(msg)
-        self._game = SolveGame(self._game).execute(solver=solver, verbose=verbose)
+        SolveGame(self._game).execute(solver=solver, verbose=verbose)
         return self
 
     def display(self) -> None:

@@ -37,7 +37,7 @@ help = "Run all the automatic tests."
 cmd = "pytest --maxfail=1 -vv --durations=0"
 cwd = "tests"
 
-[tasks.test_unit]
+[tasks.test-unit]
 help = "Run all the automatic unit tests."
 cmd = "pytest --maxfail=1 -vv --durations=0"
 cwd = "tests/unit"
