@@ -2,7 +2,6 @@ from typing import Any
 
 from .._shared.domain.game_facade import GameFacade
 from ._game_grid import ShikakuGrid
-from ._seed_type import RectangleSeedType, SeedType
 
 
 class Shikaku(GameFacade):
@@ -23,7 +22,7 @@ class Shikaku(GameFacade):
 
     def __init__(self,
             size: int,
-            seeds: dict[tuple[int, int], RectangleSeedType | int | None]
+            seeds: dict[tuple[int, int], dict[str, Any] | int | None]
         ) -> None:
         """
         Args:
@@ -37,7 +36,7 @@ class Shikaku(GameFacade):
         """
         super().__init__(size, seeds)
 
-    def _set_game(self, seeds: dict[tuple[int, int], SeedType | int | None]) -> None:
+    def _set_game(self, seeds: dict[tuple[int, int], dict[str, Any] | int | None]) -> None:
         self._game = ShikakuGrid(dims=self.dims, seeds=seeds)
 
     @property

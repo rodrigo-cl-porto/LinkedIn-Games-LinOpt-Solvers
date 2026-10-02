@@ -1,6 +1,6 @@
 from ..domain.game_grid import GameGrid
 from ..domain.use_case import UseCase
-from ._factory import GameRendererFactory
+from .renderer.factory import GameRendererFactory
 
 
 class ShowGame(UseCase):

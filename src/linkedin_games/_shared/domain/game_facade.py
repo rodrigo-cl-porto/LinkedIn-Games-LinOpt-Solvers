@@ -60,6 +60,15 @@ class GameFacade(ABC):
         return self._game.solution
 
     def solve(self, solver: str = "highs", verbose: bool = False) -> Self:
+        """Solves the game.
+        
+        Args:
+            solver: The solver to be used. Options are "highs" (default), "glpk", and "cbc".
+            verbose: Whether to print the solver's output. Default is False.
+
+        Returns:
+            The solved game
+        """
         if self._game.is_solved:
             msg = "The game is already solved."
             raise RuntimeError(msg)
@@ -67,4 +76,5 @@ class GameFacade(ABC):
         return self
 
     def display(self) -> None:
+        """Displays the game in a graphical window."""
         ShowGame(self._game).execute()

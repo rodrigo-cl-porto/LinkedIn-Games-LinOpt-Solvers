@@ -1,18 +1,19 @@
-from .._shared.optimization.solution._solution import GameSolution
+from typing import Any
+
+from .._shared.optimization.solution.solution import GameSolution
 from ..shikaku._game_grid import ShikakuGrid
 from ._seed import PatchSeed
-from ._seed_type import SeedType
 from ._shape import PatchShape
 from ._solution import PatchesSolution
 
 
 class PatchesGrid(ShikakuGrid):
     
-    def __init__(self, dims: tuple[int, int], seeds: dict[tuple[int, int], SeedType | int | None]) -> None:
+    def __init__(self, dims: tuple[int, int], seeds: dict[tuple[int, int], dict[str, Any] | int | None]) -> None:
         super().__init__(dims, seeds)
 
     @staticmethod
-    def _build_seeds(seeds: dict[tuple[int, int], SeedType | int | None]) -> list:
+    def _build_seeds(seeds: dict[tuple[int, int], dict[str, Any] | int | None]) -> list:
         return [
             PatchSeed(
                 square=square,
@@ -23,11 +24,9 @@ class PatchesGrid(ShikakuGrid):
         ]
 
     def set_solution(self, value: GameSolution) -> None:
-
         if not isinstance(value, PatchesSolution):
             msg = f"Invalid input. Got a {type(value).__name__} object."
             raise TypeError(msg)
-
         for seed_color, rectangle in value.rectangles.items():
             seed= self._seeds[seed_color].to_dict()
             patch_area =  rectangle.height * rectangle.width

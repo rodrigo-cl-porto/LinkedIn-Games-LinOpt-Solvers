@@ -5,7 +5,7 @@ from ....sudoku._solution import SudokuSolution
 from ....tango._solution import TangoSolution
 from ....zip._solution import ZipSolution
 from ...domain.game_grid import GameGrid
-from ._solution import GameSolution
+from .solution import GameSolution
 
 
 class GameSolutionFactory:

@@ -1,3 +1,1 @@
-::: linkedin_games.base.Sudoku
-    options:
-        show_bases: true
+::: linkedin_games.Sudoku

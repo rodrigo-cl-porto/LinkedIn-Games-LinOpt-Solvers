@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Self, cast
 
 import pyomo.environ as pyo
 
-from .._shared.optimization.solution._solution import GameSolution
+from .._shared.optimization.solution.solution import GameSolution
 from ._rectangle import Rectangle
 
 if TYPE_CHECKING:

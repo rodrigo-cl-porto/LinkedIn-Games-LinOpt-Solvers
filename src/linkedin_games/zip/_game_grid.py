@@ -1,5 +1,5 @@
 from .._shared.domain.game_grid import GameGrid
-from .._shared.optimization.solution._solution import GameSolution
+from .._shared.optimization.solution.solution import GameSolution
 from .._shared.utils.taxicab_distance import TaxicabDistance
 from ._solution import ZipSolution
 

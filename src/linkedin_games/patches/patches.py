@@ -1,7 +1,7 @@
-from ..shikaku._seed_type import SeedType
+from typing import Any
+
 from ..shikaku.shikaku import Shikaku
 from ._game_grid import PatchesGrid
-from ._seed_type import PatchSeedType
 
 
 class Patches(Shikaku):
@@ -20,7 +20,7 @@ class Patches(Shikaku):
         - A rectangle must cover only one seed;
         - The area of all rectangles must be greater than 1 square on the grid.
     """
-    def __init__(self, size: int, seeds: dict[tuple[int, int], PatchSeedType | int | None]) -> None:
+    def __init__(self, size: int, seeds: dict[tuple[int, int], dict[str, Any] | int | None]) -> None:
         """
         Args:
             size: The side length of the game.
@@ -44,5 +44,5 @@ class Patches(Shikaku):
         """
         super().__init__(size, seeds)
 
-    def _set_game(self, seeds: dict[tuple[int, int], SeedType | int | None]) -> None:
+    def _set_game(self, seeds: dict[tuple[int, int], dict[str, Any] | int | None]) -> None:
         self._game = PatchesGrid(dims=self.dims, seeds=seeds)

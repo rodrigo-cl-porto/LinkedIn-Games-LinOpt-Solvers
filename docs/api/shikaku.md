@@ -1,1 +1,1 @@
-::: linkedin_games.base.Shikaku
+::: linkedin_games.Shikaku

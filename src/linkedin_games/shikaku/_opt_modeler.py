@@ -1,6 +1,6 @@
 import pyomo.environ as pyo
 
-from .._shared.optimization.modeler._opt_modeler import OptModeler
+from .._shared.optimization.modeler.opt_modeler import OptModeler
 from ._game_grid import ShikakuGrid
 
 

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from ..optimization.solution._solution import GameSolution
+from ..optimization.solution.solution import GameSolution
 
 
 class GameGrid(ABC):

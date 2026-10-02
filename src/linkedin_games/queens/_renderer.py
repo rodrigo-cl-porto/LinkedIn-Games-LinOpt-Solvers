@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 
-from .._shared.visualization._renderer import GameRenderer
+from .._shared.visualization.renderer.renderer import GameRenderer
 from ._game_grid import QueensGrid
 
 

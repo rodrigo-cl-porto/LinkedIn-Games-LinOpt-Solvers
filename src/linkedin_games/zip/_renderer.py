@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 
 from .._shared.utils.color_generator import ColorGenerator
-from .._shared.visualization._renderer import GameRenderer
+from .._shared.visualization.renderer.renderer import GameRenderer
 from ._game_grid import ZipGrid
 
 

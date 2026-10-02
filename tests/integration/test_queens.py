@@ -18,8 +18,7 @@ def test_queens_307() -> None:
         "#E6F388": {(5,5), (5,6)} # Yellow
     }
     queens = Queens(7, regions)
-    queens.solve()
-    assert queens.solution == [(1,7), (2,5), (3,2), (4,4), (5,6), (6,3), (7,1)]
+    assert queens.solve().solution == [(1,7), (2,5), (3,2), (4,4), (5,6), (6,3), (7,1)]
 
 def test_queens_502() -> None:
     lightsteelblue = {(8,2), (9,2), (10,2), (10,3)}
@@ -53,8 +52,7 @@ def test_queens_502() -> None:
             "#E6F388": yellow
         }
     )
-    queens.solve()
-    assert queens.solution == [(1,4), (2,9), (3,5), (4,10), (5,3), (6,11), (7,7), (8,2), (9,6), (10,8), (11,1)]
+    assert queens.solve().solution == [(1,4), (2,9), (3,5), (4,10), (5,3), (6,11), (7,7), (8,2), (9,6), (10,8), (11,1)]
 
 def test_queens_528() -> None:
     green = {(2,2), (2,3), (3,2), (4,2), (4,3)}
@@ -84,8 +82,7 @@ def test_queens_528() -> None:
             "purple": purple
         }
     )
-    queens.solve()
-    assert queens.solution == [(1,8), (2,5), (3,2), (4,4), (5,1), (6,6), (7,10), (8,3), (9,9), (10,7)]
+    assert queens.solve().solution == [(1,8), (2,5), (3,2), (4,4), (5,1), (6,6), (7,10), (8,3), (9,9), (10,7)]
 
 def test_queens_827() -> None:
     beige = {(2,2), (3,2)}
@@ -109,8 +106,7 @@ def test_queens_827() -> None:
             "beige": beige
         }
     )
-    queens.solve()
-    assert queens.solution == [(1,8), (2,6), (3,2), (4,5), (5,7), (6,4), (7,1), (8,3)]
+    assert queens.solve().solution == [(1,8), (2,6), (3,2), (4,5), (5,7), (6,4), (7,1), (8,3)]
 
 def test_queens_829() -> None:
     red = {(i,j) for i in range(3, 6) for j in range(3, 6)} - {(4,4), (5,4)}
@@ -122,7 +118,6 @@ def test_queens_829() -> None:
     beige = {(i,j) for i in range(6,10) for j in range(1,7)} - green - purple - gray
     blue = {(1,8), (1,9), (2,9), (3,9)}
     yellow = {(i,j) for i in range(4,10) for j in range(7,10)} - gray - green
-
     queens = Queens(
         size=9,
         regions={
@@ -137,5 +132,4 @@ def test_queens_829() -> None:
             "yellow": yellow
         }
     )
-    queens.solve()
-    assert queens.solution == [(1,4), (2,7), (3,9), (4,2), (5,5), (6,3), (7,6), (8,1), (9,8)]
+    assert queens.solve().solution == [(1,4), (2,7), (3,9), (4,2), (5,5), (6,3), (7,6), (8,1), (9,8)]

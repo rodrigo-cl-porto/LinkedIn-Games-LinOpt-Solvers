@@ -10,8 +10,7 @@ def test_shikaku_2026_08_10_easy():
         (5,4): 4, (5,5): 4
     }
     shikaku = Shikaku(5, seeds)
-    shikaku.solve()
-    assert shikaku.solution == [
+    assert shikaku.solve().solution == [
         {'dims': (2, 3), 'top_left': (1, 1)},
         {'dims': (2, 1), 'top_left': (1, 4)},
         {'dims': (1, 1), 'top_left': (1, 5)},
@@ -36,8 +35,7 @@ def test_shikaku_2026_08_11_medium():
         (10,6):  4, (10,8):  2,
     }
     shikaku = Shikaku(10, seeds)
-    shikaku.solve()
-    assert shikaku.solution == [
+    assert shikaku.solve().solution == [
         {'dims': (2, 1), 'top_left': (1, 1)},
         {'dims': (2, 8), 'top_left': (1, 2)},
         {'dims': (3, 1), 'top_left': (1, 10)},
@@ -82,8 +80,7 @@ def test_shikaku_2026_08_12_hard():
         (19, 4):  4, (19,12): 27, (19,19): 18,
     }
     shikaku = Shikaku(20, seeds)
-    shikaku.solve()
-    assert shikaku.solution == [
+    assert shikaku.solve().solution == [
         {'dims': (4, 2), 'top_left': (1, 1)},
         {'dims': (11, 1), 'top_left': (1, 3)},
         {'dims': (8, 1), 'top_left': (1, 4)},
@@ -139,7 +136,7 @@ def test_shikaku_2026_08_12_hard():
         {'dims': (2, 2), 'top_left': (19, 3)}
     ]
 
-@pytest.mark.skip(reason="Because takes too long")
+@pytest.mark.skip(reason="because it takes too long")
 def test_shikaku_2026_08_13_expert():
     seeds = {
         ( 1,29): 14,
@@ -167,8 +164,7 @@ def test_shikaku_2026_08_13_expert():
         (30, 2):  2,
     }
     shikaku = Shikaku(30, seeds)
-    shikaku.solve()
-    assert shikaku.solution == [
+    assert shikaku.solve().solution == [
         {'dims': (4, 13), 'top_left': (1, 1)},
         {'dims': (9, 5), 'top_left': (1, 14)},
         {'dims': (9, 3), 'top_left': (1, 19)},
@@ -237,7 +233,7 @@ def test_shikaku_2026_08_13_expert():
         {'dims': (2, 1), 'top_left': (29, 2)}
     ]
 
-@pytest.mark.skip(reason="Because takes too long")
+@pytest.mark.skip(reason="because it takes too long")
 def test_shikaku_2026_08_14_master():
     seeds = {
         ( 1,13): 80,
@@ -272,8 +268,7 @@ def test_shikaku_2026_08_14_master():
         (38,19): 44,
     }
     shikaku = Shikaku(40, seeds)
-    shikaku.solve()
-    assert shikaku.solution == [
+    assert shikaku.solve().solution == [
         {'dims': (2, 40), 'top_left': (1, 1)},
         {'dims': (2, 36), 'top_left': (3, 1)},
         {'dims': (13, 4), 'top_left': (3, 37)},

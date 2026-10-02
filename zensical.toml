@@ -18,7 +18,7 @@ nav = [
             "api/tango.md",
             "api/zip.md",
         ]},
-        {"Misc" = [
+        {"Others" = [
             "api/shikaku.md",
             "api/sudoku.md"
         ]},
@@ -109,6 +109,7 @@ paths = ["src"]
 docstring_style = "google"
 inherited_members = true
 show_bases = false
+show_labels = true
 show_source = false
 summary = true
 group_by_category = true

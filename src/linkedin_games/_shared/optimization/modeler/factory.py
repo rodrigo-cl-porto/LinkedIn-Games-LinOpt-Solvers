@@ -5,7 +5,7 @@ from ....sudoku._opt_modeler import SudokuOptModeler
 from ....tango._opt_modeler import TangoOptModeler
 from ....zip._opt_modeler import ZipOptModeler
 from ...domain.game_grid import GameGrid
-from ._opt_modeler import OptModeler
+from .opt_modeler import OptModeler
 
 
 class OptModelerFactory:

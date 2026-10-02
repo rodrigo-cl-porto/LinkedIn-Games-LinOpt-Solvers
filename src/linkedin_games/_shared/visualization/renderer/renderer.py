@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import networkx as nx
 
-from ..domain.game_grid import GameGrid
+from ...domain.game_grid import GameGrid
 
 
 class GameRenderer[G: GameGrid](ABC):

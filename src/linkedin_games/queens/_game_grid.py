@@ -1,5 +1,5 @@
 from .._shared.domain.game_grid import GameGrid
-from .._shared.optimization.solution._solution import GameSolution
+from .._shared.optimization.solution.solution import GameSolution
 from .._shared.utils.color_generator import ColorGenerator
 from ._region import Region
 from ._solution import QueensSolution

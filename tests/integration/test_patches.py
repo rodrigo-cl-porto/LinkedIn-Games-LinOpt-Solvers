@@ -16,8 +16,7 @@ def test_patches_16():
             (6,5): {"color": "#503B36", "area": 4},
         }
     )
-    patches.solve()
-    assert patches.solution == [
+    assert patches.solve().solution == [
         {'dims': (1,2), 'top_left': (1,1)},
         {'dims': (2,3), 'top_left': (1,3)},
         {'dims': (2,1), 'top_left': (1,6)},
@@ -42,8 +41,7 @@ def test_patches_46():
         (7,3): {"shape": "square"},
     }
     patches = Patches(8, seeds)
-    patches.solve()
-    assert patches.solution == [
+    assert patches.solve().solution == [
         {'dims': (8,1), 'top_left': (1,1)},
         {'dims': (1,7), 'top_left': (1,2)},
         {'dims': (1,5), 'top_left': (2,2)},
@@ -76,8 +74,7 @@ def test_patches_94():
             (8,8): {"area": 2},
         }
     )
-    patches.solve()
-    assert patches.solution == [
+    assert patches.solve().solution == [
         {'dims': (1,5), 'top_left': (1,1)},
         {'dims': (1,3), 'top_left': (1,6)},
         {'dims': (1,3), 'top_left': (2,1)},
@@ -108,8 +105,7 @@ def test_patches_121():
             (6,6): {"color": "#E30102", "area": 6, "shape": "vertical"},
         }
     )
-    patches.solve()
-    assert patches.solution == [
+    assert patches.solve().solution == [
         {'dims': (4,2), 'top_left': (1,1)},
         {'dims': (2,4), 'top_left': (1,3)},
         {'dims': (1,4), 'top_left': (3,3)},
@@ -126,8 +122,7 @@ def test_patches_141():
         (8,2): {"shape": "vertical"},
     }
     patches = Patches(8, seeds)
-    patches.solve()
-    assert patches.solution == [
+    assert patches.solve().solution == [
         {'dims': (3,5), 'top_left': (1,1)},
         {'dims': (3,3), 'top_left': (1,6)},
         {'dims': (5,3), 'top_left': (4,1)},

@@ -1,14 +1,15 @@
+from typing import Any
+
 from .._shared.domain.game_grid import GameGrid
-from .._shared.optimization.solution._solution import GameSolution
+from .._shared.optimization.solution.solution import GameSolution
 from .._shared.utils.color_generator import ColorGenerator
 from ._seed import RectangleSeed
-from ._seed_type import SeedType
 from ._solution import ShikakuSolution
 
 
 class ShikakuGrid(GameGrid):
 
-    def __init__(self, dims: tuple[int, int], seeds: dict[tuple[int, int], SeedType | int | None]) -> None:
+    def __init__(self, dims: tuple[int, int], seeds: dict[tuple[int, int], dict[str, Any] | int | None]) -> None:
         super().__init__(dims)
         self._set_seeds(seeds)
         self._solution: ShikakuSolution
@@ -17,10 +18,10 @@ class ShikakuGrid(GameGrid):
         return hash((self._dims, self._seeds))
 
     @property
-    def seeds(self) -> dict[str, dict[str, SeedType]]:
+    def seeds(self) -> dict[str, dict[str, dict[str, Any]]]:
         return {color: seed.to_dict() for color, seed in self._seeds.items()}
 
-    def _set_seeds(self, seeds: dict[tuple[int, int], SeedType | int | None]) -> None:
+    def _set_seeds(self, seeds: dict[tuple[int, int], dict[str, Any] | int | None]) -> None:
         if not isinstance(seeds, dict):
             msg = f"Seeds must be a dictionary. Got {type(seeds).__name__} instead."
             raise TypeError(msg)
@@ -32,7 +33,7 @@ class ShikakuGrid(GameGrid):
         self._seeds = {seed.color_code: seed for seed in rectangle_seeds}
 
     @staticmethod
-    def _build_seeds(seeds: dict[tuple[int, int], SeedType | int | None]) -> list[RectangleSeed]:
+    def _build_seeds(seeds: dict[tuple[int, int], dict[str, Any] | int | None]) -> list[RectangleSeed]:
         return [
             RectangleSeed(
                 square=square,

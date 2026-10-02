@@ -6,7 +6,7 @@ from pyomo.opt import SolverStatus, TerminationCondition
 from ..domain.game_grid import GameGrid
 from ..domain.use_case import UseCase
 from .modeler.factory import OptModelerFactory
-from .solution._factory import GameSolutionFactory
+from .solution.factory import GameSolutionFactory
 
 
 class SolveGame(UseCase):

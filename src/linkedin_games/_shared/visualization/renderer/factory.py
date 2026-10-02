@@ -1,11 +1,11 @@
-from ...patches._renderer import PatchesRenderer
-from ...queens._renderer import QueensRenderer
-from ...shikaku._renderer import ShikakuRenderer
-from ...sudoku._renderer import SudokuRenderer
-from ...tango._renderer import TangoRenderer
-from ...zip._renderer import ZipRenderer
-from ..domain.game_grid import GameGrid
-from ._renderer import GameRenderer
+from ....patches._renderer import PatchesRenderer
+from ....queens._renderer import QueensRenderer
+from ....shikaku._renderer import ShikakuRenderer
+from ....sudoku._renderer import SudokuRenderer
+from ....tango._renderer import TangoRenderer
+from ....zip._renderer import ZipRenderer
+from ...domain.game_grid import GameGrid
+from .renderer import GameRenderer
 
 
 class GameRendererFactory:
