@@ -1,13 +1,13 @@
 [project]
 name = "linkedin-games-jupyter-playground"
-version = "0.1.0"
+version = "1.0.0"
 description = "This branch is reserved to be hosted on Binder to serve as a Jupyter Lab playground."
 authors = [{ name = "Rodrigo C. L. Porto", email = "rodrigo.cl.porto@gmail.com" }]
 readme = "README.md"
 license = { file = "LICENSE.md" }
 requires-python = ">=3.13"
 dependencies = [
-    "linkedin-games>=0.1.1",
+    "linkedin-games>=1.0.0",
 ]
 
 [tool.hatch.build.targets.wheel]
