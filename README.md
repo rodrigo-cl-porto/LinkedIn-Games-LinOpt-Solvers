@@ -1,0 +1,22 @@
+<div id="logo" align="center">
+    <img src="https://cdn.jsdelivr.net/gh/rodrigo-cl-porto/LinkedIn-Games-LinOpt-Solvers/docs/assets/logo.svg" alt="logo" width="30%" loading="lazy" />
+</div>
+
+<div id="project-metadata" align="center">
+    <a href="https://pypi.org/project/linkedin-games/">
+        <img src="https://img.shields.io/pypi/v/linkedin-games?logo=pypi&style=flat&color=blue&logoColor=gold" alt="PyPI - Package Version" loading="lazy" />
+    </a>
+    <a href="https://pypi.org/project/linkedin-games/">
+        <img src="https://img.shields.io/pypi/pyversions/linkedin-games?logo=pypi&style=flat&color=blue&logoColor=gold" alt="PyPI - Python Version" loading="lazy" />
+    </a>
+    <a href="https://linkedin-games-linopt-solvers.readthedocs.io/">
+        <img src="https://readthedocs.org/projects/linkedin-games-linopt-solvers/badge/?version=latest&style=flat" alt="Docs Status" loading="lazy" />
+    </a>
+    <a href="https://spdx.org/licenses/">
+        <img src="https://img.shields.io/badge/license-MIT-9400d3.svg?style=flat&color=orange" alt="License - MIT" loading="lazy" />
+    </a>
+</div>
+
+# LinkedIn Games Playground
+
+This branch is reserved to be hosted on Binder to serve as a JupyterLab playground of LinkedIn Games Python package.

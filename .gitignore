@@ -1,0 +1,27 @@
+# Environment variables
+*.env
+
+# Folders from main branch
+book/
+docs/
+src/
+tests/
+binder/
+
+# VS Code settings
+.vscode
+
+# Virtual environment
+.venv
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[codz]
+*$py.class
+*cache/
+
+# Jupyter Lab checkpoints
+.ipynb_checkpoints/
+
+# Package distributions
+dist/
