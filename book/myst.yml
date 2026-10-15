@@ -1,0 +1,99 @@
+version: 1
+project:
+  id: 8d6282a6-4c6d-4f83-b6c6-ee5a591f8a02
+  title: Solving LinkedIn Games by Linear Optimization
+  subtitle: Solving LinkedIn Games by Linear Optimization with Pyomo and NetworkX libraries
+  description: This Jupyter Book presents how `linkedin-games` library implements Linear Optimization models to solve LinkedIn board games.
+  keywords:
+    - LinkedIn
+    - Games
+    - Queens
+    - Tango
+    - Zip
+    - Mini Sudoku
+    - Patches
+    - Linear Optimization
+    - Python
+    - Pyomo
+    - NetworkX
+    - Gurobipy
+    - Highspy
+  authors:
+    - name: Rodrigo Celso de Lima Porto
+      email: rodrigo.cl.porto@gmail.com
+      corresponding: true
+      github: rodrigo-cl-porto
+      linkedin: https://www.linkedin.com/in/rodrigo-cl-porto
+  github: https://github.com/rodrigo-cl-porto/LinkedIn-Games-Linear-Optimization-Solvers
+  social:
+    linkedin: https://www.linkedin.com/in/rodrigo-cl-porto
+    github: rodrigo-cl-porto
+  license: MIT
+  open_access: true
+  toc:
+    - title: Introduction
+      file: ./home.md
+    - title: 🚀 Getting Started
+      children:
+      - title: 𝑓(𝑥) What is Optimization?
+        file: ./getting-started/what-is-optimization.md
+      - title: 📦 LinkedIn Games Python Package
+        file: ./getting-started/linkedin-games-python-package.md
+    - title: 🧩 How to Solve
+      children:
+      - title: 🟩 Mini Sudoku
+        file: ./how-to-solve/mini-sudoku.ipynb
+      - title: 🟥 Patches
+        file: ./how-to-solve/patches.ipynb
+      - title: 🟪 Queens
+        file: ./how-to-solve/queens.ipynb
+      - title: 🟦 Tango
+        file: ./how-to-solve/tango.ipynb
+      - title: 🟧 Zip
+        file: ./how-to-solve/zip.ipynb
+  abbreviations:
+    BLO: Binary Linear Optimization
+    BLOP: Binary Linear Optimization Problem
+    i.e.: that is
+    KKT: Karush-Kuhn-Tucker
+    LO: Linear Optimization
+    LOP: Linear Optimization Problem
+    MTZ: Miller-Tucker-Zemlin
+    NLO: Non-Linear Optimization
+    NLOP: Non-Linear Optimization Problem
+    No.: Number
+    S.t.: Subject to
+  math:
+    \N: '\mathbb{N}'
+    \R: '\mathbb{R}'
+    \B: '\{0,1\}'
+site:
+  template: book-theme
+  options:
+    folders: true
+    favicon: ./assets/site/logo.svg
+    logo: ./assets/site/logo.svg
+    logo_dark: ./assets/site/logo_dark.svg
+  nav:
+    - title: 🐍 Useful Pythonic Features
+      children:
+      - title: Chained and Multiple Assigments
+        url: https://www.w3schools.com/python/python_variables_multiple.asp
+      - title: Classes and Objects
+        url: https://www.geeksforgeeks.org/python/python-classes-and-objects/
+      - title: Data Comprehensions
+        url: https://www.geeksforgeeks.org/python/comprehensions-in-python/
+      - title: Lambda Functions
+        url: https://www.geeksforgeeks.org/python/python-lambda-anonymous-functions-filter-map-reduce/
+    - title: 📚 Python Libraries
+      children:
+      - title: LinkedIn Games
+        url: https://linkedin-games-linear-optimization-solvers.readthedocs.io/
+      - title: Highspy
+        url: https://anaconda.org/channels/conda-forge/packages/highspy/overview
+      - title: Matplotlib
+        url: https://matplotlib.org/
+      - title: NetworkX
+        url: https://networkx.org/
+      - title: Pyomo
+        url: https://www.pyomo.org/

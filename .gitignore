@@ -1,0 +1,28 @@
+# Binder branch
+assets/
+notebooks/
+
+# Environment variables
+*.env
+
+# Jupyter Book and Zensical builds
+_build/
+
+# VS Code settings
+.vscode/*
+!.vscode/extensions.json
+
+# Virtual environment
+.venv
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[codz]
+*$py.class
+*cache/
+
+# Jupyter Lab checkpoints
+.ipynb_checkpoints/
+
+# Distribution / packaging
+dist/

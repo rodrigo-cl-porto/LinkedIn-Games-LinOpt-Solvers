@@ -1,0 +1,71 @@
+[project]
+name = "linkedin-games"
+version = "1.0.5"
+description = "A Python package for solving LinkedIn board games like Mini Sudoku, Patches, Queens, Tango and Zip using Linear Optimization models."
+keywords = [
+    "Games",
+    "Linear Optimization",
+    "LinkedIn",
+    "LinkedIn Games",
+    "Mini Sudoku",
+    "Optimization",
+    "Patches",
+    "Queens",
+    "Tango",
+    "Zip",
+]
+authors = [{ name = "Rodrigo C. L. Porto", email = "rodrigo.cl.porto@gmail.com" }]
+readme = "README.md"
+license = { file = "LICENSE.md" }
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Education",
+    "Natural Language :: English",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3 :: Only",
+    "Framework :: Pytest",
+    "Topic :: Games/Entertainment :: Puzzle Games",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Typing :: Typed"
+]
+requires-python = ">=3.13"
+dependencies = [
+    "highspy>=1.14.0",
+    "matplotlib>=3.10.8",
+    "networkx>=3.6.1",
+    "pyomo>=6.10.0",
+]
+
+[project.markdown_extensions]
+mkdocstrings = { handler = "python" }
+
+[project.urls]
+"Code Examples" = "https://mybinder.org/v2/gh/rodrigo-cl-porto/LinkedIn-Games-Linear-Optimization-Solvers/binder?urlpath=lab/tree/notebooks/"
+"Source Code" = "https://github.com/rodrigo-cl-porto/LinkedIn-Games-Linear-Optimization-Solvers"
+"Textbook" = "https://rodrigo-cl-porto.github.io/LinkedIn-Games-Linear-Optimization-Solvers/"
+"Documentation" = "https://linkedin-games-linear-optimization-solvers.readthedocs.io/"
+"LinkedIn Profile" = "https://www.linkedin.com/in/rodrigo-cl-porto/"
+"GitHub Profile" = "https://github.com/rodrigo-cl-porto"
+
+[dependency-groups]
+book = [
+    "ipywidgets>=8.1.8",
+    "jupyter-book>=2.1.7",
+    "jupyterlab>=4.6.2",
+    "jupyterlab-myst>=2.7.0",
+]
+dev = [
+    "poethepoet>=0.48.0", # Task runner
+    "pytest>=9.1.1",      # Automatic tests
+    "ruff>=0.15.22",      # Linting/Formatter
+    "ty>=0.0.69",         # Type Checker
+]
+docs = [
+    "mkdocstrings-python>=2.0.9",
+    "zensical>=0.0.67",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.1,<0.13.0"]
+build-backend = "uv_build"
